@@ -22,11 +22,11 @@ Copy files locally for further processing
 - rsync -rutP Hefaistos:/media/storage/dijet/rootfiles/*v[X].root rootfiles/
 
 Hadd files together as needed (either JetMET+ZB, or parts of IOV)
-- python addAllIOVs.py
+- python3 addAllIOVs.py
 
 After producing the jmenano_[data,mc]_out_v[X].root root files and hadding: 
-- root -l -b -q DijetHistosCombine.C+g   [merge triggers]
-- root -l -b -q DijetHistosJER.C+g       [JER SF]
+- root -l -b -q histogram_scripts/DijetHistosCombine.C+g   [merge triggers]
+- root -l -b -q histogram_scriptsDijetHistosJER.C+g       [JER SF]
 - root -l -b -q DijetHistosL2Res.C+g     [dijet L2Res]
 - root -l -b -q DijetHistosOverlay.C+g   [draw dijet L2Res]
 

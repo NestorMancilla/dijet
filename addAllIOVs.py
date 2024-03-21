@@ -4,7 +4,7 @@ import os
 # Purpose: hadd files together automatically, either JetMET+ZB and/or
 #           IOVs-in-parts. Update the list_of_lists below and set version.
 
-version = 'v36_Summer23MG_L2L3Res_v1'
+version = 'v39_L2Rel_L2L3Res_v2_SF_noJetveto'
 includeZB = True
 doMC = False
 
