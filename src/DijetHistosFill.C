@@ -76,7 +76,7 @@ std::set<std::string> mcIOV = {"Summer22",
                                "Summer22MG", "Summer22EEMG", "Summer22MG1", "Summer22MG2",
                                "Summer22EEMG1", "Summer22EEMG2", "Summer22EEMG3", "Summer22EEMG4",
                                "TestSummer23MGBPix",
-                               "Winter24Flat"};
+                               "Winter24MGFlat"};
 
 // UTILITIES
 double DELTAPHI(double phi1, double phi2)
@@ -906,6 +906,19 @@ void DijetHistosFill::Loop()
   
       }
     }
+  }
+  if (dataset == "Winter24MGFlat" )
+  {
+    jec = getFJC("",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
+		 "Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
+                 "");  
+    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
+    jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi"; // To compare with Summer23MG
+    jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
+    //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
+    //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+    useJERSFvsPt = true;
   }
 
   // 2023
@@ -2037,6 +2050,9 @@ void DijetHistosFill::Loop()
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
+  if (dataset == "Winter24MGFlat")
+    fjv = new TFile("rootfiles/jetveto2023BC.root", "READ"); // To compare with Summer23
+    //fjv = new TFile("rootfiles/jetveto2023D.root", "READ"); // To compare with Summer23Bix
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -2076,6 +2092,8 @@ void DijetHistosFill::Loop()
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix"))
+    h2jv = (TH2D *)fjv->Get("jetvetomap");
+  if (dataset == "Winter24MGFlat")
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   assert(h2jv);
 
@@ -2561,9 +2579,9 @@ void DijetHistosFill::Loop()
           h->p2jsf->Fill(fabs(p4.Eta()), p4g.Pt(),
                          smearJets ? Jet_CF[i] : 1, w);
           h->h3res_Match->Fill(p4g.Eta(), p4g.Pt(), p4.Pt()/p4g.Pt(), w);
-	  h->h3res_raw->Fill(p4g.Eta(), p4g.Pt(), rawJetPt / p4g.Pt(), w);
+	  h->h3res_raw->Fill(p4g.Eta(), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
 	  h->p2r->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
-          h->p2r_raw->Fill(fabs(p4.Eta()), p4g.Pt(), rawJetPt / p4g.Pt(), w);
+          h->p2r_raw->Fill(fabs(p4.Eta()), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
         }
         h->p2effz->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
         if (hasMatchVtx)
