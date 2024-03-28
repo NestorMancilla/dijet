@@ -296,8 +296,8 @@ public :
    Int_t           Jet_electronIdx2[nJetMax];   //[nJet]
    Int_t           Jet_hfadjacentEtaStripsSize[nJetMax];   //[nJet]
    Int_t           Jet_hfcentralEtaStripSize[nJetMax];   //[nJet]
-  // Int_t           Jet_jetId[nJetMax];   //[nJet] // NanoV10,11
-   UChar_t         Jet_jetId[nJetMax];   //[nJet] // NanoV12
+   Int_t           Jet_jetId[nJetMax];   //[nJet] // NanoV10,11
+   //UChar_t         Jet_jetId[nJetMax];   //[nJet] // NanoV12
    Int_t           Jet_muonIdx1[nJetMax];   //[nJet]
    Int_t           Jet_muonIdx2[nJetMax];   //[nJet]
    Int_t           Jet_nConstChHads[nJetMax];   //[nJet]
@@ -536,7 +536,7 @@ public :
    Float_t         Pileup_nTrueInt;
    Float_t         Pileup_pudensity;
    Float_t         Pileup_gpudensity;
-   Float_t         Pileup_pthatmax;
+   Float_t         Pileup_pthatmax; // Not used for Nano V9
    Int_t           Pileup_nPU;
    Int_t           Pileup_sumEOOT;
    Int_t           Pileup_sumLOOT;
@@ -701,8 +701,8 @@ public :
   //Int_t           GenJetAK8ForJEC_partonFlavour[45];   //[nGenJetAK8ForJEC]
   //UChar_t         GenJetAK8ForJEC_hadronFlavour[45];   //[nGenJetAK8ForJEC]
   //Int_t           GenJet_partonFlavour[nGenJetMax];   //[nGenJet]
-  //Int_t           GenJet_partonFlavour[nGenJetMax]; //[nGenJet] // NanoV10,11
-   Short_t         GenJet_partonFlavour[nGenJetMax]; //[nGenJet] // NanoV12
+   Int_t           GenJet_partonFlavour[nGenJetMax]; //[nGenJet] // NanoV10,11
+   //Short_t         GenJet_partonFlavour[nGenJetMax]; //[nGenJet] // NanoV12
    UChar_t         GenJet_hadronFlavour[nGenJetMax];   //[nGenJet]
    Float_t         GenVtx_t0;
 
@@ -711,10 +711,10 @@ public :
    Int_t           JetCHS_partonFlavour[88];   //[nJetCHS]
 
    Short_t           Jet_genJetIdx[nJetMax];   //[nJet]
-  //Int_t           Jet_hadronFlavour[nJetMax];   //[nJet] // NanoV10,11
-   UChar_t           Jet_hadronFlavour[nJetMax];   //[nJet] // NanoV12
-  //Int_t           Jet_partonFlavour[nJetMax];   //[nJet] // NanoV10,11
-   Short_t         Jet_partonFlavour[nJetMax]; //[nJet] // NanoV12
+   Int_t           Jet_hadronFlavour[nJetMax];   //[nJet] // NanoV10,11
+   //UChar_t           Jet_hadronFlavour[nJetMax];   //[nJet] // NanoV12
+   Int_t           Jet_partonFlavour[nJetMax];   //[nJet] // NanoV10,11
+   //Short_t         Jet_partonFlavour[nJetMax]; //[nJet] // NanoV12
    Int_t           LowPtElectron_genPartIdx[11];   //[nLowPtElectron]
    UChar_t         LowPtElectron_genPartFlav[11];   //[nLowPtElectron]
    Int_t           Muon_genPartIdx[58];   //[nMuon]
@@ -2280,7 +2280,7 @@ public :
    TBranch        *b_Pileup_nTrueInt;   //!
    TBranch        *b_Pileup_pudensity;   //!
    TBranch        *b_Pileup_gpudensity;   //!
-   TBranch        *b_Pileup_pthatmax;   //!
+   TBranch        *b_Pileup_pthatmax;   //! //Not used for Nano V9
    TBranch        *b_Pileup_nPU;   //!
    TBranch        *b_Pileup_sumEOOT;   //!
    TBranch        *b_Pileup_sumLOOT;   //!

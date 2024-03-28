@@ -8,7 +8,7 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
    'UL2017B','UL2017C','UL2017D','UL2017E','UL2017F',
     'UL2018A','UL2018B','UL2018C', 'UL2018D',
     'UL2018D1','UL2018D2',
-    'UL2016APVMG','UL2016MG','UL2017MG', 'UL2018MG',
+    'UL2016APVMG','UL2016MG','UL2017MG', 'UL2018MC',
     'UL2016BCD_ZB','UL2016EF_ZB','UL2016GH_ZB',
     'UL2017B_ZB','UL2017C_ZB','UL2017D_ZB','UL2017E_ZB','UL2017F_ZB',
     'UL2018A_ZB','UL2018B_ZB','UL2018C_ZB', 'UL2018D_ZB',
@@ -16,6 +16,7 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2022C_ZB','2022D_ZB','2022E_ZB','2022F_ZB','2022G_ZB',
     '2023Cv4', '2023D', '2023BCv123', '2023Cv123', '2023Cv123_ZB',
     '2023BCv123_ZB','2023Cv4_ZB','2023D_ZB',
+    'UL2018MC_1', 'UL2018MC_2', 'UL2018MC_3', 'UL2018MC_4', 'UL2018MC_5',
     'Summer22MG1','Summer22MG2',
     'Summer22EEMG1','Summer22EEMG2','Summer22EEMG3','Summer22EEMG4',
     'Summer22EEMG_full', 'Summer22MG_full',
@@ -23,8 +24,8 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     'Summer23MGBPix_1', 'Summer23MGBPix_2', 'Summer23MGBPix_3', 'Summer23MGBPix_4', 'Summer23MGBPix',
     'Summer23MG_test', 'Summer23MGBPix_test',
     'Summer23MG_new_1', 'Summer23MG_new_2', 'Summer23MG_new_3', 'Summer23MG_new_4',
-    'TestSummer23MGBPix',
-    'Winter24Flat'
+    'TestSummer23MGBPix', 'Summer23MCFlat', 'Summer23MCBPixFlat',
+    'Winter24MCFlat'
 ]
 
 # Run 3 is all samples with year 2023 and 2022 from the full IOV_list
@@ -33,7 +34,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v39_Winter24_noJetveto_SmearJets'
+version = 'v39_2018_JV_noSJets_noRwPU'
 
 IOV_input = []
 

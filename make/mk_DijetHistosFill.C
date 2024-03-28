@@ -72,7 +72,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   // Datasets, these can be taken out of the code and put in a file etc.
   std::unordered_set<std::string> MC_datasets = {"UL2016APVMG",
      "UL2016MG", "UL2016Flat",
-     "UL2017MG", "UL2018MG",
+     "UL2017MG", "UL2018MC",
+     "UL2018MC_1", "UL2018MC_2", "UL2018MC_3", "UL2018MC_4", "UL2018MC_5",
      "Summer22Flat", "Summer22MG",
      "Summer22MG1", "Summer22MG2",
      "Summer22EEFlat", "Summer22EEMG",
@@ -83,13 +84,13 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer23MGBPix_1", "Summer23MGBPix_2", "Summer23MGBPix_3", "Summer23MGBPix_4", "Summer23MGBPix",
      "Summer23MG_test", "Summer23MGBPix_test",
      "Summer23MG_new_1", "Summer23MG_new_2", "Summer23MG_new_3", "Summer23MG_new_4",
-     "TestSummer23MGBPix",
-     "Winter24Flat"
+     "TestSummer23MGBPix", "Summer23MCFlat", "Summer23MCBPixFlat",
+     "Winter24MCFlat"
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 
   "UL2016EF", "UL2016GH", "UL2017B", "UL2017C", "UL2017D", 
-  "UL2017E", "UL2017F", "UL2018A", "UL2018B", "UL2018C", 
+  "UL2017E", "UL2017F", "UL2018A", "UL2018B", "UL2018C", "UL2018D", 
   "UL2018D1", "UL2018D2", "UL2016BCD_ZB", "UL2016EF_ZB", 
   "UL2016GH_ZB", "UL2017B_ZB", "UL2017C_ZB", "UL2017D_ZB", 
   "UL2017E_ZB", "UL2017F_ZB", "UL2018A_ZB", "UL2018B_ZB", 
