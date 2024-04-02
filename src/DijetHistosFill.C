@@ -564,7 +564,7 @@ void DijetHistosFill::Loop()
   }
 
   fChain->SetBranchStatus("Flag_METFilters", 1);
-  if (isRun3)
+  if (isRun2 || isRun3) //April 2, 2024: Same recommendation filters for Run2 and Run3
   {
     // https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Run_3_recommendations
     fChain->SetBranchStatus("Flag_goodVertices", 1);
@@ -749,7 +749,7 @@ void DijetHistosFill::Loop()
     jecl1rc = getFJC("Summer19UL17_RunF_V6_DATA_L1RC_AK4PFchs", "", "");
   }
   // 2018
-  if (dataset == "UL2018MG" || dataset == "UL2018MC" || TString(dataset.c_str()).Contains("UL2018MC"))
+  if (dataset == "UL2018MG" || TString(dataset.c_str()).Contains("UL2018MG") || TString(dataset.c_str()).Contains("UL2018MC"))
   {
     jec = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
                  "Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
@@ -2303,7 +2303,7 @@ void DijetHistosFill::Loop()
     }
     double rho = Rho_fixedGridRhoFastjetAll;
 
-    bool doPtHatFilter = true; // Set to false for Nano V09, March 26, 2024
+    bool doPtHatFilter = true; // Set to false for MC Nano V09, isMG works fine 
     if (doPtHatFilter && isMC )
     {
       if (isMG && !isRun3 && 2. * Pileup_pthatmax > LHE_HT)
@@ -2327,13 +2327,13 @@ void DijetHistosFill::Loop()
     // mrunls[run][luminosityBlock] = 1;
 
     // Check that MET filters are all true
-    bool pass_METfilter = (isRun3 &&
+    bool pass_METfilter = ((isRun3 || isRun2) &&
                            Flag_goodVertices &&
                            Flag_globalSuperTightHalo2016Filter &&
-                           Flag_EcalDeadCellTriggerPrimitiveFilter &&
-                           Flag_BadPFMuonFilter &&
-                           Flag_BadPFMuonDzFilter &&
-                           Flag_hfNoisyHitsFilter &&
+                           Flag_EcalDeadCellTriggerPrimitiveFilter && // Issues using Run2
+                           Flag_BadPFMuonFilter && // Issues using Run2
+                           Flag_BadPFMuonDzFilter && // Issues using Run2
+                           Flag_hfNoisyHitsFilter && // Issues using Run2
                            Flag_eeBadScFilter &&
                            Flag_ecalBadCalibFilter);
 
