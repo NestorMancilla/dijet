@@ -6,8 +6,8 @@
 //#else
 //     #include "../interface/DijetHistosFill.h" // Specific for NanoV12 (assumed default)
 //#endif
-#include "../interface/DijetHistosFillNanoV9.h"
-//#include "../interface/DijetHistosFill.h"
+//#include "../interface/DijetHistosFillNanoV9.h"
+#include "../interface/DijetHistosFill.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -38,7 +38,7 @@ bool redoJEC = true;
 bool doMCtrigOnly = false;
 
 // JER smearing (JER SF)
-bool smearJets = false;
+bool smearJets = true;
 bool useJERSFvsPt = true; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
@@ -564,7 +564,7 @@ void DijetHistosFill::Loop()
   }
 
   fChain->SetBranchStatus("Flag_METFilters", 1);
-  if (isRun2 || isRun3) //April 2, 2024: Same recommendation filters for Run2 and Run3
+  if (isRun2 || isRun3) //April 2, 2024: Same filters for UL Run2 and Run3
   {
     // https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Run_3_recommendations
     fChain->SetBranchStatus("Flag_goodVertices", 1);
@@ -884,21 +884,27 @@ void DijetHistosFill::Loop()
       jec = getFJC("",
                   "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
                   "");
-      //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";      
+      jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
+      //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+      jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
     } else {
       jec = getFJC("", 
                   "Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
                   "");
-      //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi.txt"; 
+      jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
+      //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
+      //
+      // Resolution SF version 2: https://indico.cern.ch/event/1399194/
+      // April 3, 2024
+      //
+      //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV2_MC_SF_AK4PFPuppi", "");
+      jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
     }
     //jec = getFJC("", // Winter23Prompt23_V2_MC_L1FastJet_AK4PFPuppi",
     //             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
     //             "");                                                                                   // Winter23Prompt23_V2_MC_L2L3Residual_AK4PFPuppi");
     jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
-    //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi"; // For Summer23
-    //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
-    jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // For Sumer23BPix
-    jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
     useJERSFvsPt = true;
 
     if (reweightPU)
@@ -1167,7 +1173,16 @@ void DijetHistosFill::Loop()
       //{0, 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.489, 3.839, 5.191};
       // Newer L2Res |eta| binning from Mikel
       // https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
-      {0., 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.839, 4.013, 4.583, 5.191};
+      //{0., 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.839, 4.013, 4.583, 5.191};
+      //
+      // Nestor April 3, 2024: |eta| binning to compare with DESY results
+      //
+      {0, 0.087, 0.174, 0.261, 0.348, 0.435,
+       0.522, 0.609, 0.696, 0.783, 0.879, 0.957, 1.044, 1.131, 1.218, 1.305,
+       1.392, 1.479, 1.566, 1.653, 1.74, 1.83, 1.93, 2.043, 2.172, 2.322, 2.5,
+       2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
+       4.363, 4.538, 4.716, 4.889, 5.191};
+
   const int nxd = sizeof(vxd) / sizeof(vxd[0]) - 1;
 
   // p_reco/p_gen binning
@@ -2407,7 +2422,7 @@ void DijetHistosFill::Loop()
         Jet_l1rcFactor[i] = Jet_rawFactor[i];
       }
       
-      if (true)//changed March 27,2024
+      if (true)//Nestor: changed March 27,2024
       { // check jet veto
         int i1 = h2jv->GetXaxis()->FindBin(Jet_eta[i]);
         int j1 = h2jv->GetYaxis()->FindBin(Jet_phi[i]);
