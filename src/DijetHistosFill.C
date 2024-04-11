@@ -84,6 +84,7 @@ std::set<std::string> mcIOV = {"Summer22",
                                "Summer22MG", "Summer22EEMG", "Summer22MG1", "Summer22MG2",
                                "Summer22EEMG1", "Summer22EEMG2", "Summer22EEMG3", "Summer22EEMG4",
                                "TestSummer23MGBPix",
+			       "Summer23MC_Cas"
                                "Winter24MCFlat"};
 
 // UTILITIES
@@ -850,16 +851,17 @@ void DijetHistosFill::Loop()
   // 22/23 MC
   if (dataset == "Summer22" ||
       dataset == "Summer22Flat" ||
+      TString(dataset.c_str()).Contains("Summer22MC") ||
       TString(dataset.c_str()).Contains("Summer22MG"))
   {
     jec = getFJC("",                                       // Winter22Run3_V2_MC_L1FastJet_AK4PFPuppi",
                                                            //"Winter22Run3_V2_MC_L2Relative_AK4PFPuppi",
                  "Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
                  "");                                      // Winter22Run3_V2_MC_L2L3Residual_AK4PFPuppi");
-    //jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
-    //jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
-    jerpath = "";
-    jerpathsf = "";
+    jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
+    jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
+    //jerpath = "";
+    //jerpathsf = "";
     useJERSFvsPt = false;
   }
   if (dataset == "Summer22EE" ||
@@ -870,36 +872,36 @@ void DijetHistosFill::Loop()
                                                                  //"Summer22EEPrompt22_V1_MC_L2Relative_AK4PFPuppi",
                  "Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
                  "");                                            // Summer22EEPrompt22_V1_MC_L2L3Residual_AK4PFPuppi");
-    //jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt";
-    //jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt";
-    jerpath = "";
-    jerpathsf = "";
+    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt";
+    jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt";
+    //jerpath = "";
+    //jerpathsf = "";
     useJERSFvsPt = false;
   }
   if (dataset == "Summer23" ||
-      dataset == "Summer23MCFlat" || dataset == "Summer23MG" ||
+      dataset == "Summer23MCFlat" || dataset == "Summer23MG" || TString(dataset.c_str()).Contains("Summer23MC") ||
       dataset == "Summer23MCBPixFlat" || dataset == "Summer23BPIXMG" || TString(dataset.c_str()).Contains("Summer23"))
   {
-    if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPixFlat")) {
+    if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPixFlat") || TString(dataset.c_str()).Contains("Summer23MCBPix")) {
       jec = getFJC("",
                   "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
                   "");
       jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
-      //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
-      jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
+      jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
     } else {
       jec = getFJC("", 
                   "Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
                   "");
       jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
-      //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
+      jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
       //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
       //
       // Resolution SF version 2: https://indico.cern.ch/event/1399194/
       // April 3, 2024
       //
       //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV2_MC_SF_AK4PFPuppi", "");
-      jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
     }
     //jec = getFJC("", // Winter23Prompt23_V2_MC_L1FastJet_AK4PFPuppi",
     //             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
@@ -977,6 +979,16 @@ void DijetHistosFill::Loop()
                  "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",                     // Mikel
                                                                                //"Run23D-Prompt_DATA_L2L3Residual_AK4PFPuppi"
                  "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+  }
+
+  if (dataset == "2024B" || dataset == "2024B_ZB")
+  {
+    jec = getFJC("",
+                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi");
+		 "Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
+
   }
 
   if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
@@ -1173,15 +1185,15 @@ void DijetHistosFill::Loop()
       //{0, 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.489, 3.839, 5.191};
       // Newer L2Res |eta| binning from Mikel
       // https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
-      //{0., 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.839, 4.013, 4.583, 5.191};
+      {0., 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.839, 4.013, 4.583, 5.191};
       //
       // Nestor April 3, 2024: |eta| binning to compare with DESY results
       //
-      {0, 0.087, 0.174, 0.261, 0.348, 0.435,
-       0.522, 0.609, 0.696, 0.783, 0.879, 0.957, 1.044, 1.131, 1.218, 1.305,
-       1.392, 1.479, 1.566, 1.653, 1.74, 1.83, 1.93, 2.043, 2.172, 2.322, 2.5,
-       2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
-       4.363, 4.538, 4.716, 4.889, 5.191};
+      //{0, 0.087, 0.174, 0.261, 0.348, 0.435,
+      // 0.522, 0.609, 0.696, 0.783, 0.879, 0.957, 1.044, 1.131, 1.218, 1.305,
+      // 1.392, 1.479, 1.566, 1.653, 1.74, 1.83, 1.93, 2.043, 2.172, 2.322, 2.5,
+      // 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
+      // 4.363, 4.538, 4.716, 4.889, 5.191};
 
   const int nxd = sizeof(vxd) / sizeof(vxd[0]) - 1;
 
@@ -1284,6 +1296,8 @@ void DijetHistosFill::Loop()
       LoadJSON("rootfiles/Cert_Collisions2022_355100_362760_Golden.json");
     if (TString(dataset.c_str()).Contains("2023"))
       LoadJSON("rootfiles/Cert_Collisions2023_366442_370790_Golden.json");
+    //if (TString(dataset.c_str()).Contains("2024"))
+      //LoadJSON("rootfiles/");
   }
   int _nbadevts_json(0);
 
@@ -2064,7 +2078,8 @@ void DijetHistosFill::Loop()
   if (dataset == "2022C" || dataset == "2022D" || dataset == "2022C_ZB" ||
       dataset == "2022D_ZB" || dataset == "Summer22" ||
       dataset == "Summer22Flat" ||
-      TString(dataset.c_str()).Contains("Summer22MG"))
+      TString(dataset.c_str()).Contains("Summer22MG") ||
+      TString(dataset.c_str()).Contains("Summer22MC"))
     fjv = new TFile("rootfiles/jetveto2022CD.root", "READ");
   if (dataset == "2022E" || dataset == "2022F" || dataset == "2022G" ||
       dataset == "2022F1" || dataset == "2022F2" ||
@@ -2077,15 +2092,16 @@ void DijetHistosFill::Loop()
       dataset == "2023Cv123" || dataset == "2023Cv4" ||
       dataset == "2023B_ZB" || dataset == "2023C_ZB" || dataset == "2023BCv123_ZB" ||
       dataset == "2023Cv123_ZB" || dataset == "2023Cv4_ZB" ||
-      dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" ||
+      dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" || 
+      TString(dataset.c_str()).Contains("Summer23MC") ||
       (TString(dataset.c_str()).Contains("Summer23MG") && ! TString(dataset.c_str()).Contains("MGBPix")))
     fjv = new TFile("rootfiles/jetveto2023BC.root", "READ");
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
-      TString(dataset.c_str()).Contains("Summer23MGBPix"))
+      TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
-  if (dataset == "Winter24MCFlat")
-    //fjv = new TFile("rootfiles/jetveto2023BC.root", "READ"); // To compare with Summer23
-    fjv = new TFile("rootfiles/jetveto2023D.root", "READ"); // To compare with Summer23Bix
+  if (dataset == "2024B" || dataset == "Winter24MCFlat")
+    fjv = new TFile("rootfiles/jetveto2023BC.root", "READ"); // To compare with Summer23
+    //fjv = new TFile("rootfiles/jetveto2023D.root", "READ"); // To compare with Summer23Bix
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -2108,7 +2124,8 @@ void DijetHistosFill::Loop()
   if (dataset == "2022C" || dataset == "2022D" || dataset == "2022C_ZB" ||
       dataset == "2022D_ZB" || dataset == "Summer22" ||
       dataset == "Summer22Flat" ||
-      TString(dataset.c_str()).Contains("Summer22MG"))
+      TString(dataset.c_str()).Contains("Summer22MG") ||
+      TString(dataset.c_str()).Contains("Summer22MC"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   if (dataset == "2022E" || dataset == "2022F" || dataset == "2022G" ||
       dataset == "2022F1" || dataset == "2022F2" ||
@@ -2122,12 +2139,13 @@ void DijetHistosFill::Loop()
       dataset == "2023B_ZB" || dataset == "2023C_ZB" || dataset == "2023BCv123_ZB" ||
       dataset == "2023Cv123_ZB" || dataset == "2023Cv4_ZB" ||
       dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" ||
+      TString(dataset.c_str()).Contains("Summer23MC") ||
       (TString(dataset.c_str()).Contains("Summer23MG") && ! TString(dataset.c_str()).Contains("MGBPix")))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
-      TString(dataset.c_str()).Contains("Summer23MGBPix"))
+      TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
-  if (dataset == "Winter24MCFlat")
+  if (dataset == "2024B" || dataset == "Winter24MCFlat")
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   assert(h2jv);
 
