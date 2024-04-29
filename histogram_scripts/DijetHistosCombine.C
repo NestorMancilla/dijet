@@ -6,88 +6,67 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TProfile2D.h"
+#include "TH3D.h"
 #include <iostream>
 
 int debug = 1; // 1=trg, 2=dir, 3=all
-string version = "v39_L2Rel_L2L3Res_v2_SF_noJetveto";
+string version = "v39_2024_Prompt_eta_SFD_DCSOnly_Filter_HLT_MPF";
 void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 			 string trg, string folder);
 //void mergeDijet(TDirectory *dir, TDirectory *dout);
 bool copyBin(string trg, string folder, string histo, double pt, double eta);
 
-void DijetHistosCombines(string file = "rootfiles/"+version+"/jmenano_data_out.root");
+void DijetHistosCombines(string file = "rootfiles/jmenano_data_out.root");
 
 void DijetHistosCombine() {
 
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022C_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022D_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022CD_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022E_JME_"+version+".root");
+  // Nestor run
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022E_"+version+"_22Sep2023.root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022F_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022G_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2022FG_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2023BCv123_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2023Cv4_JME_"+version+".root");
+  //DijetHistosCombines("../rootfiles/jmenano_data_out_2023D_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022C_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022D_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022E_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022F_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022G_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024BC_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv4_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2023D_JME_"+version+".root");
 
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2022C_JME_"+version+".root");
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2022D_JME_"+version+".root");
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2022CD_JME_"+version+".root");
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2022E_JME_"+version+".root");
-
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2022F_JME_"+version+".root");
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2022G_JME_"+version+".root");
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2022FG_JME_"+version+".root");
-
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2023BCv123_JME_"+version+".root");
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2023Cv4_JME_"+version+".root");
-  //DijetHistosCombines("../rootfiles/"+version+"/jmenano_data_out_2023D_JME_"+version+".root");
-
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23MG_test/jmenano_mc_out_Summer23MGBPix_test_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23DT_NoL2L3Res/jmenano_data_out_2023Cv123_JME_v36_Summer23DT_NoL2L3Res.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23DT_NoL2L3Res_Winter/jmenano_data_out_2023Cv4_JME_v36_Summer23DT_NoL2L3Res.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23DT_NoL2L3Res_Winter/jmenano_data_out_2023D_JME_v36_Summer23DT_NoL2L3Res.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv4_JME_"+version+".root");
-  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023D_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/");
-  
-
-
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23MG_L2Res_v1/jmenano_data_out_2023Cv123_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23MG_L2Res_v1/jmenano_data_out_2023Cv4_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23MG_L2Res_v1/jmenano_data_out_2023D_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/v36_Summer23DT_NoL2L3Res_Winter/jmenano_mc_out_Summer23MGBPix_v36_Summer23DT_NoL2L3Res.root");
   // Really slow on this after all the others, rerun separately (then sec)
-//  DijetHistosCombines("../rootfiles/"+version+"/jmenano_mc_out_Summer22EEMG_"+version+".root");
-// DijetHistosCombines("../rootfiles/"+version+"/jmenano_mc_out_Summer22MG_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_test_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_test_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_"+version+".root");
-  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_"+version+".root"); 
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22MG_full_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22EEMG_full_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_Cv123_"+version+".root");
+  DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_Cv4_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/v35a/2022E/jmenano_mc_out_Summer22MG_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_"+version+".root");
 
-  /*
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_data_out_v22ul16.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_v22ul16flatmc.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_v22ul16mg.root");
-  */
-  //DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_v23ul16flat.root");
-  //DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_v23ul16mg.root");
 
-  // Before JER SF for MC
-  /*
-  DijetHistosCombines("haddfiles/jmenano_data_out_UL2016APV_v26c.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2016APVMG_v26.root");
-  DijetHistosCombines("haddfiles/jmenano_data_out_UL2016GH_v26c.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2016MG_v26.root");
-  DijetHistosCombines("haddfiles/jmenano_data_out_UL2017_v26.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2017MG_v26.root");
-  DijetHistosCombines("haddfiles/jmenano_data_out_UL2018_v26c.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2018MG_v26.root");
-  */
-  
+  //DijetHistosCombines("rootfiles/jmenano_mc_out_v23ul16flat.root");
+  //DijetHistosCombines("rootfiles/jmenano_mc_out_v23ul16mg.root");
 
   // This one is taking a while. Why? CPU ~100%, mem up to >3 GB
   //DijetHistosCombines("haddfiles/jmenano_data_out_Run2_v26c.root");
   //DijetHistosCombines("haddfiles/jmenano_mc_out_Run2_v26.root");
   /*
   // After JER SF for MC
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2016APVMG_v27.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2016MG_v27.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2017MG_v27.root");
-  DijetHistosCombines("rootfiles/"+version+"/jmenano_mc_out_UL2018MG_v27.root");
+  DijetHistosCombines("rootfiles/jmenano_mc_out_UL2016APVMG_v27.root");
+  DijetHistosCombines("rootfiles/jmenano_mc_out_UL2016MG_v27.root");
+  DijetHistosCombines("rootfiles/jmenano_mc_out_UL2017MG_v27.root");
+  DijetHistosCombines("rootfiles/jmenano_mc_out_UL2018MG_v27.root");
   DijetHistosCombines("haddfiles/jmenano_mc_out_Run2_v27.root");
   */
 
@@ -95,29 +74,29 @@ void DijetHistosCombine() {
   // Iita_20230814/*_v1.root -> Iita_20230824_jetveto/*_JME_v1.root
   /*
   // 2022
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022C_JME_v1.root");
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022D_JME_v1.root");
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022E_JME_v1.root");
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022F_JME_v1.root");
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022G_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022C_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022D_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022E_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022F_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022G_JME_v1.root");
   // 2023
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/nano_data_out_2023B_JME_v1.root");
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/nano_data_out_2023Cv123_JME_v1.root");
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/nano_data_out_2023BCv123_JME_v1.root");
-  DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/nano_data_out_2023Cv4_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/nano_data_out_2023B_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/nano_data_out_2023Cv123_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/nano_data_out_2023BCv123_JME_v1.root");
+  DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/nano_data_out_2023Cv4_JME_v1.root");
   */
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/nano_data_out_2023D_JME_v1.root");
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_mc_out_Summer22_v1.root");
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_mc_out_Summer22EE_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/nano_data_out_2023D_JME_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_mc_out_Summer22_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_mc_out_Summer22EE_v1.root");
   // Main combos (after checking stability for L2Res)
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022CD_JME_v1.root");
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022FG_JME_v1.root");
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2022EFG_JME_v1.root");
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/nano_data_out_2023Cv4D_JME_v1.root");
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/nano_data_out_2022BCv123_JME_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022CD_JME_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022FG_JME_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2022EFG_JME_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/nano_data_out_2023Cv4D_JME_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/nano_data_out_2022BCv123_JME_v1.root");
   //
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_data_out_2223_JME_v1.root");
-  //DijetHistosCombines("../jecsys3/rootfiles/"+version+"Iita_20230824_jetveto/jmenano_mc_out_Summer22Both_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2223_JME_v1.root");
+  //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_mc_out_Summer22Both_v1.root");
   
 } // DijetHistosCombine
 
@@ -211,7 +190,7 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	    int ibin = p2->GetBin(binx, biny);
 	    if (copyBin(trg, folder, key->GetName(),
 			h2o->GetYaxis()->GetBinCenter(biny),
-			h2o->GetXaxis()->GetBinCenter(binx))) {
+			h2o->GetXaxis()->GetBinCenter(binx), 0.)) {
 	      if (folder=="Jetveto") {
 		h2o->SetBinContent(ibin, h2o->GetBinContent(ibin)+
 				   p2->GetBinContent(ibin));
@@ -279,6 +258,44 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	} // for biny
 
       } // TProfile2D
+
+      else if (obj->InheritsFrom("TH3D")) {
+        TH3D *h3 = (TH3D*)obj;
+        TH3D *h3o = (TH3D*)outdir->FindObject(key->GetName());
+        if (!h3o) {
+          outdir->cd();
+          h3o = (TH3D*)h3->Clone(key->GetName());
+          h3o->Reset();
+        }
+        for (int binx = 1; binx != h3->GetNbinsX()+1; ++binx) {
+          for (int biny = 1; biny != h3->GetNbinsY()+1; ++biny) {
+            for (int binz = 1; binz != h3->GetNbinsZ()+1; ++binz) {
+              int ibin = h3->GetBin(binx, biny, binz);
+              string hist = key->GetName();
+	      copyBin(trg, folder, key->GetName(),
+		      h3o->GetYaxis()->GetBinCenter(biny),
+		      h3o->GetXaxis()->GetBinCenter(binx));
+              if (folder=="Dijet2" && (hist=="h3m0"||hist=="h3m2")) {
+                h3o->SetBinContent(ibin, h3o->GetBinContent(ibin)+
+                                   h3->GetBinContent(ibin));
+                h3o->SetBinError(ibin, sqrt(pow(h3o->GetBinError(ibin),2)+
+					    pow(h3->GetBinError(ibin),2)));
+              }
+              else if (folder=="Jetveto" &&(hist=="Asymm"||hist=="h3asymm")) {
+                h3o->SetBinContent(ibin, h3o->GetBinContent(ibin)+
+                                   h3->GetBinContent(ibin));
+                h3o->SetBinError(ibin, sqrt(pow(h3o->GetBinError(ibin),2)+
+                                            pow(h3->GetBinError(ibin),2)));
+              }
+	      else {
+		h3o->SetBinContent(ibin, h3->GetBinContent(ibin));
+		h3o->SetBinError(ibin, h3->GetBinError(ibin));
+	      }
+            } // for binz
+          } // for biny
+        } // for binx
+      } // TH3D
+
       else if (obj->InheritsFrom("TH2D")) {
 	TH2D *h2 = (TH2D*)obj;
 	TH2D *h2o = (TH2D*)outdir->FindObject(key->GetName());
@@ -314,6 +331,7 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	  } // for biny
 	} // for binx
       } // TH2D
+
       else if (obj->InheritsFrom("TProfile")) {
 	TProfile *p = (TProfile*)obj;
 
@@ -442,7 +460,18 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     md2pf["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
     md2pf["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
     md2pf["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-
+    
+    md2pf["HLT_PFJetFwd40"]  = range{49,  84,  fwdetad, 5.2};   //Added to check HLT PFJetFwd. Nestor. April 25, 2024.
+    md2pf["HLT_PFJetFwd60"]  = range{84,  114, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd80"]  = range{114, 196, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd140"] = range{196, 272, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd200"] = range{272, 330, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd260"] = range{330, 395, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd320"] = range{395, 468, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd400"] = range{468, 548, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd450"] = range{548, 686, fwdetad, 5.2};
+    md2pf["HLT_PFJetFwd500"] = range{686,6500, fwdetad, 5.2};   //
+    
     md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
     md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
     md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
@@ -519,22 +548,42 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
   }
 
+  if (folder=="MCtruth" && (hist=="ptreco/ptgen" || hist=="response_ptgen" || hist=="response_etagen" ||
+			    hist=="h2pteta" || hist=="h2pteta_gen" || hist=="h2pteta_rec" ||
+			    hist=="p2jes" || hist=="p2jsf" || hist=="p2r" ||
+                            hist=="p2r_NoMatch" || hist=="p2r_raw" || hist=="p2effz" ||
+                            hist=="p2eff" || hist=="p2pur"))
+    return true;
+
   bool tcHist = (folder=="Dijet2" && (hist=="h2ptetatc" || hist=="p2restc" ||
 				      hist=="p2m0tc" || hist=="p2m2tc" ||
 				      hist=="p2mntc" || hist=="p2mutc"));
   bool pfHist = (folder=="Dijet2" && (hist=="h2ptetapf" || hist=="p2respf" ||
 				      hist=="p2m0pf" || hist=="p2m2pf" ||
 				      hist=="p2mnpf" || hist=="p2mupf"));
+  bool h3MPF = (folder=="Dijet2" && (hist=="h3m0" || hist=="h3m2"));
+
+  bool h3asymm = (folder=="Jetveto" && (hist=="Asymm"||hist=="h3asymm"));
   
   if (folder=="Jetveto" && (hist=="p2chf" || hist=="p2nhf" || hist=="p2nef" ||
 			    hist=="p2asymm" || hist=="h2phieta" ||
-			    hist=="h2phieta_ave"))
+			    hist=="h2phieta_ave" || hist=="p2asymm_noveto"))
     return true;
-  if (folder=="Jetveto" &&
-      mi.find(trg)!=mi.end() &&
-      pt >= mi[trg].ptmin && pt < mi[trg].ptmax &&
-      fabs(eta) >= mi[trg].absetamin && fabs(eta) < mi[trg].absetamax)
-    return true;
+  if (folder=="Jetveto") {
+    if (h3asymm) {
+      if (mi.find(trg)!=mi.end() &&
+          pt >= mi[trg].ptmin && pt < mi[trg].ptmax &&
+          fabs(eta) >= mi[trg].absetamin && fabs(eta) < mi[trg].absetamax)
+        return true;
+    }
+    else {
+      if (mi.find(trg)!=mi.end() &&
+          pt >= mi[trg].ptmin && pt < mi[trg].ptmax &&
+          fabs(eta) >= mi[trg].absetamin && fabs(eta) < mi[trg].absetamax)
+        return true;
+    }
+  }
+
   if (folder=="Incjet" &&
       mi.find(trg)!=mi.end() &&
       pt >= mi[trg].ptmin && pt < mi[trg].ptmax &&
@@ -545,6 +594,13 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
       pt >= md[trg].ptmin && pt < md[trg].ptmax &&
       fabs(eta) >= md[trg].absetamin && fabs(eta) < md[trg].absetamax)
     return true;
+
+  if (folder=="MCtruth")// && 
+      //md2.find(trg)!=md2.end() &&
+      //pt >= md2[trg].ptmin && pt < md2[trg].ptmax &&
+      //fabs(eta) >= md2[trg].absetamin && fabs(eta) < md2[trg].absetamax)
+    return true; 
+      
   if (folder=="Dijet2") {
     
     if (tcHist) { // pT,tag binning
@@ -558,6 +614,12 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
 	  pt >= md2pf[trg].ptmin && pt < md2pf[trg].ptmax &&
 	  fabs(eta) >= md2pf[trg].absetamin && fabs(eta) < md2pf[trg].absetamax)
 	return true;
+    }
+    else if (h3MPF) { // TH3D MPF binning
+      if (md2pf.find(trg)!=md2pf.end() &&
+          pt >= md2pf[trg].ptmin && pt < md2pf[trg].ptmax &&
+          fabs(eta) >= md2pf[trg].absetamin && fabs(eta) < md2pf[trg].absetamax)
+        return true;
     }
     else { // pT,AVP or pT,ave binning
       if (md2.find(trg)!=md2.end() &&
