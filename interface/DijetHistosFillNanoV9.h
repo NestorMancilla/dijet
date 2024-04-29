@@ -4077,17 +4077,29 @@ void DijetHistosFill::Init(TTree *tree)
    // (once per file to be processed).
      // Find the HT from file name
 
-   HT_bins["40to70"] = std::make_pair(2, std::make_pair(40, 70));
-   HT_bins["70to100"] = std::make_pair(3, std::make_pair(70, 100)); 
+   // HT_bins for NanoV09
+   HT_bins["50to100"] = std::make_pair(3, std::make_pair(50, 100));
    HT_bins["100to200"] = std::make_pair(4, std::make_pair(100, 200));
-   HT_bins["200to400"] = std::make_pair(5, std::make_pair(200, 400));
-   HT_bins["400to600"] = std::make_pair(6, std::make_pair(400, 600));
-   HT_bins["600to800"] = std::make_pair(7, std::make_pair(600, 800));
-   HT_bins["800to1000"] = std::make_pair(8, std::make_pair(800, 1000));
-   HT_bins["1000to1200"] = std::make_pair(9, std::make_pair(1000, 1200));
-   HT_bins["1200to1500"] = std::make_pair(10, std::make_pair(1200, 1500));
-   HT_bins["1500to2000"] = std::make_pair(11, std::make_pair(1500, 2000));
-   HT_bins["HT-2000"] = std::make_pair(12, std::make_pair(2000, 9999));
+   HT_bins["200to300"] = std::make_pair(5, std::make_pair(200, 300));
+   HT_bins["300to500"] = std::make_pair(6, std::make_pair(300, 500));
+   HT_bins["500to700"] = std::make_pair(7, std::make_pair(500, 700));
+   HT_bins["700to1000"] = std::make_pair(8, std::make_pair(700, 1000));
+   HT_bins["1000to1500"] = std::make_pair(9, std::make_pair(1000, 1500));
+   HT_bins["1500to2000"] = std::make_pair(10, std::make_pair(1500, 2000));
+   HT_bins["2000toInf"] = std::make_pair(11, std::make_pair(2000, 9999));
+
+   // HT_bins for Run3
+   //HT_bins["40to70"] = std::make_pair(2, std::make_pair(40, 70));
+   //HT_bins["70to100"] = std::make_pair(3, std::make_pair(70, 100)); 
+   //HT_bins["100to200"] = std::make_pair(4, std::make_pair(100, 200));
+   //HT_bins["200to400"] = std::make_pair(5, std::make_pair(200, 400));
+   //HT_bins["400to600"] = std::make_pair(6, std::make_pair(400, 600));
+   //HT_bins["600to800"] = std::make_pair(7, std::make_pair(600, 800));
+   //HT_bins["800to1000"] = std::make_pair(8, std::make_pair(800, 1000));
+   //HT_bins["1000to1200"] = std::make_pair(9, std::make_pair(1000, 1200));
+   //HT_bins["1200to1500"] = std::make_pair(10, std::make_pair(1200, 1500));
+   //HT_bins["1500to2000"] = std::make_pair(11, std::make_pair(1500, 2000));
+   //HT_bins["HT-2000"] = std::make_pair(12, std::make_pair(2000, 9999));
 
    // Set branch addresses and branch pointers
    if (!tree) return;
