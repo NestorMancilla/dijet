@@ -7,7 +7,8 @@
 //     #include "../interface/DijetHistosFill.h" // Specific for NanoV12 (assumed default)
 //#endif
 //#include "../interface/DijetHistosFillNanoV9.h"
-#include "../interface/DijetHistosFill.h"
+//#include "../interface/DijetHistosFill.h"
+#include "../interface/DijetHistosFill_2024Prompt.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -35,7 +36,7 @@
 bool redoJEC = true;
 
 // MC triggers (slow) or not (faster)
-bool doMCtrigOnly = false;
+bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
 bool smearJets = true;
@@ -180,8 +181,11 @@ public:
   TH2D *h2ptaeta_all, *h2ptaeta_sel, *h2phieta_ave;
   TH2D *h2ptteta_all, *h2ptteta_sel, *h2phieta_tag;
 
+  // Asymm
+  TH3D *h3asymm;
+
   // Balancing
-  TProfile2D *p2asymm;
+  TProfile2D *p2asymm, *p2asymm_noveto;
   //Tprofile2D *p2asymm_noveto;
 
   // (Optional) composition plots
@@ -247,6 +251,7 @@ public:
   TH2D *h2pteta;
   TProfile2D *p2res, *p2m0, *p2m2, *p2mn, *p2mu;
   TProfile2D *p2m0x, *p2m2x;
+  TH3D *h3m0, *h3m2;
 
   // Extra for FSR studies
   TProfile2D *p2mnu, *p2mnx, *p2mux, *p2mnux;
@@ -296,6 +301,7 @@ public:
   int trgpt;
   float lumsum, lumsum2, lum, lum2; // lum is recorded, lum2 delivered
   TH1D *htrglumi, *htrgpu, *hnpv, *hnpvgood;
+  //TH1F *hLumiPerRun;
 };
 
 
@@ -447,7 +453,9 @@ void DijetHistosFill::Loop()
   if (isRun3)
   //if (isRun3 || isMG )
     fChain->SetBranchStatus("Rho_fixedGridRhoFastjetAll", 1);
-  fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
+  if (!TString(dataset.c_str()).Contains("2024"))
+    fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
+  //fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
 
   // Listing of available triggers
   vector<string> vtrg = {
@@ -461,6 +469,16 @@ void DijetHistosFill::Loop()
       "HLT_PFJet400",
       "HLT_PFJet450",
       "HLT_PFJet500",
+      "HLT_PFJetFwd40", //
+      "HLT_PFJetFwd60",
+      "HLT_PFJetFwd80",
+      "HLT_PFJetFwd140",
+      "HLT_PFJetFwd200",
+      "HLT_PFJetFwd260",
+      "HLT_PFJetFwd320",
+      "HLT_PFJetFwd400",
+      "HLT_PFJetFwd450",
+      "HLT_PFJetFwd500", //
       "HLT_DiPFJetAve40",
       "HLT_DiPFJetAve60",
       "HLT_DiPFJetAve80",
@@ -500,9 +518,9 @@ void DijetHistosFill::Loop()
     vtrg.push_back("HLT_PFJetFwd500");
   }
 
-  if (doMCtrigOnly = true && isMC)
+  if (doMCtrigOnly && isMC) //Set doMCtrigOnly = true and comment vtrg.clear(); to see the list of triggers
   {
-//    vtrg.clear();
+    vtrg.clear();
     vtrg.push_back("HLT_MC");
   }
 
@@ -561,7 +579,10 @@ void DijetHistosFill::Loop()
     // fChain->SetBranchStatus("PuppiMET_pt",1);
     // fChain->SetBranchStatus("PuppiMET_phi",1);
     fChain->SetBranchStatus("RawPuppiMET_pt", 1);
+    fChain->SetBranchStatus("RawPuppiMET_sumEt", 1);
     fChain->SetBranchStatus("RawPuppiMET_phi", 1);
+    //fChain->SetBranchStatus("MET_pt", 1);
+    //fChain->SetBranchStatus("MET_sumEt", 1);
   }
 
   fChain->SetBranchStatus("Flag_METFilters", 1);
@@ -886,16 +907,18 @@ void DijetHistosFill::Loop()
       jec = getFJC("",
                   "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
                   "");
+      //jerpathsf = "";
+      //jersfvspt = getFJC("", "", "");
       jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
-      jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
-      //jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+      jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
     } else {
       jec = getFJC("", 
                   "Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
                   "");
       jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
-      jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
-      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
+      jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
       //
       // Resolution SF version 2: https://indico.cern.ch/event/1399194/
       // April 3, 2024
@@ -906,6 +929,7 @@ void DijetHistosFill::Loop()
     //jec = getFJC("", // Winter23Prompt23_V2_MC_L1FastJet_AK4PFPuppi",
     //             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
     //             "");                                                                                   // Winter23Prompt23_V2_MC_L2L3Residual_AK4PFPuppi");
+    //jerpath = "";
     jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
     useJERSFvsPt = true;
 
@@ -939,10 +963,10 @@ void DijetHistosFill::Loop()
 		 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
                  "");  
     jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
-    //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi"; // To compare with Summer23MG
-    //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
     jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
-    jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+    //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+    jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
+
     useJERSFvsPt = true;
   }
 
@@ -981,13 +1005,33 @@ void DijetHistosFill::Loop()
                  "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
   }
 
-  if (dataset == "2024B" || dataset == "2024B_ZB")
+  if (TString(dataset.c_str()).Contains("2024A")  || dataset == "2024B_ZB")
   {
     jec = getFJC("",
-                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
-                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
+                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
+  {
+    jec = getFJC("",
+                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+		 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // Cv123, Cv4
+                 "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
                  //"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi");
-		 "Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
+		 //"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
+  {
+    jec = getFJC("",
+                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // Cv123, Cv4
+                 "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1185,32 +1229,73 @@ void DijetHistosFill::Loop()
       //{0, 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.489, 3.839, 5.191};
       // Newer L2Res |eta| binning from Mikel
       // https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
-      {0., 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.839, 4.013, 4.583, 5.191};
+      //{0., 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.839, 4.013, 4.583, 5.191};
       //
       // Nestor April 3, 2024: |eta| binning to compare with DESY results
       //
-      //{0, 0.087, 0.174, 0.261, 0.348, 0.435,
-      // 0.522, 0.609, 0.696, 0.783, 0.879, 0.957, 1.044, 1.131, 1.218, 1.305,
-      // 1.392, 1.479, 1.566, 1.653, 1.74, 1.83, 1.93, 2.043, 2.172, 2.322, 2.5,
-      // 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
-      // 4.363, 4.538, 4.716, 4.889, 5.191};
+      {0, 0.087, 0.174, 0.261, 0.348, 0.435,
+       0.522, 0.609, 0.696, 0.783, 0.879, 0.957, 1.044, 1.131, 1.218, 1.305,
+       1.392, 1.479, 1.566, 1.653, 1.74, 1.83, 1.93, 2.043, 2.172, 2.322, 2.5,
+       2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
+       4.363, 4.538, 4.716, 4.889, 5.191};
 
   const int nxd = sizeof(vxd) / sizeof(vxd[0]) - 1;
 
   // p_reco/p_gen binning
-  int numEntries = 100;
+  int reco_nedges = 101;
   double minValue = 0.0;
   double maxValue = 2.0;
-  double stepSize = (maxValue - minValue) / (numEntries - 1);
+  double stepSize = (maxValue - minValue) / (reco_nedges - 1);
   // Create the vector
-  std::vector<double> vres(numEntries);
+  std::vector<double> vres(reco_nedges);
 
   // Populate the vector with values
-  for (int i = 0; i < numEntries; ++i) {
+  for (int i = 0; i < reco_nedges; ++i) {
       vres[i] = minValue + i * stepSize;
   }
   const int nres = sizeof(vres) / sizeof(vres[0]) - 1;
 
+  // Binning for 3D histo. Nestor. April 25, 2024. Format example (xAxis.size()-1, xAxis.data())
+  // phi binning
+  int phi_nedges = 73;
+  double phi_minValue = -TMath::Pi();
+  double phi_maxValue = +TMath::Pi();
+  double phi_stepSize = (phi_maxValue - phi_minValue) / (phi_nedges - 1);
+  // Create the vector
+  std::vector<double> phi_vx(phi_nedges);
+
+  // Populate the vector with values
+  for (int i = 0; i < phi_nedges; ++i) {
+      phi_vx[i] = phi_minValue + i * phi_stepSize;
+  }
+
+  // Asymm binning
+  int asymm_nedges = 201;
+  double asymm_minValue = -1.0;
+  double asymm_maxValue = 1.0;
+  double asymm_stepSize = (asymm_maxValue - asymm_minValue) / (asymm_nedges - 1);
+  // Create the vector
+  std::vector<double> asymm_vx(asymm_nedges);
+
+  // Populate the vector with values
+  for (int i = 0; i < asymm_nedges; ++i) {
+      asymm_vx[i] = asymm_minValue + i * asymm_stepSize;
+  }
+
+  // JER studies
+  // Asymm binning
+  int MPF_nedges = 201;
+  double MPF_minValue = 0.0;
+  double MPF_maxValue = 2.0;
+  double MPF_stepSize = (MPF_maxValue - MPF_minValue) / (MPF_nedges - 1);
+  // Create the vector
+  std::vector<double> MPF_vx(MPF_nedges);
+
+  // Populate the vector with values
+  for (int i = 0; i < MPF_nedges; ++i) {
+      MPF_vx[i] = MPF_minValue + i * MPF_stepSize;
+  }
+  //
 
   const int ny = 800;
   double vy[ny + 1];
@@ -1296,8 +1381,17 @@ void DijetHistosFill::Loop()
       LoadJSON("rootfiles/Cert_Collisions2022_355100_362760_Golden.json");
     if (TString(dataset.c_str()).Contains("2023"))
       LoadJSON("rootfiles/Cert_Collisions2023_366442_370790_Golden.json");
-    //if (TString(dataset.c_str()).Contains("2024"))
-      //LoadJSON("rootfiles/");
+    if (TString(dataset.c_str()).Contains("2024"))
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379154_DCSOnly_TkPx.json"); // April 10, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379355_DCSOnly_TkPx.json"); // April 14, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379454_DCSOnly_TkPx.json"); // April 15, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379470_DCSOnly_TkPx.json"); // April 16, 2024, 19:30
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379530_DCSOnly_TkPx.json"); // April 17, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379618_DCSOnly_TkPx.json"); // April 18, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379774_DCSOnly_TkPx.json"); // April 21, 2024, 19:31
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_379075_Golden.json"); // Released April 18, implemented April 22
+      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 28, 2024, 19:31
+
   }
   int _nbadevts_json(0);
 
@@ -1318,7 +1412,7 @@ void DijetHistosFill::Loop()
   map<string, multijetHistos *> mhmj;
   map<string, lumiHistos *> mhlumi;
 
-  bool dolumi = false;
+  bool dolumi = false; //Nestor. xsection plot. April 17, 2024.
   if (dolumi)
     LoadLumi();
 
@@ -1491,8 +1585,12 @@ void DijetHistosFill::Loop()
                                  nx, vx, 72, -TMath::Pi(), +TMath::Pi());
       h->p2asymm = new TProfile2D("p2asymm", ";#eta;#phi;Asymmetry",
                                   nx, vx, 72, -TMath::Pi(), +TMath::Pi());
-      //h->p2asymm_noveto = new TProfile2D("p2asymm_noveto", ";#eta;#phi;Asymmetry_noveto",
-      //                            nx, vx, 72, -TMath::Pi(), +TMath::Pi());
+      h->p2asymm_noveto = new TProfile2D("p2asymm_noveto", ";#eta;#phi;Asymmetry_noveto",
+                                  nx, vx, 72, -TMath::Pi(), +TMath::Pi());
+      h->h3asymm = new TH3D("h3asymm", ";#eta;#phi;h3asymm",
+		        //nx, vx, 72, -TMath::Pi(), +TMath::Pi(), 200, -1, 1);
+			nx, vx, phi_vx.size()-1, phi_vx.data(),asymm_vx.size()-1, asymm_vx.data());
+
 
       if (doJetvetoVariants)
       {
@@ -1842,6 +1940,12 @@ void DijetHistosFill::Loop()
                                          "MPF2X (DBX)",
                                 nxd, vxd, nptd, vptd, "S");
 
+      // For JER studies
+      h->h3m0 = new TH3D("h3m0", ";#eta;p_{T,avp} (GeV);MPF0",
+                         nxd, vxd, nptd, vptd, MPF_vx.size()-1,MPF_vx.data());
+      h->h3m2 = new TH3D("h3m2", ";#eta;p_{T,avp} (GeV);MPF2",
+                         nxd, vxd, nptd, vptd, MPF_vx.size()-1, MPF_vx.data());
+      
       // Extra for FRS studies
       h->p2mnu = new TProfile2D("p2mnu", ";#eta;p_{T,avp} (GeV);MPFnu",
                                 nxd, vxd, nptd, vptd);
@@ -2054,7 +2158,8 @@ void DijetHistosFill::Loop()
       h->lumsum2 = 0.0;
       h->htrglumi = new TH1D("htrglumi", "", 100, 0, 1);
       h->htrgpu = new TH1D("htrgpu", "", 100, 0, 100);
-      h->hnpv = new TH1D("hnpv", "", 100, 0, 100);
+      //h->hLumiPerRun = new TH1F("hLumiPerRun", "Average Luminosity per Run", 1, 0, 0);
+      //h->hnpv = new TH1D("hnpv", "", 100, 0, 100);
       h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
     }
 
@@ -2099,9 +2204,8 @@ void DijetHistosFill::Loop()
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
-  if (dataset == "2024B" || dataset == "Winter24MCFlat")
-    fjv = new TFile("rootfiles/jetveto2023BC.root", "READ"); // To compare with Summer23
-    //fjv = new TFile("rootfiles/jetveto2023D.root", "READ"); // To compare with Summer23Bix
+  if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
+    fjv = new TFile("rootfiles/jetveto2023D.root", "READ"); // To compare with Summer23Bix
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -2145,7 +2249,7 @@ void DijetHistosFill::Loop()
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
-  if (dataset == "2024B" || dataset == "Winter24MCFlat")
+  if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   assert(h2jv);
 
@@ -2308,6 +2412,7 @@ void DijetHistosFill::Loop()
     // if (Cut(ientry) < 0) continue;
 
     double w = (isMC ? genWeight : 1.);
+    //double w = (isMC ? genWeight : (genWeight/lumsum));
     if (isMG)
     {
 
@@ -2361,12 +2466,14 @@ void DijetHistosFill::Loop()
 
     // Check that MET filters are all true
     bool pass_METfilter = ((isRun3 || isRun2) &&
+		           //MET_pt / MET_sumEt > 0.3 && // To (maybe) remove noise spoiling the RMS. Nestor April24, 2024.
+		           !(RawPuppiMET_pt / RawPuppiMET_sumEt > 0.3) && // To (maybe) remove noise spoiling the RMS. Nestor April24, 2024.
                            Flag_goodVertices &&
                            Flag_globalSuperTightHalo2016Filter &&
-                           Flag_EcalDeadCellTriggerPrimitiveFilter && // Issues using Run2
-                           Flag_BadPFMuonFilter && // Issues using Run2
-                           Flag_BadPFMuonDzFilter && // Issues using Run2
-                           Flag_hfNoisyHitsFilter && // Issues using Run2
+                           Flag_EcalDeadCellTriggerPrimitiveFilter && //
+                           Flag_BadPFMuonFilter && //
+                           Flag_BadPFMuonDzFilter && //
+                           Flag_hfNoisyHitsFilter && //
                            Flag_eeBadScFilter &&
                            Flag_ecalBadCalibFilter);
 
@@ -2438,6 +2545,7 @@ void DijetHistosFill::Loop()
         Jet_RES[i] = 1.;
         Jet_deltaJES[i] = 1.;
         Jet_l1rcFactor[i] = Jet_rawFactor[i];
+	//Jet_l1rcFactor[i] = Jet_pt[i] * (1.0 - Jet_rawFactor[i]); //To test raw pt response, Nestor. April 16, 2024.
       }
       
       if (true)//Nestor: changed March 27,2024
@@ -3097,16 +3205,27 @@ void DijetHistosFill::Loop()
           if (!(*mtrg[trg]))
             continue;
 
+// Plot without jet veto test (to be approved, Nestor)
+	  if (doJetveto && fabs(p4t.Eta()) < 1.3 && dphi > 2.7 &&
+                        fabs(asymm) < maxa && //!
+                        p4t.Pt() > 15. && Jet_jetId[itag] >= 4 &&
+                        p4p.Pt() > 15. && Jet_jetId[iprobe] >= 4 &&
+                        //!Jet_jetveto[itag] && !Jet_jetveto[iprobe] && //!
+                        pass_METfilter > 0)
+	  //if (doJetveto && isdijet)
+	  {
+            jetvetoHistos *h = mhjv[trg];
+
+            if (ptave >= h->ptmin && ptave < h->ptmax &&
+                fabs(eta) >= h->absetamin && fabs(eta) < h->absetamax)
+            {
+              h->p2asymm_noveto->Fill(eta, p4p.Phi(), asymm, w);
+	      h->h3asymm->Fill(eta, p4p.Phi(), asymm, w);
+            }
+	  }
+// end of the test 
           if (doJetveto && isdijet)
           {
-// Plot without jet veto test
-            //if (ptave >= h->ptmin && ptave < h->ptmax &&
-            //    fabs(eta) >= h->absetamin && fabs(eta) < h->absetamax)
-            //{
-              //if (doJetvetoVariants)
-              //h->p2asymm_noveto->Fill(eta, p4p.Phi(), asymm, w);
-            //}
-// end of the test 
             jetvetoHistos *h = mhjv[trg];
 
             if (doJetvetoVariants)
@@ -3247,6 +3366,10 @@ void DijetHistosFill::Loop()
 
             h->p2m0x->Fill(abseta, ptavp2, m0bx, w);
             h->p2m2x->Fill(abseta, ptavp2, m2bx, w);
+
+	    // JER studies
+	    h->h3m0->Fill(abseta, ptavp2, m0b, w);
+            h->h3m2->Fill(abseta, ptavp2, m2b, w);
 
             // Extras for FSR studies
             h->p2mnu->Fill(abseta, ptavp2, mnub, w);
@@ -3465,10 +3588,10 @@ void DijetHistosFill::Loop()
           }
         }
         */
-
         h->htrglumi->Fill(lum, w); //  / prescale
         h->htrgpu->Fill(trpu, w);
-        h->hnpv->Fill(PV_npvs, w);
+	//h->hLumiPerRun->Fill(run, lum, w);
+        //h->hnpv->Fill(PV_npvs, w);
         h->hnpvgood->Fill(PV_npvsGood, w);
 
         h_trgvslumi->Fill(itrg, lum, w);
