@@ -13,7 +13,8 @@
 #include "../CondFormats/JetMETObjects/interface/JetResolutionObject.h"
 #include "../JetMETCorrections/Modules/interface/JetResolution.h"
 
-#include "../interface/DijetHistosFill.h"
+//#include "../interface/DijetHistosFill.h"
+#include "../interface/DijetHistosFill_2024Prompt.h" // For Prompt 2024 and to add the luminosity in the Loop function. Nestor. April 19.
 
 #include "TSystem.h"
 
@@ -73,7 +74,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   std::unordered_set<std::string> MC_datasets = {"UL2016APVMG",
      "UL2016MG", "UL2016Flat",
      "UL2017MG", "UL2018MC",
-     "UL2018MC_1", "UL2018MC_2", "UL2018MC_3", "UL2018MC_4", "UL2018MC_5",
+     "UL2018MG_1", "UL2018MG_2", "UL2018MG_3", "UL2018MG_4", "UL2018MG_5",
+     "Summer22MC_Flat2018",
      "Summer22Flat", "Summer22MG",
      "Summer22MG1", "Summer22MG2",
      "Summer22EEFlat", "Summer22EEMG",
@@ -85,6 +87,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer23MG_test", "Summer23MGBPix_test",
      "Summer23MG_new_1", "Summer23MG_new_2", "Summer23MG_new_3", "Summer23MG_new_4",
      "TestSummer23MGBPix", "Summer23MCFlat", "Summer23MCBPixFlat",
+     "Summer23MCBPix_Cas", "Summer23MC_Cas",
      "Winter24MCFlat"
      };
 
@@ -97,7 +100,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "UL2018C_ZB", "UL2018D_ZB", "2022C", "2022D", "2022E", 
   "2022F", "2022G", "2022F1", "2022F2", "2023BCv123", "2023B", "2023Cv123", "2023Cv123_ZB","2023Cv4", 
   "2023D", "2022C_ZB", "2022D_ZB", "2022E_ZB", "2022F_ZB", "2022G_ZB", 
-  "2023BCv123_ZB", "2023Cv4_ZB", "2023D_ZB"
+  "2023BCv123_ZB", "2023Cv4_ZB", "2023D_ZB",
+  "2024B", "2024B_JME", "2024B_ZB", "2024C", "2024C_JME", "2024C_ZB"
   };
 
   // Check if dataset is supported
