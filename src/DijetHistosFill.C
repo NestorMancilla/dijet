@@ -918,13 +918,11 @@ void DijetHistosFill::Loop()
                   "");
       jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
       //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
-      jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
-      //
+      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
       // Resolution SF version 2: https://indico.cern.ch/event/1399194/
       // April 3, 2024
-      //
       //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV2_MC_SF_AK4PFPuppi", "");
-      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
+      jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
     }
     //jec = getFJC("", // Winter23Prompt23_V2_MC_L1FastJet_AK4PFPuppi",
     //             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
@@ -1005,7 +1003,7 @@ void DijetHistosFill::Loop()
                  "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
   }
 
-  if (TString(dataset.c_str()).Contains("2024A")  || dataset == "2024B_ZB")
+  if (TString(dataset.c_str()).Contains("2024A")  || dataset == "2024A_ZB")
   {
     jec = getFJC("",
                  "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
@@ -1016,22 +1014,20 @@ void DijetHistosFill::Loop()
   if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
   {
     jec = getFJC("",
-                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-		 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // Cv123, Cv4
-                 "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
-                 //"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi");
-		 //"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
+		 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+		 "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
 
   }
 
   if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
   {
     jec = getFJC("",
-                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-                 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // Cv123, Cv4
-                 "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
-                 //"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi");
-                 //"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
+		 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+		 "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
 
   }
 
@@ -1390,7 +1386,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379618_DCSOnly_TkPx.json"); // April 18, 2024, 19:31
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379774_DCSOnly_TkPx.json"); // April 21, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379075_Golden.json"); // Released April 18, implemented April 22
-      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 28, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 28, 2024, 19:31
+      LoadJSON("rootfiles/Cert_Collisions2024_378981_379470_Golden.json"); // April 30, 2024, 09:57
 
   }
   int _nbadevts_json(0);
