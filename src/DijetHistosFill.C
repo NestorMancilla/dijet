@@ -954,19 +954,6 @@ void DijetHistosFill::Loop()
       }
     }
   }
-  if (dataset == "Winter24MCFlat" )
-  {
-    jec = getFJC("",
-                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
-		 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
-                 "");  
-    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
-    jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
-    //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
-    jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
-
-    useJERSFvsPt = true;
-  }
 
   // 2023
   // if (dataset=="2023B" || dataset=="2023B_ZB") {
@@ -1000,9 +987,24 @@ void DijetHistosFill::Loop()
                                                                                //"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
                  "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",                     // Mikel
                                                                                //"Run23D-Prompt_DATA_L2L3Residual_AK4PFPuppi"
-                 "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+		 "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
   }
 
+  if (dataset == "Winter24MCFlat" )
+  {
+    jec = getFJC("",
+                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
+                 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
+                 "");
+    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
+    jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
+    //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+    jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
+
+    useJERSFvsPt = true;
+  }
+ 
   if (TString(dataset.c_str()).Contains("2024A")  || dataset == "2024A_ZB")
   {
     jec = getFJC("",
@@ -1226,9 +1228,8 @@ void DijetHistosFill::Loop()
       // Newer L2Res |eta| binning from Mikel
       // https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
       //{0., 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.93, 2.172, 2.322, 2.5, 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.839, 4.013, 4.583, 5.191};
-      //
+      
       // Nestor April 3, 2024: |eta| binning to compare with DESY results
-      //
       {0, 0.087, 0.174, 0.261, 0.348, 0.435,
        0.522, 0.609, 0.696, 0.783, 0.879, 0.957, 1.044, 1.131, 1.218, 1.305,
        1.392, 1.479, 1.566, 1.653, 1.74, 1.83, 1.93, 2.043, 2.172, 2.322, 2.5,
@@ -1386,7 +1387,7 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379618_DCSOnly_TkPx.json"); // April 18, 2024, 19:31
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_379774_DCSOnly_TkPx.json"); // April 21, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379075_Golden.json"); // Released April 18, implemented April 22
-      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 28, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 29, 2024, 19:31
       LoadJSON("rootfiles/Cert_Collisions2024_378981_379470_Golden.json"); // April 30, 2024, 09:57
 
   }
