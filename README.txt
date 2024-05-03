@@ -72,6 +72,24 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v40. Main changes list because of not updated version before:
+// 	SmearJets true;
+//	ReweightPU false;
+//	JetVeto -> Histogram without Veto: p2asymm_noveto
+//		   3D histogram: h3asymm;
+//	Dijet2 -> New histogrmas: h3m0 and h3m2
+// 	HLT triggers: HLT_PFJetFwd[40,500], were included only for Run 2
+//	Narrow eta bins
+//	Binning for new histogrmas (h3m0, h3m2)
+// 	MET cut: !(RawPuppiMET_pt / RawPuppiMET_sumEt > 0.3) To remove noise spoiling the RMS.
+// 	The following information is related to 2024 Prompt datasets
+//		JSON filess: Cert_Collisions2024_378981_379866_Golden.json
+//			     Collisions24_13p6TeV_378981_380238_DCSOnly_TkPx.json
+// 		JEC: 
+//		    L2Rel: Winter24Run3_V1_MC_L2Relative_AK4PUPPI
+//		    L2L2Res: Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi
+//		JetVeto for 2024: rootfiles/jetveto2023D.root
+		Dataset: May 3rd, 2024 for C. Same list for B (April 24)
 // v39. Fixed an issue with Summer23 MC input files which caused gaps in the HT histogram
 // v38. Added option for PU reweighting
 // v37. Added Summer23 MC samples
