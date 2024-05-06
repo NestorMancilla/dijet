@@ -1018,8 +1018,9 @@ void DijetHistosFill::Loop()
     jec = getFJC("",
 		 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                  //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-		 "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+		 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
                  //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+		 "Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1028,8 +1029,9 @@ void DijetHistosFill::Loop()
     jec = getFJC("",
 		 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                  //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-		 "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+		 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
                  //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+		 "Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1389,8 +1391,9 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379075_Golden.json"); // Released April 18, implemented April 22
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 29, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379470_Golden.json"); // April 30, 2024, 09:57
-      LoadJSON("rootfiles/Cert_Collisions2024_378981_379866_Golden.json"); // May 3, 2024, 12:55
-      //LoadJSON("rootfiles/Cert_Collisions2024_378981_379866_Golden.json"); // May 2, 2024, 19:31
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_379866_Golden.json"); // May 3, 2024, 12:55
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380238_DCSOnly_TkPx.json"); // May 2, 2024, 19:31
+      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380403_DCSOnly_TkPx.json"); // May 6, 2024, 11:51
 
   }
   int _nbadevts_json(0);
@@ -2205,7 +2208,7 @@ void DijetHistosFill::Loop()
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
   if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
-    fjv = new TFile("rootfiles/jetveto2023D.root", "READ"); // To compare with Summer23Bix
+    fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");  
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
