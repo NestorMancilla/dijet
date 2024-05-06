@@ -26,7 +26,7 @@ Hadd files together as needed (either JetMET+ZB, or parts of IOV)
 
 After producing the jmenano_[data,mc]_out_v[X].root root files and hadding: 
 - root -l -b -q histogram_scripts/DijetHistosCombine.C+g   [merge triggers]
-- root -l -b -q histogram_scriptsDijetHistosJER.C+g       [JER SF]
+- root -l -b -q histogram_scripts/DijetHistosJER.C+g       [JER SF]
 - root -l -b -q DijetHistosL2Res.C+g     [dijet L2Res]
 - root -l -b -q DijetHistosOverlay.C+g   [draw dijet L2Res]
 
@@ -72,6 +72,7 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v40.1 2024 Prompt using DCSOnly from May 2.
 // v40. Main changes list because of not updated version before:
 // 	SmearJets true;
 //	ReweightPU false;
@@ -83,13 +84,13 @@ Bugs:
 //	Binning for new histogrmas (h3m0, h3m2)
 // 	MET cut: !(RawPuppiMET_pt / RawPuppiMET_sumEt > 0.3) To remove noise spoiling the RMS.
 // 	The following information is related to 2024 Prompt datasets
-//		JSON filess: Cert_Collisions2024_378981_379866_Golden.json
+//		JSON filess: Cert_Collisions2024_378981_379866_Golden.json (v40 only runs using Golden JSON file)
 //			     Collisions24_13p6TeV_378981_380238_DCSOnly_TkPx.json
 // 		JEC: 
 //		    L2Rel: Winter24Run3_V1_MC_L2Relative_AK4PUPPI
 //		    L2L2Res: Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi
 //		JetVeto for 2024: rootfiles/jetveto2023D.root
-		Dataset: May 3rd, 2024 for C. Same list for B (April 24)
+//		Dataset: May 3rd, 2024 for C. Same list for B (April 24)
 // v39. Fixed an issue with Summer23 MC input files which caused gaps in the HT histogram
 // v38. Added option for PU reweighting
 // v37. Added Summer23 MC samples
