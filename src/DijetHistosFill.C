@@ -55,6 +55,7 @@ bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
+bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
 
 // Core additions
 bool doPFComposition = true; // jetveto / incjet / dijet / multijet
@@ -304,6 +305,15 @@ public:
   //TH1F *hLumiPerRun;
 };
 
+class jetsperRuns
+{
+public:
+  string trg;
+  int trgpt;
+  double ptmin, ptmax, absetamin, absetamax;
+  TH1D *h1jetrate;
+  TH2D *h2jetpteta;
+};
 
 // Helper function to retrieve FactorizedJetCorrector
 FactorizedJetCorrector *getFJC(string l1 = "", string l2 = "", string res = "",
@@ -816,7 +826,7 @@ void DijetHistosFill::Loop()
   // 2022
   //  Align JECs with
   //  https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
-  if (dataset == "2022C" || dataset == "2022C_ZB")
+  if (dataset == "2022C" || dataset == "2022C_ZB" || dataset == "2022C_prompt" || dataset == "2022C_ZB_prompt")
   {
     jec = getFJC("",                                       // Winter22Run3_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
                                                            //"Winter22Run3_RunC_V2_DATA_L2Relative_AK4PFPuppi",
@@ -826,7 +836,7 @@ void DijetHistosFill::Loop()
                  "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
     //"");//"Winter22Run3_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
   }
-  if (dataset == "2022D" || dataset == "2022D_ZB")
+  if (dataset == "2022D" || dataset == "2022D_ZB" || dataset == "2022D_prompt" || dataset == "2022D_ZB_prompt")
   {
     jec = getFJC("",                                       // Winter22Run3_RunD_V2_DATA_L1FastJet_AK4PFPuppi",
                                                            //"Winter22Run3_RunD_V2_DATA_L2Relative_AK4PFPuppi",
@@ -1020,7 +1030,8 @@ void DijetHistosFill::Loop()
                  //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
 		 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
                  //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-		 "Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+		 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1031,7 +1042,20 @@ void DijetHistosFill::Loop()
                  //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
 		 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
                  //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-		 "Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+		 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1391,9 +1415,10 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379075_Golden.json"); // Released April 18, implemented April 22
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 29, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379470_Golden.json"); // April 30, 2024, 09:57
-      //LoadJSON("rootfiles/Cert_Collisions2024_378981_379866_Golden.json"); // May 3, 2024, 12:55
+      LoadJSON("rootfiles/Cert_Collisions2024_378981_379866_Golden.json"); // May 3, 2024, 12:55
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380238_DCSOnly_TkPx.json"); // May 2, 2024, 19:31
-      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380403_DCSOnly_TkPx.json"); // May 6, 2024, 11:51
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380403_DCSOnly_TkPx.json"); // May 6, 2024, 11:51
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380533_DCSOnly_TkPx.json"); // May 9, 2024, 19:31
 
   }
   int _nbadevts_json(0);
@@ -1414,6 +1439,7 @@ void DijetHistosFill::Loop()
   map<string, dijetHistos2 *> mhdj2;
   map<string, multijetHistos *> mhmj;
   map<string, lumiHistos *> mhlumi;
+  map<string, jetsperRuns *> mjet;
 
   bool dolumi = false; //Nestor. xsection plot. April 17, 2024.
   if (dolumi)
@@ -2166,6 +2192,40 @@ void DijetHistosFill::Loop()
       h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
     }
 
+    // Jets per runs
+    if (doJetsperRuns)
+    {
+
+      if (debug)
+        cout << "Setup doJetsperRuns " << trgpt << endl
+             << flush;
+
+      dout->mkdir("JetsperRuns");
+      dout->cd("JetsperRuns");
+
+      jetsperRuns *h = new jetsperRuns();
+
+      string &t = vtrg[itrg];
+      mjet[t] = h;
+      h->trg = t;
+      h->trgpt = trgpt;
+
+      struct range &r = mt[t];
+      h->ptmin = r.ptmin;
+      h->ptmax = r.ptmax;
+      h->absetamin = r.absetamin;
+      h->absetamax = r.absetamax;
+
+      //h->h1jetrate = new TH1D("h1jetrate", "", 2613, 369803.5, 372415.5); //2023D v1+v2
+      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 441, 378971.5, 379411.5); //2024B
+      h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 841, 379412.5, 380252.5); //2024C
+      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 841, 379412.5, 380252.5); //2024D
+      h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                          "N_{events}",
+                               nxd, vxd, nptd, vptd);
+
+    } // doJetsperRuns
+
   } // for itrg
 
   if (debugevent)
@@ -2187,7 +2247,8 @@ void DijetHistosFill::Loop()
       dataset == "2022D_ZB" || dataset == "Summer22" ||
       dataset == "Summer22Flat" ||
       TString(dataset.c_str()).Contains("Summer22MG") ||
-      TString(dataset.c_str()).Contains("Summer22MC"))
+      TString(dataset.c_str()).Contains("Summer22MC") ||
+      dataset == "2022C_prompt" || dataset == "2022C_ZB_prompt" || dataset == "2022D_prompt" || dataset == "2022D_ZB_prompt")
     fjv = new TFile("rootfiles/jetveto2022CD.root", "READ");
   if (dataset == "2022E" || dataset == "2022F" || dataset == "2022G" ||
       dataset == "2022F1" || dataset == "2022F2" ||
@@ -2208,7 +2269,8 @@ void DijetHistosFill::Loop()
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
   if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
-    fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");  
+    //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
+    fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -2232,7 +2294,8 @@ void DijetHistosFill::Loop()
       dataset == "2022D_ZB" || dataset == "Summer22" ||
       dataset == "Summer22Flat" ||
       TString(dataset.c_str()).Contains("Summer22MG") ||
-      TString(dataset.c_str()).Contains("Summer22MC"))
+      TString(dataset.c_str()).Contains("Summer22MC") ||
+      dataset == "2022C_prompt" || dataset == "2022C_ZB_prompt" || dataset == "2022D_prompt" || dataset == "2022D_ZB_prompt")
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   if (dataset == "2022E" || dataset == "2022F" || dataset == "2022G" ||
       dataset == "2022F1" || dataset == "2022F2" ||
@@ -3602,6 +3665,32 @@ void DijetHistosFill::Loop()
       }
       mrunls[run][luminosityBlock] = 1;
     } // doLumi
+
+    //doJetsperRun
+    if (doJetsperRuns)
+    {
+      for (int itrg = 0; itrg != ntrg; ++itrg)
+      {
+        for (int i = 0; i != njet; ++i)
+	{
+	  string &trg = vtrg[itrg];
+	  if (!(*mtrg[trg]))
+	    continue;
+
+	  jetsperRuns *h = mjet[trg];
+	  if (debugevent)
+	  {
+	    cout << "Analyze lumi" << endl
+	         << flush;
+	  }
+	  if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0)
+	  {
+	    h->h1jetrate->Fill(run, w);
+	    h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+          }
+	}
+      }
+    } // doJetsperRun
 
     h2mhtvsmet->Fill(p4t1met.Pt(), p4mht.Pt(), w);
   } // for jentry
