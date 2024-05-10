@@ -72,6 +72,8 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v43. 2024D with 2024C L2L3Res. New V2M jet veto map and V2M L2L3Res. First test for number of jets vs runs (NOT normalized by luminosity).
+//      Same Golden JSON. Cert_Collisions2024_378981_379866_Golden.json 
 // v42. 2022 prompt datasets for C and D. NanoAOD v8.
 // v41.1 2024 Prompt using DCSOnly from May 6.
 // v41. New jet veto maps: rootfiles/jetveto2024BC_V1M.root . New L2L3Res CondFormats/JetMETObjects/data/Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi.txt
