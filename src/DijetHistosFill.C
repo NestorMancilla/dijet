@@ -31,6 +31,7 @@
 #include <unordered_map>
 #include <array>
 #include <string_view>
+#include <algorithm>
 
 // Recalculate JECs
 bool redoJEC = true;
@@ -112,8 +113,9 @@ constexpr const char lumibyls2023C4[] = "luminosityscripts/csvfiles/lumibyls2023
 constexpr const char lumibyls2023C123[] = "luminosityscripts/csvfiles/lumibyls2023C123.csv";
 constexpr const char lumibyls2023ABC[] = "luminosityscripts/csvfiles/lumibyls2023ABC.csv";
 constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
+constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 19> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 23> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -133,6 +135,10 @@ constexpr std::array<std::pair<const char*, const char*>, 19> lumifiles = {{
     {"20223Cv123_ZB", lumibyls2023C123},
     {"2023D", lumibyls2023D},
     {"2023D_ZB", lumibyls2023D},
+    {"2024B", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
+    {"2024B_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
+    {"2024C", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
+    {"2024C_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -366,6 +372,188 @@ FactorizedJetCorrector *getFJC(string l1 = "", string l2 = "", string res = "",
 
   return jec;
 } // getFJC
+
+/////////////////////////
+/////////////////////////
+bool DijetHistosFill::LoadLumi()
+{
+  // For calculating luminosity on the fly based on .csv file and take only events with non-zero luminosity
+
+  const char *lumifile = getLumifile(dataset.c_str());
+
+  PrintInfo(string("Processing LoadLumi() with ") + lumifile + "...", true);
+
+  // Check lumi against the list of good runs
+  const int a_goodruns[] = {};
+  const int ngoodruns = sizeof(a_goodruns) / sizeof(a_goodruns[0]);
+  set<int> goodruns;
+  if (ngoodruns > 0)
+  { // This is an old remnant
+    for (int runidx = 0; runidx != ngoodruns; ++runidx)
+      goodruns.insert(a_goodruns[runidx]);
+
+    for (auto runit = goodruns.begin(); runit != goodruns.end(); ++runit)
+      cout << *runit << ", ";
+    cout << endl;
+  }
+  set<pair<int, int>> nolums;
+
+  ifstream f(lumifile, ios::in);
+  if (!f.is_open())
+    return false;
+  float secLS = 2.3310e+01;
+  string s;
+  int rn, fill, numls, ifoo;
+  //int rn, fill, ls, ifoo;
+  float del, rec, avgpu, energy;
+  char sfoo[512];
+  bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess1)
+    return false;
+  PrintInfo(string("\nstring: ") + s + " !", true);
+
+  // HOX: the lumi file format has been changing. Change the conditions when needed.
+  //if (s != "#Data tag : 23v1 , Norm tag: None")
+  if (s != "#Data tag : 24v1 , Norm tag: None")
+    return false;
+
+  bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess2)
+    return false;
+  PrintInfo(string("\nstring: ") + s + " !", true);
+  //if (s != "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source")
+  if (s != "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)")
+    return false;
+
+  int nls(0);
+  double lumsum(0);
+  double lumsum_good(0);
+  double lumsum_json(0);
+  bool skip(false);
+  std::set<int> runNumbers;
+  while (getline(f, s, '\n'))
+  {
+    // Skip if not STABLE BEAMS or wrong number of arguments
+    // STABLE BEAMS alts: ADJUST, BEAM DUMP, FLAT TOP, INJECTION PHYSICS BEAM, N/A, RAMP DOWN, SETUP, SQUEEZE
+    //if (sscanf(s.c_str(), "%d:%d,%d:%d,%d/%d/%d %d:%d:%d,STABLE BEAMS,%f,%f,%f,%f,%s",
+               //&rn, &fill, &ls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
+    if (sscanf(s.c_str(), "%d:%d,%d/%d/%d %d:%d:%d,%d,%d,%f,%f",
+               &rn, &fill, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &numls, &ifoo, &del, &rec) != 12)
+      skip = true;
+
+    if (debugevent)
+      PrintInfo(Form("Run %d ls %d lumi %f/pb", rn, numls, rec * 1e-6), true);
+
+    if (skip)
+    { // The user should know if this happens, since we can choose to use only STABLE BEAMS
+      if (skip)
+        PrintInfo(string("Skipping line (effects the recorded lumi):\n") + s, true);
+      skip = false;
+      continue;
+    }
+
+    //if (_lums[rn][numls] != 0)
+    if (_lums[rn] != 0)
+      return false;
+    //if (_avgpu[rn][numls] != 0)
+      //return false;
+    // lumiCalc.py returns lumi in units of mub-1 (=>nb-1=>pb-1)
+    double lum = rec * 1000.; //* 1e-6;
+    double lum2 = del * 1000.; //* 1e-6;
+    //Runs dictionary
+    if (runNumbers.find(rn) == runNumbers.end()) {
+      runNumbers.insert(rn);
+    }
+    std::vector<float> binEdges(runNumbers.begin(), runNumbers.end());
+    binEdges.push_back(*runNumbers.rbegin() + 1);
+    _runNumberBin = binEdges;
+    /*
+    std::cout << "binEdges: ";
+    for (auto it2 = binEdges.begin(); it2 != binEdges.end(); ++it2) {
+        std::cout << *it2;
+        if (it2 != binEdges.end() - 1) { // Print a comma after all elements except the last one
+            std::cout << ", ";
+        }
+    }
+    std::cout << std::endl;
+    */
+    //
+    if (lum == 0 and goodruns.find(rn) != goodruns.end() and (_json[rn][numls] == 1)) // The second condition had !jp::dojson or
+      nolums.insert(pair<int, int>(rn, nls));
+
+    //_avgpu[rn][numls] = avgpu * 69000. / 80000.; // brilcalc --minBiasXsec patch
+    //_lums[rn][numls] = lum;
+    _lums[rn] = lum;
+    _lums2[rn][numls] = lum2;
+    lumsum += lum;
+    if (goodruns.find(rn) != goodruns.end()) // Apr 17
+      lumsum_good += lum;
+    if ((_json[rn][numls]))
+      lumsum_json += lum;
+    ++nls;
+    if (nls > 100000000)
+      return false;
+  }
+
+  PrintInfo(Form("Called LoadLumi() with %s:\nLoaded %lu runs with %d lumi sections containing %f"
+                 " pb-1 of data,\n of which %f pb-1 is in good runs (%f%%)\nThis corresponds to %f"
+                 " hours of data-taking\nThe JSON file contains %f pb-1 (%f%%)",
+                 lumifile, _lums.size(), nls, lumsum, lumsum_good,
+                 100. * lumsum_good / lumsum, nls * secLS / 3600, lumsum_json, 100. * lumsum_json / lumsum),
+            true);
+
+  // Report any empty lumi section
+  if (nolums.size() != 0)
+  {
+    PrintInfo(Form("Warning, found %lu non-normalizable LS:", nolums.size()), true);
+    for (auto lumit = nolums.begin(); lumit != nolums.end(); ++lumit)
+    {
+      cout << " [" << lumit->first << "," << lumit->second;
+      auto lumit2 = lumit;
+      ++lumit2;
+      if (lumit2->first != lumit->first or lumit2->second != lumit->second + 1)
+        cout << "]";
+      else
+      {
+        for (int lumadd = 0; lumit2 != nolums.end() and lumit2->first == lumit->first and
+                             lumit2->second == lumit->second + lumadd + 1;
+             ++lumadd, ++lumit2)
+        {
+        };
+        lumit = --lumit2;
+        cout << "-" << lumit->second << "]";
+      }
+    } // for lumit
+    cout << endl;
+  } // nolums
+  cout << "lumsum value: " << lumsum << endl;
+  cout << endl;
+  _lumsum = lumsum;
+  cout << "_lumsum value: " << _lumsum << endl;
+  //Unique run numbers
+  /*
+  for (const auto& number : runNumbers) {
+      std::cout << number << std::endl;
+  }
+  
+  int run_example = 379866;
+  auto it = runNumbers.find(run_example);
+  if (it != runNumbers.end()) {
+      std::cout << run_example << " is included in runNumbers." << std::endl;
+  } else {
+      std::cout << run_example << " is not included in runNumbers." << std::endl;
+  }
+  auto it3 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run_example);
+  if (it3 != _runNumberBin.end()) {
+      std::cout << "run_example is included in binEdges." << std::endl;
+  } else {
+      std::cout << "run_example is not included in binEdges." << std::endl;
+  }
+  */
+  return true;
+} // LoadLumi
+
+/////////////////////////
 
 void DijetHistosFill::Loop()
 {
@@ -1441,7 +1629,7 @@ void DijetHistosFill::Loop()
   map<string, lumiHistos *> mhlumi;
   map<string, jetsperRuns *> mjet;
 
-  bool dolumi = false; //Nestor. xsection plot. April 17, 2024.
+  bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
   if (dolumi)
     LoadLumi();
 
@@ -2215,10 +2403,24 @@ void DijetHistosFill::Loop()
       h->ptmax = r.ptmax;
       h->absetamin = r.absetamin;
       h->absetamax = r.absetamax;
-
+      //for (int i = 0; i < _runNumberBin.size(); ++i) {
+      //  std::cout << i << " " << _runNumberBin[i] << std::endl;
+      //}
+      //std::cout << std::endl;
+      //std::cout << "_runNumberBin size: "  << _runNumberBin.size() <<  std::endl;
+      /*
+      std::cout << "binEdges: ";
+      for (auto it4 = _runNumberBin.begin(); it4 != _runNumberBin.end(); ++it4) {
+        std::cout << *it4;
+        if (it4 != _runNumberBin.end() - 1) { // Print a comma after all elements except the last one
+            std::cout << ", ";
+        }
+      }
+      */
       //h->h1jetrate = new TH1D("h1jetrate", "", 2613, 369803.5, 372415.5); //2023D v1+v2
       //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 441, 378971.5, 379411.5); //2024B
-      h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 841, 379412.5, 380252.5); //2024C
+      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 841, 379412.5, 380252.5); //2024C
+      h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
       //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 841, 379412.5, 380252.5); //2024D
       h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                           "N_{events}",
@@ -2379,6 +2581,13 @@ void DijetHistosFill::Loop()
   Float_t Jet_CF[nJetMax];
   Float_t Jet_genDR[nJetMax];
   // Float_t Jet_smearFactor[nJetMax];
+
+  /*
+  //To check the luminosity and the function Load Lumi is called 
+  bool is_load_lumi = LoadLumi(); // try to load lumi information
+  cout << "Load Lumi: " << is_load_lumi << endl;
+  cout << "_lumsum: " << _lumsum << endl;
+  */
 
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry = 0; jentry < nentries; jentry++)
@@ -3633,10 +3842,12 @@ void DijetHistosFill::Loop()
           cout << "Analyze lumi" << endl
                << flush;
         }
-        float lum = _lums[run][luminosityBlock];
-        float lum2 = _lums2[run][luminosityBlock];
+        //float lum = _lums[run][luminosityBlock];
+        //float lum2 = _lums2[run][luminosityBlock];
+        float lum = _lums[run];
+        //float lum2 = _lums2[run][luminosityBlock];
         h->lum += lum; // /prescale
-        h->lum2 += lum2; // /prescale
+        //h->lum2 += lum2; // /prescale
         // TODO:
         // PRESCALE INFORMATION
         /*
@@ -3684,7 +3895,16 @@ void DijetHistosFill::Loop()
 	         << flush;
 	  }
 	  if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0)
-	  {
+	  { 
+	    auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
+	    if (it5 != _runNumberBin.end()){
+              //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
+	      //w = 1./_lums[run];
+	      w = (isMC ? genWeight : 1./_lums[run]);
+	    }
+	    else {
+	      w = (isMC ? genWeight : 1.); 
+	    }
 	    h->h1jetrate->Fill(run, w);
 	    h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
           }
@@ -3779,7 +3999,7 @@ void DijetHistosFill::PrintInfo(string info, bool printcout)
     cout << info << endl
          << flush;
 }
-
+/*
 // Load luminosity information
 // TODO:
 // Currently no good runs are defined
@@ -3912,6 +4132,8 @@ bool DijetHistosFill::LoadLumi()
   cout << endl;
   return true;
 } // LoadLumi
+
+*/
 
 // Code originally from jetphys/HistosFill.C
 bool DijetHistosFill::LoadJSON(string json)
