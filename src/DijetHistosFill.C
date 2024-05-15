@@ -113,9 +113,11 @@ constexpr const char lumibyls2023C4[] = "luminosityscripts/csvfiles/lumibyls2023
 constexpr const char lumibyls2023C123[] = "luminosityscripts/csvfiles/lumibyls2023C123.csv";
 constexpr const char lumibyls2023ABC[] = "luminosityscripts/csvfiles/lumibyls2023ABC.csv";
 constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
-constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
+//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
+//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
+constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 23> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 25> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -135,10 +137,12 @@ constexpr std::array<std::pair<const char*, const char*>, 23> lumifiles = {{
     {"20223Cv123_ZB", lumibyls2023C123},
     {"2023D", lumibyls2023D},
     {"2023D_ZB", lumibyls2023D},
-    {"2024B", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
-    {"2024B_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
-    {"2024C", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
-    {"2024C_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024D 
+    {"2024B", lumibyls2024BC}, //Luminosity per run for prompt 2024BC 
+    {"2024B_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024BC 
+    {"2024C", lumibyls2024BC}, //Luminosity per run for prompt 2024BC
+    {"2024C_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024BC
+    {"2024D", lumibyls2024BC}, //Luminosity per run for prompt 2024D
+    {"2024D_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024D
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -1161,7 +1165,8 @@ void DijetHistosFill::Loop()
   // }
 
   if (dataset == "2023B" || dataset == "2023B_ZB" || dataset == "2023BCv123" || 
-      dataset == "2023BCv123_ZB" || dataset == "2023Cv123" || dataset == "2023Cv123_ZB")
+      dataset == "2023BCv123_ZB" || dataset == "2023Cv123" || dataset == "2023Cv123_ZB" ||
+      dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt")
   {
     jec = getFJC("",                                                               // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
                                                                                    //"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
@@ -1170,7 +1175,8 @@ void DijetHistosFill::Loop()
                  "Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
   }
 
-  if (dataset == "2023Cv4" || dataset == "2023Cv4_ZB")
+  if (dataset == "2023Cv4" || dataset == "2023Cv4_ZB" || 
+      dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt")
   {
     jec = getFJC("",                                                             // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
                                                                                  //"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
@@ -1179,7 +1185,8 @@ void DijetHistosFill::Loop()
                  "Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
   }
 
-  if (dataset == "2023D" || dataset == "2023D_ZB")
+  if (dataset == "2023D" || dataset == "2023D_ZB" ||
+      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt")
   {
     jec = getFJC("",                                                           // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
                                                                                //"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
@@ -1603,10 +1610,12 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379075_Golden.json"); // Released April 18, implemented April 22
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380074_DCSOnly_TkPx.json"); // April 29, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_379470_Golden.json"); // April 30, 2024, 09:57
-      LoadJSON("rootfiles/Cert_Collisions2024_378981_379866_Golden.json"); // May 3, 2024, 12:55
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_379866_Golden.json"); // May 3, 2024, 12:55
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380238_DCSOnly_TkPx.json"); // May 2, 2024, 19:31
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380403_DCSOnly_TkPx.json"); // May 6, 2024, 11:51
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380533_DCSOnly_TkPx.json"); // May 9, 2024, 19:31
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_380115_Golden.json"); // May 13, 2024, 19:33
+      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 14, 2024, 19:31
 
   }
   int _nbadevts_json(0);
@@ -1629,7 +1638,7 @@ void DijetHistosFill::Loop()
   map<string, lumiHistos *> mhlumi;
   map<string, jetsperRuns *> mjet;
 
-  bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
+  bool dolumi = false; //Nestor. xsection plot. April 17, 2024.
   if (dolumi)
     LoadLumi();
 
@@ -2381,7 +2390,7 @@ void DijetHistosFill::Loop()
     }
 
     // Jets per runs
-    if (doJetsperRuns)
+    if (doJetsperRuns && dolumi)
     {
 
       if (debug)
@@ -2463,7 +2472,10 @@ void DijetHistosFill::Loop()
       dataset == "2023Cv123" || dataset == "2023Cv4" ||
       dataset == "2023B_ZB" || dataset == "2023C_ZB" || dataset == "2023BCv123_ZB" ||
       dataset == "2023Cv123_ZB" || dataset == "2023Cv4_ZB" ||
-      dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" || 
+      dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" ||
+      dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt" || 
+      dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt" ||
+      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MC") ||
       (TString(dataset.c_str()).Contains("Summer23MG") && ! TString(dataset.c_str()).Contains("MGBPix")))
     fjv = new TFile("rootfiles/jetveto2023BC.root", "READ");
@@ -2510,6 +2522,9 @@ void DijetHistosFill::Loop()
       dataset == "2023Cv123" || dataset == "2023Cv4" ||
       dataset == "2023B_ZB" || dataset == "2023C_ZB" || dataset == "2023BCv123_ZB" ||
       dataset == "2023Cv123_ZB" || dataset == "2023Cv4_ZB" ||
+      dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt" ||
+      dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt" ||
+      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" ||
       TString(dataset.c_str()).Contains("Summer23MC") ||
       (TString(dataset.c_str()).Contains("Summer23MG") && ! TString(dataset.c_str()).Contains("MGBPix")))
@@ -3878,7 +3893,7 @@ void DijetHistosFill::Loop()
     } // doLumi
 
     //doJetsperRun
-    if (doJetsperRuns)
+    if (doJetsperRuns && dolumi)
     {
       for (int itrg = 0; itrg != ntrg; ++itrg)
       {

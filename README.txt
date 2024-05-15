@@ -72,6 +72,13 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v46. Process for 2023 Cv123, Cv4 and D using prompt data.
+//      To avoid possible problems from luminosity histograms, dolumi = false and dolumi include in if (jetsperrun && dolumi) to avoid this hist
+// v45. Process for 2024B and C prompt using Cert_Collisions2024_378981_380115_Golden.json. Luminosity file lumibyrun2024_378981_380115_Golden.csv
+// v44. First process using lumunosity from Brilcalc. 
+//	Same selection as inclusive jets Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0
+//      CVS file based on Golden JSON Cert_Collisions2024_378981_379866_Golden.json
+// v43.1 Process for 2024 B and C using DCSOnly Collisions24_13p6TeV_378981_380533_DCSOnly_TkPx.json
 // v43. 2024D with 2024C L2L3Res. New V2M jet veto map and V2M L2L3Res. First test for number of jets vs runs (NOT normalized by luminosity).
 //      Same Golden JSON. Cert_Collisions2024_378981_379866_Golden.json 
 // v42. 2022 prompt datasets for C and D. NanoAOD v8.
