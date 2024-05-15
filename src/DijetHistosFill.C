@@ -2475,11 +2475,11 @@ void DijetHistosFill::Loop()
       dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" ||
       dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt" || 
       dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt" ||
-      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MC") ||
       (TString(dataset.c_str()).Contains("Summer23MG") && ! TString(dataset.c_str()).Contains("MGBPix")))
     fjv = new TFile("rootfiles/jetveto2023BC.root", "READ");
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
+      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
   if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
@@ -2524,12 +2524,12 @@ void DijetHistosFill::Loop()
       dataset == "2023Cv123_ZB" || dataset == "2023Cv4_ZB" ||
       dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt" ||
       dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt" ||
-      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       dataset == "Summer23MCFlat" || dataset == "Summer23MCBPixFlat" ||
       TString(dataset.c_str()).Contains("Summer23MC") ||
       (TString(dataset.c_str()).Contains("Summer23MG") && ! TString(dataset.c_str()).Contains("MGBPix")))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   if (dataset == "2023D" || dataset == "2023D_ZB" ||
+      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
