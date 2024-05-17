@@ -72,6 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v49. Process for 2024 HLT Jet500 skim data and Mc Winter24. New golden JSON file: Cert_Collisions2024_378981_380470_Golden.json. No JER SF (No smearing) 
+// v48. Process for 2024 HLT Jet500 skimm data files. Adding the TH2D PF compositions vs pT. dolumi false to avoid problems with the empty histograms.
+//	Same golden JSON file
+// v47. To be added: Jet pt, pass the vector that stores the run numbers from float to double, eta regions, add 0.5 to each binning, triggers 
 // v46. Process for 2023 Cv123, Cv4 and D using prompt data.
 //      To avoid possible problems from luminosity histograms, dolumi = false and dolumi include in if (jetsperrun && dolumi) to avoid this hist
 // v45. Process for 2024B and C prompt using Cert_Collisions2024_378981_380115_Golden.json. Luminosity file lumibyrun2024_378981_380115_Golden.csv

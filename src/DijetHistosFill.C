@@ -40,7 +40,7 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = true;
+bool smearJets = false;
 bool useJERSFvsPt = true; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
@@ -114,8 +114,8 @@ constexpr const char lumibyls2023C123[] = "luminosityscripts/csvfiles/lumibyls20
 constexpr const char lumibyls2023ABC[] = "luminosityscripts/csvfiles/lumibyls2023ABC.csv";
 constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
-//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
-constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
+constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
+//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 25> lumifiles = {{
     {"2022C", lumibyls2022C},
@@ -168,6 +168,9 @@ struct range
   double absetamax;
 };
 std::map<std::string, struct range> mt;
+// Hardcoded pT, eta thresholds for each trigger
+// used in e.g. jetrate
+std::map<std::string, struct range> mi;
 
 // CLASS DEFINITIONS
 class mctruthHistos
@@ -225,6 +228,8 @@ public:
   // (Optional) composition plots
   TProfile2D *p2pt, *p2rho, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13;
+  // Related to the tails issue. May 17, 2024. Nestor
+  TH2D *h2chf13;
 };
 
 class dijetHistos
@@ -434,7 +439,7 @@ bool DijetHistosFill::LoadLumi()
   double lumsum_good(0);
   double lumsum_json(0);
   bool skip(false);
-  std::set<int> runNumbers;
+  std::set<double> runNumbers;
   while (getline(f, s, '\n'))
   {
     // Skip if not STABLE BEAMS or wrong number of arguments
@@ -465,10 +470,23 @@ bool DijetHistosFill::LoadLumi()
     double lum = rec * 1000.; //* 1e-6;
     double lum2 = del * 1000.; //* 1e-6;
     //Runs dictionary
+    
     if (runNumbers.find(rn) == runNumbers.end()) {
       runNumbers.insert(rn);
     }
-    std::vector<float> binEdges(runNumbers.begin(), runNumbers.end());
+
+    /*
+    double runWithOffset = rn + 0.5;
+    if (runNumbers.find(runWithOffset) == runNumbers.end()) {
+        runNumbers.insert(runWithOffset);
+        std::cout << "rn_with_offset: " << runWithOffset << std::endl;
+    }
+    std::cout << "Contents of runNumbers:" << std::endl;
+    for (const auto& num : runNumbers) {
+        std::cout << num << std::endl;
+    }
+    */
+    std::vector<double> binEdges(runNumbers.begin(), runNumbers.end());
     binEdges.push_back(*runNumbers.rbegin() + 1);
     _runNumberBin = binEdges;
     /*
@@ -860,7 +878,30 @@ void DijetHistosFill::Loop()
   mt["HLT_PFJetFwd450"] = range{500, 600, fwdeta0, 5.2}; // x
   mt["HLT_PFJetFwd500"] = range{600, 6500, fwdeta0, 5.2};
 
-
+  // For jetrate vs runs
+  mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0};
+  mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};
+  mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta};
+  mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
+  mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0};
+  mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0};
+  mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0};
+  mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0};
+  mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0};
+  mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0};
+  //mi["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
+    
+  mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2};
+  mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2};
+  mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2};
+  mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2};
+  mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2};
+  mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2};
+  mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2};
+  mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2};
+  mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2};
+  mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
+  ///
 
   if (debug)
     cout << "Setting up JEC corrector" << endl
@@ -1196,10 +1237,11 @@ void DijetHistosFill::Loop()
 		 "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
   }
 
-  if (dataset == "Winter24MCFlat" )
+  if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
   {
     jec = getFJC("",
-                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
+		 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI"
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
                  //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
                  "");
     jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
@@ -1215,6 +1257,18 @@ void DijetHistosFill::Loop()
     jec = getFJC("",
                  "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
                  "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (TString(dataset.c_str()).Contains("2024_skim")  || dataset == "2024_skim_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1615,7 +1669,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380403_DCSOnly_TkPx.json"); // May 6, 2024, 11:51
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380533_DCSOnly_TkPx.json"); // May 9, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_380115_Golden.json"); // May 13, 2024, 19:33
-      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 14, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 14, 2024, 19:31
+      LoadJSON("rootfiles/Cert_Collisions2024_378981_380470_Golden.json"); // May 16, 2024, 11:13
 
   }
   int _nbadevts_json(0);
@@ -1925,6 +1980,9 @@ void DijetHistosFill::Loop()
         h->pchf13 = new TProfile("pchf13", ";#eta;p_{T,jet} (GeV);"
                                            "CHF",
                                  npt, vpt);
+        h->h2chf13 = new TH2D("h2chf13", ";p_{T,jet} (GeV);CHF;"
+                                           "CHF",
+                                 npt, vpt, 132, 0, 1+4./128);
         h->pnhf13 = new TProfile("pnhf13", ";#eta;p_{T,jet} (GeV);"
                                            "NHF",
                                  npt, vpt);
@@ -2389,6 +2447,7 @@ void DijetHistosFill::Loop()
       h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
     }
 
+    /*
     // Jets per runs
     if (doJetsperRuns && dolumi)
     {
@@ -2417,27 +2476,53 @@ void DijetHistosFill::Loop()
       //}
       //std::cout << std::endl;
       //std::cout << "_runNumberBin size: "  << _runNumberBin.size() <<  std::endl;
-      /*
-      std::cout << "binEdges: ";
-      for (auto it4 = _runNumberBin.begin(); it4 != _runNumberBin.end(); ++it4) {
-        std::cout << *it4;
-        if (it4 != _runNumberBin.end() - 1) { // Print a comma after all elements except the last one
-            std::cout << ", ";
-        }
-      }
-      */
-      //h->h1jetrate = new TH1D("h1jetrate", "", 2613, 369803.5, 372415.5); //2023D v1+v2
-      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 441, 378971.5, 379411.5); //2024B
-      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 841, 379412.5, 380252.5); //2024C
+      
+      //std::cout << "binEdges: ";
+      //for (auto it4 = _runNumberBin.begin(); it4 != _runNumberBin.end(); ++it4) {
+       // std::cout << *it4;
+        //if (it4 != _runNumberBin.end() - 1) { // Print a comma after all elements except the last one
+         //   std::cout << ", ";
+       // }
+      //}
+      
       h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
-      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;NumberOfJets;", 841, 379412.5, 380252.5); //2024D
       h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                           "N_{events}",
                                nxd, vxd, nptd, vptd);
 
     } // doJetsperRuns
+    */ 
 
   } // for itrg
+
+  // Jets per runs
+  if (doJetsperRuns && dolumi)
+  {
+    TDirectory *dout = gDirectory;
+
+    dout->mkdir("JetsperRuns");
+    dout->cd("JetsperRuns");
+
+    jetsperRuns *h = new jetsperRuns();
+
+    //for (int i = 0; i < _runNumberBin.size(); ++i) {
+    //  std::cout << i << " " << _runNumberBin[i] << std::endl;
+    //}
+    //std::cout << std::endl;
+    //std::cout << "_runNumberBin size: "  << _runNumberBin.size() <<  std::endl;
+      
+    //std::cout << "binEdges: ";
+    //for (auto it4 = _runNumberBin.begin(); it4 != _runNumberBin.end(); ++it4) {
+     // std::cout << *it4;
+      //if (it4 != _runNumberBin.end() - 1) { // Print a comma after all elements except the last one
+       //   std::cout << ", ";
+     // }
+    //}
+    h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
+    h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                        "N_{events}",
+                             nxd, vxd, nptd, vptd);
+  }
 
   if (debugevent)
     cout << "Load jet veto maps" << endl
@@ -2482,7 +2567,7 @@ void DijetHistosFill::Loop()
       dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
-  if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
+  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat"))
     //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
     fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
   assert(fjv);
@@ -2532,7 +2617,7 @@ void DijetHistosFill::Loop()
       dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
-  if (TString(dataset.c_str()).Contains("2024")  || dataset == "Winter24MCFlat")
+  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   assert(h2jv);
 
@@ -2634,6 +2719,7 @@ void DijetHistosFill::Loop()
                      laptime.RealTime(), nlap);
 	cout << Form("\nEvents per second: %1.2f", events_per_second); // Print events per second
       }
+      //cout << "Flag befeore the jets entry " << endl;
       if (jentry != 0 && nlap != 0)
       {
         cout << Form("\nEstimated runtime:  %1.0f sec. "
@@ -3194,6 +3280,7 @@ void DijetHistosFill::Loop()
                 h->ppt13->Fill(pt, Jet_pt[i], w);
                 h->prho13->Fill(pt, rho, w);
                 h->pchf13->Fill(pt, Jet_chHEF[i], w);
+		h->h2chf13->Fill(pt, Jet_chHEF[i], w);
                 h->pnhf13->Fill(pt, Jet_neHEF[i], w);
                 h->pnef13->Fill(pt, Jet_neEmEF[i], w);
                 h->pcef13->Fill(pt, Jet_chEmEF[i], w);
@@ -3893,6 +3980,41 @@ void DijetHistosFill::Loop()
     } // doLumi
 
     //doJetsperRun
+    /*
+    if (doJetsperRuns && dolumi)
+    {
+      for (int itrg = 0; itrg != ntrg; ++itrg)
+      {
+        for (int i = 0; i != njet; ++i)
+	{
+	  string &trg = vtrg[itrg];
+	  if (!(*mtrg[trg]))
+	    continue;
+
+	  jetsperRuns *h = mjet[trg];
+	  if (debugevent)
+	  {
+	    cout << "Analyze lumi" << endl
+	         << flush;
+	  }
+	  if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0) // abs(p4g.Eta()) < 1.3
+	  { 
+	    auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
+	    if (it5 != _runNumberBin.end()){
+              //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
+	      w = (isMC ? genWeight : 1./_lums[run]);
+	    }
+	    else {
+	      w = (isMC ? genWeight : 1.); 
+	    }
+	    h->h1jetrate->Fill(run, w);
+	    h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+          }
+	}
+      }
+    } // doJetsperRun
+    */
+
     if (doJetsperRuns && dolumi)
     {
       for (int itrg = 0; itrg != ntrg; ++itrg)
@@ -3920,12 +4042,19 @@ void DijetHistosFill::Loop()
 	    else {
 	      w = (isMC ? genWeight : 1.); 
 	    }
-	    h->h1jetrate->Fill(run, w);
-	    h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+	    //std::cout << "Before the p4.pt selection " << std::endl; 
+	    if (p4.Pt() >= mi[trg].ptmin && p4.Pt() < mi[trg].ptmax &&
+	        fabs(p4.Eta()) >= mi[trg].absetamin && fabs(p4.Eta()) < mi[trg].absetamax) {
+	      h->h1jetrate->Fill(run, w);
+	      //h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+	      //std::cout << "The p4.pt is passing the selection " << std::endl;  
+            }
           }
 	}
       }
     } // doJetsperRun
+    
+
 
     h2mhtvsmet->Fill(p4t1met.Pt(), p4mht.Pt(), w);
   } // for jentry
