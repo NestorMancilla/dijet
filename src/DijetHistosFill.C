@@ -114,8 +114,10 @@ constexpr const char lumibyls2023C123[] = "luminosityscripts/csvfiles/lumibyls20
 constexpr const char lumibyls2023ABC[] = "luminosityscripts/csvfiles/lumibyls2023ABC.csv";
 constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
-constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
+//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
+//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380470_Golden.csv";
+constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 25> lumifiles = {{
     {"2022C", lumibyls2022C},
@@ -1672,7 +1674,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380533_DCSOnly_TkPx.json"); // May 9, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_380115_Golden.json"); // May 13, 2024, 19:33
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 14, 2024, 19:31
-      LoadJSON("rootfiles/Cert_Collisions2024_378981_380470_Golden.json"); // May 16, 2024, 11:13
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_380470_Golden.json"); // May 16, 2024, 11:13
+      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 16, 2024, 19:30
 
   }
   int _nbadevts_json(0);
@@ -1695,7 +1698,7 @@ void DijetHistosFill::Loop()
   map<string, lumiHistos *> mhlumi;
   map<string, jetsperRuns *> mjet;
 
-  bool dolumi = false; //Nestor. xsection plot. April 17, 2024.
+  bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
   if (dolumi)
     LoadLumi();
 
@@ -2449,7 +2452,7 @@ void DijetHistosFill::Loop()
       h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
     }
 
-    /*
+    
     // Jets per runs
     if (doJetsperRuns && dolumi)
     {
@@ -2493,10 +2496,11 @@ void DijetHistosFill::Loop()
                                nxd, vxd, nptd, vptd);
 
     } // doJetsperRuns
-    */ 
+     
 
   } // for itrg
 
+  /*
   // Jets per runs
   if (doJetsperRuns && dolumi)
   {
@@ -2525,6 +2529,7 @@ void DijetHistosFill::Loop()
                                         "N_{events}",
                              nxd, vxd, nptd, vptd);
   }
+  */
 
   if (debugevent)
     cout << "Load jet veto maps" << endl
@@ -3982,7 +3987,7 @@ void DijetHistosFill::Loop()
     } // doLumi
 
     //doJetsperRun
-    /*
+    
     if (doJetsperRuns && dolumi)
     {
       for (int itrg = 0; itrg != ntrg; ++itrg)
@@ -4015,8 +4020,8 @@ void DijetHistosFill::Loop()
 	}
       }
     } // doJetsperRun
-    */
-
+    
+    /*
     if (doJetsperRuns && dolumi)
     {
       for (int itrg = 0; itrg != ntrg; ++itrg)
@@ -4055,7 +4060,7 @@ void DijetHistosFill::Loop()
 	}
       }
     } // doJetsperRun
-    
+    */
 
 
     h2mhtvsmet->Fill(p4t1met.Pt(), p4mht.Pt(), w);
