@@ -72,7 +72,8 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
-// v51. Added a single luminosity directory instead of directories per trigger. Added triggers from DijetCombine.C for incl to apply before fill the hist.
+// v51. Added a single luminosity directory instead of directories per trigger. Added triggers from DijetCombine.C for incl to apply before 
+//      fill the hist. Binnig vector double instead of int.
 //      378981_380470 Golden JSON file used 
 //      MC Winter24 Flat to compare. dolumi = false.
 //      The code for jet rate per run per triggers still there but commented.
@@ -80,7 +81,8 @@ Bugs:
 // v50.1 Same as v50 but using DCSOnly.
 // v50. Process for 2024 data using the Cert_Collisions2024_378981_380470_Golden.json JSON file. The luminosity test is added. 
 // v49. Process for 2024 HLT Jet500 skim data and Mc Winter24. New golden JSON file: Cert_Collisions2024_378981_380470_Golden.json. No JER SF (No smearing) 
-// v48. Process for 2024 HLT Jet500 skimm data files. Adding the TH2D PF compositions vs pT. dolumi false to avoid problems with the empty histograms.
+// v48. Process for 2024 HLT Jet500 skimm data files. Adding in inclusive directory the TH2D PF compositions vs pT. dolumi false to avoid 
+//      problems with the empty histograms.
 //	Same golden JSON file
 // v47. To be added: Jet pt, pass the vector that stores the run numbers from float to double, eta regions, add 0.5 to each binning, triggers 
 // v46. Process for 2023 Cv123, Cv4 and D using prompt data.
