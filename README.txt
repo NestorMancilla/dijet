@@ -74,6 +74,7 @@ Bugs:
 
 // v51. Added a single luminosity directory instead of directories per trigger. Added triggers from DijetCombine.C for incl to apply before fill the hist.
 //      378981_380470 Golden JSON file used 
+//      MC Winter24 Flat to compare. dolumi = false.
 //      The code for jet rate per run per triggers still there but commented.
 //      To fix: if dolumi = false, the jetrate lumi directory will exist. 
 // v50.1 Same as v50 but using DCSOnly.
