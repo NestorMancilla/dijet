@@ -72,6 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v53. Test for gluon jets. Activate branch Jet_btagPNetQvG (NanoAODv12). Add new directory for MPF/DB calculations for dijet.
+//      Add the requirement if (Jet_btagPNetQvG[j] < working_point. Working points: 0.16 (tight gluons), 0.33 (medium), 0.55 (loose gluons).
+//      To do after: unclustered energy and extra activity should be looked at.
+// v52. Added the jet veto for BPix to prompt 24. It could be included in Jet_jetveto[i] or not. Set false for next versions.
 // v51. Added a single luminosity directory instead of directories per trigger. Added triggers from DijetCombine.C for incl to apply before 
 //      fill the hist. Binnig vector double instead of int.
 //      378981_380470 Golden JSON file used 

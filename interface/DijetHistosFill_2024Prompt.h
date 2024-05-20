@@ -50,7 +50,7 @@ public :
    //map<int, map<int, float> > _lums;
    map<int, float> _lums;
    double _lumsum;
-   std::vector<float> _runNumberBin;
+   std::vector<double> _runNumberBin;
    map<int, map<int, float> > _lums2;
    map<int, map<int, float> > _avgpu;
 //    map<string, TH1D*> _pudist;
@@ -58,6 +58,8 @@ public :
 
    Bool_t HLT_MC = kTRUE;
    Bool_t Jet_jetveto[100];
+   Bool_t Jet_jetveto_BPix[100];
+   Bool_t Jet_jetvetomap[100];
 
    
   

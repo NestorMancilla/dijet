@@ -2577,6 +2577,8 @@ void DijetHistosFill::Loop()
   // h2hot_ul17_plus_hep17_plus_hbpw89 (UL17)
   // h2hot_ul18_plus_hem1516_and_hbp2m1 (UL18)
   TH2D *h2jv(0);
+  // To add BPix veto for prompt 2024
+  TH2D *h2jvBPix(0);
   if (isRun2 == 1 || isRun2 == 2)
   { // TString(ds.c_str()).Contains("2016")) {
     h2jv = (TH2D *)fjv->Get("h2hot_ul16_plus_hbm2_hbp12_qie11");
@@ -2619,7 +2621,9 @@ void DijetHistosFill::Loop()
     h2jv = (TH2D *)fjv->Get("jetvetomap");
   if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
+    h2jvBPix = (TH2D *)fjv->Get("jetvetomap_bpix");
   assert(h2jv);
+
 
   // Long64_t nentries = fChain->GetEntriesFast();
   Long64_t nentries = fChain->GetEntries(); // Long startup time
@@ -2928,7 +2932,18 @@ void DijetHistosFill::Loop()
       { // check jet veto
         int i1 = h2jv->GetXaxis()->FindBin(Jet_eta[i]);
         int j1 = h2jv->GetYaxis()->FindBin(Jet_phi[i]);
-        Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
+        int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
+        int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
+        Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
+	Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
+
+	if (bool dojv_andBPix = false)
+	{
+	  Jet_jetveto[i] = Jet_jetvetomap[i] || Jet_jetveto_BPix[i]; 
+	}
+	else {
+          Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
+	}
       } // jet veto
       else
         Jet_jetveto[i] = false;
