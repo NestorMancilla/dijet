@@ -72,6 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v51. Added a single luminosity directory instead of directories per trigger. Added triggers from DijetCombine.C for incl to apply before fill the hist.
+//      378981_380470 Golden JSON file used 
+//      The code for jet rate per run per triggers still there but commented.
+//      To fix: if dolumi = false, the jetrate lumi directory will exist. 
 // v50.1 Same as v50 but using DCSOnly.
 // v50. Process for 2024 data using the Cert_Collisions2024_378981_380470_Golden.json JSON file. The luminosity test is added. 
 // v49. Process for 2024 HLT Jet500 skim data and Mc Winter24. New golden JSON file: Cert_Collisions2024_378981_380470_Golden.json. No JER SF (No smearing) 
