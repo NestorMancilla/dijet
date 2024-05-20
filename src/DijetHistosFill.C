@@ -328,8 +328,9 @@ public:
   string trg;
   int trgpt;
   double ptmin, ptmax, absetamin, absetamax;
-  TH1D *h1jetrate;
-  TH2D *h2jetpteta;
+  // Jet rate per trigger
+  //TH1D *h1jetrate;
+  //TH2D *h2jetpteta;
 };
 
 // Helper function to retrieve FactorizedJetCorrector
@@ -881,28 +882,30 @@ void DijetHistosFill::Loop()
   mt["HLT_PFJetFwd500"] = range{600, 6500, fwdeta0, 5.2};
 
   // For jetrate vs runs
-  mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0};
-  mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};
-  mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta};
-  mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
-  mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0};
-  mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0};
-  mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0};
-  mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0};
-  mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0};
-  mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0};
+  mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
+  mi["HLT_MC"]       = range{15,6500,  0, 5.2};
+  mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
+  mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
+  mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
+  mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
+  mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0}; // 4
+  mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0}; // 5
+  mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0}; // 6
+  mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0}; // 7
+  mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0}; // 8
+  mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0}; // 9
   //mi["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
     
-  mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2};
-  mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2};
-  mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2};
-  mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2};
-  mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2};
-  mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2};
-  mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2};
-  mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2};
-  mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2};
-  mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
+  mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2}; //  10
+  mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2}; // 11
+  mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2}; // 12
+  mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2}; // 13
+  mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2}; // 14
+  mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2}; // 15
+  mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2}; // 16
+  mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2}; // 16
+  mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2}; // 17
+  mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2}; // 18
   ///
 
   if (debug)
@@ -1596,6 +1599,26 @@ void DijetHistosFill::Loop()
   fout->cd("Refs");
   TH1D *hnjet = new TH1D("hnjet", "hnjet", 500, 0, 500);
 
+  bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
+  if (dolumi)
+    LoadLumi();
+
+  /*
+  if (dolumi =true) {
+    fout->mkdir("JetsperRuns");
+    fout->cd("JetsperRuns");
+    TH1D *h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
+    TH2D *h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+		                           "N_{events}",
+                                nxd, vxd, nptd, vptd);
+  }
+  */
+  fout->mkdir("JetsperRuns");
+  fout->cd("JetsperRuns");
+  TH1D *h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
+  TH2D *h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                         "N_{events}",
+                              nxd, vxd, nptd, vptd);
   /*
   // PF composition plots
   // Copy L2Res histograms for multiple pT bins
@@ -1698,9 +1721,9 @@ void DijetHistosFill::Loop()
   map<string, lumiHistos *> mhlumi;
   map<string, jetsperRuns *> mjet;
 
-  bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
-  if (dolumi)
-    LoadLumi();
+  //bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
+  //if (dolumi)
+  //  LoadLumi();
 
   for (int itrg = 0; itrg != ntrg; ++itrg)
   {
@@ -2452,8 +2475,8 @@ void DijetHistosFill::Loop()
       h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
     }
 
-    
-    // Jets per runs
+    /*
+    // Jets per runs per triggers
     if (doJetsperRuns && dolumi)
     {
 
@@ -2461,8 +2484,8 @@ void DijetHistosFill::Loop()
         cout << "Setup doJetsperRuns " << trgpt << endl
              << flush;
 
-      dout->mkdir("JetsperRuns");
-      dout->cd("JetsperRuns");
+      fout->mkdir("JetsperRuns");
+      fout->cd("JetsperRuns");
 
       jetsperRuns *h = new jetsperRuns();
 
@@ -2490,46 +2513,16 @@ void DijetHistosFill::Loop()
        // }
       //}
       
-      h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
-      h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
-                                          "N_{events}",
-                               nxd, vxd, nptd, vptd);
+      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
+      //h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+       //                                   "N_{events}",
+         //                      nxd, vxd, nptd, vptd);
 
     } // doJetsperRuns
-     
+    */ 
 
   } // for itrg
 
-  /*
-  // Jets per runs
-  if (doJetsperRuns && dolumi)
-  {
-    TDirectory *dout = gDirectory;
-
-    dout->mkdir("JetsperRuns");
-    dout->cd("JetsperRuns");
-
-    jetsperRuns *h = new jetsperRuns();
-
-    //for (int i = 0; i < _runNumberBin.size(); ++i) {
-    //  std::cout << i << " " << _runNumberBin[i] << std::endl;
-    //}
-    //std::cout << std::endl;
-    //std::cout << "_runNumberBin size: "  << _runNumberBin.size() <<  std::endl;
-      
-    //std::cout << "binEdges: ";
-    //for (auto it4 = _runNumberBin.begin(); it4 != _runNumberBin.end(); ++it4) {
-     // std::cout << *it4;
-      //if (it4 != _runNumberBin.end() - 1) { // Print a comma after all elements except the last one
-       //   std::cout << ", ";
-     // }
-    //}
-    h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
-    h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
-                                        "N_{events}",
-                             nxd, vxd, nptd, vptd);
-  }
-  */
 
   if (debugevent)
     cout << "Load jet veto maps" << endl
@@ -3997,8 +3990,8 @@ void DijetHistosFill::Loop()
 	  string &trg = vtrg[itrg];
 	  if (!(*mtrg[trg]))
 	    continue;
-
-	  jetsperRuns *h = mjet[trg];
+          // uncomment for jet per run per trigger
+	  //jetsperRuns *h = mjet[trg];
 	  if (debugevent)
 	  {
 	    cout << "Analyze lumi" << endl
@@ -4014,55 +4007,22 @@ void DijetHistosFill::Loop()
 	    else {
 	      w = (isMC ? genWeight : 1.); 
 	    }
-	    h->h1jetrate->Fill(run, w);
-	    h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+	    const std::string &trg = vtrg[itrg];
+	    const range &r = mi[trg];
+	    //if jet rate per run per triggers, comment this loop
+	    if (p4.Pt() >= r.ptmin && p4.Pt() < r.ptmax &&
+                fabs(p4.Eta()) >= r.absetamin && fabs(p4.Eta()) < r.absetamax) {
+                h1jetrate->Fill(run, w);
+                h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+                //std::cout << "The p4.pt is passing: " << p4.Pt() << "and the pt min is: " << r.ptmin << "from the trg: " << itrg << std::endl;
+            }
+	    //h->h1jetrate->Fill(run, w);
+	    //h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
           }
 	}
       }
     } // doJetsperRun
     
-    /*
-    if (doJetsperRuns && dolumi)
-    {
-      for (int itrg = 0; itrg != ntrg; ++itrg)
-      {
-        for (int i = 0; i != njet; ++i)
-	{
-	  string &trg = vtrg[itrg];
-	  if (!(*mtrg[trg]))
-	    continue;
-
-	  jetsperRuns *h = mjet[trg];
-	  if (debugevent)
-	  {
-	    cout << "Analyze lumi" << endl
-	         << flush;
-	  }
-	  if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0)
-	  { 
-	    auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
-	    if (it5 != _runNumberBin.end()){
-              //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
-	      //w = 1./_lums[run];
-	      w = (isMC ? genWeight : 1./_lums[run]);
-	    }
-	    else {
-	      w = (isMC ? genWeight : 1.); 
-	    }
-	    //std::cout << "Before the p4.pt selection " << std::endl; 
-	    if (p4.Pt() >= mi[trg].ptmin && p4.Pt() < mi[trg].ptmax &&
-	        fabs(p4.Eta()) >= mi[trg].absetamin && fabs(p4.Eta()) < mi[trg].absetamax) {
-	      h->h1jetrate->Fill(run, w);
-	      //h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
-	      //std::cout << "The p4.pt is passing the selection " << std::endl;  
-            }
-          }
-	}
-      }
-    } // doJetsperRun
-    */
-
-
     h2mhtvsmet->Fill(p4t1met.Pt(), p4mht.Pt(), w);
   } // for jentry
   cout << endl
