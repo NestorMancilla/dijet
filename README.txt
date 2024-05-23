@@ -72,9 +72,16 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
-// v53. Test for gluon jets. Activate branch Jet_btagPNetQvG (NanoAODv12). Add new directory for MPF/DB calculations for dijet.
-//      Add the requirement if (Jet_btagPNetQvG[j] < working_point. Working points: 0.16 (tight gluons), 0.33 (medium), 0.55 (loose gluons).
-//      To do after: unclustered energy and extra activity should be looked at.
+// v54. Add luminosity files per trigger. Test using Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json. 
+//      For 2023 test, jet veto bpix false. For 2024 jet veto bpix is included.
+//	The jet rate histograms were moved after the histograms are filled for IncJets (to be in the same loop). Required that lum > 0.
+//	The trigger requirements are applied using the same method as IncJets. h->ptmin, ptmax, abs etamin and max.
+//	Extra histogram without w to compare results. Some parts were moved out from the loop to reduce the iteration time.
+//	To do: add the exit if run is not in run number.
+// v53. Test for gluon jets. Activate branch Jet_btagPNetQvG (NanoAODv12). Add new directory for MPF/DB calculations for dijet. BPix jet veto + jet veto to all.
+//      To do:
+//      2. Add the requirement if (Jet_btagPNetQvG[j] < working_point. Working points: 0.16 (tight gluons), 0.33 (medium), 0.55 (loose gluons).
+//      1. unclustered energy and extra activity should be looked at.
 // v52. Added the jet veto for BPix to prompt 24. It could be included in Jet_jetveto[i] or not. Set false for next versions.
 // v51. Added a single luminosity directory instead of directories per trigger. Added triggers from DijetCombine.C for incl to apply before 
 //      fill the hist. Binnig vector double instead of int.

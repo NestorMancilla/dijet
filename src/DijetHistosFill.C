@@ -20,6 +20,7 @@
 #include "TProfile2D.h"
 #include "TStopwatch.h"
 
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <set>
@@ -54,6 +55,7 @@ bool doJetveto = true; // eta-phi maps
 bool doMCtruth = true;
 bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
+bool doGluonJets = true; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
 bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
@@ -258,6 +260,33 @@ public:
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13; // tag
 };
 
+class gluonHistos
+{
+public:
+  // Basic information about the trigger
+  string trg;
+  int trgpt;
+  double ptmin, ptmax, absetamin, absetamax;
+
+  TH2D *h2pteta_aball, *h2pteta_absel;
+  TH2D *h2pteta_adall, *h2pteta_adsel;
+  TH2D *h2pteta_tcall, *h2pteta_tcsel;
+  TH2D *h2pteta_pfall, *h2pteta_pfsel;
+  TProfile2D *p2resab, *p2resad, *p2restc, *p2respf; // JEC L2L3Res for undoing
+  TProfile2D *p2m0, *p2m0x, *p2m2, *p2m2x;           // JER MPFX, DBX methods
+  TProfile2D *p2m0_t, *p2m0x_t, *p2m2_t, *p2m2x_t;           // JER MPFX, DBX methods per working point tight
+  TProfile2D *p2m0_m, *p2m0x_m, *p2m2_m, *p2m2x_m;           // JER MPFX, DBX methods per working point medium
+  TProfile2D *p2m0_l, *p2m0x_l, *p2m2_l, *p2m2x_l;           // JER MPFX, DBX methods per working point loose
+  TProfile2D *p2m0ab, *p2m2ab, *p2mnab, *p2muab;     // pT,avp (bisector)
+  TProfile2D *p2m0ad, *p2m2ad, *p2mnad, *p2muad;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc, *p2m2tc, *p2mntc, *p2mutc;     // pT,tag (central)
+  TProfile2D *p2m0pf, *p2m2pf, *p2mnpf, *p2mupf;     // pt,probe (forward)
+
+  // (Optional) composition plots
+  TProfile2D *p2pt, *p2rho, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;      // probe,avp
+  TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13; // tag
+};
+
 class dijetHistos2
 {
 public:
@@ -329,8 +358,8 @@ public:
   int trgpt;
   double ptmin, ptmax, absetamin, absetamax;
   // Jet rate per trigger
-  //TH1D *h1jetrate;
-  //TH2D *h2jetpteta;
+  TH1D *h1jetrate, *h1jetrate_nolum;
+  TH2D *h2jetpteta;
 };
 
 // Helper function to retrieve FactorizedJetCorrector
@@ -390,6 +419,160 @@ FactorizedJetCorrector *getFJC(string l1 = "", string l2 = "", string res = "",
 bool DijetHistosFill::LoadLumi()
 {
   // For calculating luminosity on the fly based on .csv file and take only events with non-zero luminosity
+  /*
+  vector<string> vtrg = {
+    "HLT_PFJet40",
+    "HLT_PFJet60",
+    "HLT_PFJet80",
+    "HLT_PFJet140",
+    "HLT_PFJet200",
+    "HLT_PFJet260",
+    "HLT_PFJet320",
+    "HLT_PFJet400",
+    "HLT_PFJet450",
+    "HLT_PFJet500",
+    "HLT_PFJetFwd40",
+    "HLT_PFJetFwd60",
+    "HLT_PFJetFwd80",
+    "HLT_PFJetFwd140",
+    "HLT_PFJetFwd200",
+    "HLT_PFJetFwd260",
+    "HLT_PFJetFwd320",
+    "HLT_PFJetFwd400",
+    "HLT_PFJetFwd450",
+    "HLT_PFJetFwd500",
+    //"HLT_ZeroBias"
+  };
+  */
+    vector<string> vtrg = {
+      "HLT_PFJet40",
+      "HLT_PFJet60",
+      "HLT_PFJet80",
+      "HLT_PFJet140",
+      "HLT_PFJet200",
+      "HLT_PFJet260",
+      "HLT_PFJet320",
+      "HLT_PFJet400",
+      "HLT_PFJet450",
+      "HLT_PFJet500",
+      "HLT_PFJetFwd40", //
+      "HLT_PFJetFwd60",
+      "HLT_PFJetFwd80",
+      "HLT_PFJetFwd140",
+      "HLT_PFJetFwd200",
+      "HLT_PFJetFwd260",
+      "HLT_PFJetFwd320",
+      "HLT_PFJetFwd400",
+      "HLT_PFJetFwd450",
+      "HLT_PFJetFwd500", //
+      "HLT_DiPFJetAve40",
+      "HLT_DiPFJetAve60",
+      "HLT_DiPFJetAve80",
+      "HLT_DiPFJetAve140",
+      "HLT_DiPFJetAve200",
+      "HLT_DiPFJetAve260",
+      "HLT_DiPFJetAve320",
+      "HLT_DiPFJetAve400",
+      "HLT_DiPFJetAve500",
+      "HLT_DiPFJetAve60_HFJEC",
+      "HLT_DiPFJetAve80_HFJEC",
+      "HLT_DiPFJetAve100_HFJEC",
+      "HLT_DiPFJetAve160_HFJEC",
+      "HLT_DiPFJetAve220_HFJEC",
+      "HLT_DiPFJetAve300_HFJEC"};
+
+  // List of filenames
+  vector<string> filenames = {
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet40_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet60_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet80_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet140_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet200_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet260_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet320_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet400_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet450_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet500_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd40_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd60_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd80_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd140_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd200_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd260_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd320_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd400_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd450_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd500_378981_380963_DCSOnly.csv",
+    //"luminosityscripts/csvfiles/lumi_HLT_PFJet500_366442_370790_Golden.csv", //2023 data
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve40_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve140_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve200_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve260_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve320_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve400_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve500_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_HFJEC_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_HFJEC_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve100_HFJEC_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve160_HFJEC_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve220_HFJEC_378981_380963_DCSOnly.csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve300_HFJEC_378981_380963_DCSOnly.csv"
+  };
+
+  for (size_t idx = 0; idx < vtrg.size(); ++idx) {
+      const string& trigger = vtrg[idx];
+      const string& filename = filenames[idx];
+
+      ifstream file(filename);
+
+      // Check if the file opened successfully
+      if (!file.is_open()) {
+          cerr << "Error opening file: " << filename << endl;
+          continue;
+      }
+
+      string line;
+      while (getline(file, line)) {
+          // Skip comment lines
+          if (line[0] == '#') continue;
+
+          stringstream ss(line);
+          string run_fill, time, ncms, hltpath, delivered, recorded;
+
+          // Parse the line
+          getline(ss, run_fill, ',');
+          getline(ss, time, ',');
+          getline(ss, ncms, ',');
+          getline(ss, hltpath, ',');
+          getline(ss, delivered, ',');
+          getline(ss, recorded, ',');
+
+          // Check if the base trigger name matches
+          if (hltpath.find(trigger) != string::npos) {
+              // Extract run number from run:fill
+              int run = stoi(run_fill.substr(0, run_fill.find(':')));
+
+              // Convert recorded luminosity to double
+              double lum = stod(recorded);
+
+              // Store the run and luminosity in the map
+              mlumi[trigger][run] = lum;
+          }
+      }
+
+      // Close the file
+      file.close();
+  }
+  /*
+  for (const auto& trigger : mlumi) {
+      cout << "Trigger: " << trigger.first << endl;
+      for (const auto& run : trigger.second) {
+          cout << "  Run: " << run.first << ", Luminosity: " << run.second << endl;
+      }
+  }
+  */
 
   const char *lumifile = getLumifile(dataset.c_str());
 
@@ -768,6 +951,7 @@ void DijetHistosFill::Loop()
   }
 
   fChain->SetBranchStatus("nJet", 1);
+  fChain->SetBranchStatus("Jet_btagPNetQvG", 1);
   fChain->SetBranchStatus("Jet_pt", 1);
   fChain->SetBranchStatus("Jet_eta", 1);
   fChain->SetBranchStatus("Jet_phi", 1);
@@ -1603,22 +1787,13 @@ void DijetHistosFill::Loop()
   if (dolumi)
     LoadLumi();
 
-  /*
-  if (dolumi =true) {
-    fout->mkdir("JetsperRuns");
-    fout->cd("JetsperRuns");
-    TH1D *h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
-    TH2D *h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
-		                           "N_{events}",
-                                nxd, vxd, nptd, vptd);
-  }
-  */
-  fout->mkdir("JetsperRuns");
-  fout->cd("JetsperRuns");
-  TH1D *h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
-  TH2D *h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
-                                         "N_{events}",
-                              nxd, vxd, nptd, vptd);
+  //fout->mkdir("JetsperRuns");
+  //fout->cd("JetsperRuns");
+  //TH1D *h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
+  //TH2D *h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+  //                                       "N_{events}",
+  //                            nxd, vxd, nptd, vptd);
+
   /*
   // PF composition plots
   // Copy L2Res histograms for multiple pT bins
@@ -1697,8 +1872,9 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380533_DCSOnly_TkPx.json"); // May 9, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_380115_Golden.json"); // May 13, 2024, 19:33
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 14, 2024, 19:31
-      LoadJSON("rootfiles/Cert_Collisions2024_378981_380470_Golden.json"); // May 16, 2024, 11:13
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_380470_Golden.json"); // May 16, 2024, 11:13
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 16, 2024, 19:30
+      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json"); // May 21, 2024, 19:31
 
   }
   int _nbadevts_json(0);
@@ -1716,6 +1892,7 @@ void DijetHistosFill::Loop()
   map<string, jetvetoHistos *> mhjv;
   map<string, incjetHistos *> mhij;
   map<string, dijetHistos *> mhdj;
+  map<string, gluonHistos *> mhgj;
   map<string, dijetHistos2 *> mhdj2;
   map<string, multijetHistos *> mhmj;
   map<string, lumiHistos *> mhlumi;
@@ -2202,6 +2379,242 @@ void DijetHistosFill::Loop()
 
     } // doDijet
 
+    // GluonJets per trigger
+    if (doGluonJets)
+    {
+      if (debug)
+        cout << "Setup doGluonJets " << trgpt << endl
+             << flush;
+
+      dout->mkdir("GluonJets");
+      dout->cd("GluonJets");
+
+      gluonHistos *h = new gluonHistos();
+
+      string &t = vtrg[itrg];
+      mhgj[t] = h;
+      h->trg = t;
+      h->trgpt = trgpt;
+
+      struct range &r = mt[t];
+      h->ptmin = r.ptmin;
+      h->ptmax = r.ptmax;
+      h->absetamin = r.absetamin;
+      h->absetamax = r.absetamax;
+
+      // Counting of events, and JEC L2L3Res for undoing
+      h->h2pteta_aball = new TH2D("h2pteta_aball", ";#eta;p_{T,avp} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->h2pteta_absel = new TH2D("h2pteta_absel", ";#eta;p_{T,avp} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->p2resab = new TProfile2D("p2resab", ";#eta;p_{T,avp} (GeV);"
+                                             "JES(probe)/JES(tag)",
+                                  nx, vx, npt, vpt);
+
+      // MPF decomposition for HDM method
+      h->p2m0ab = new TProfile2D("p2m0ab", ";#eta;p_{T,avp} (GeV);MPF0",
+                                 nx, vx, npt, vpt);
+      h->p2m2ab = new TProfile2D("p2m2ab", ";#eta;p_{T,avp} (GeV);MPF2",
+                                 nx, vx, npt, vpt);
+      h->p2mnab = new TProfile2D("p2mnab", ";#eta;p_{T,avp} (GeV);MPFn",
+                                 nx, vx, npt, vpt);
+      h->p2muab = new TProfile2D("p2muab", ";#eta;p_{T,avp} (GeV);MPFu",
+                                 nx, vx, npt, vpt);
+
+      // Variants with different binnings and with error on the mean
+      h->h2pteta_adall = new TH2D("h2pteta_adall", ";#eta;p_{T,ave} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->h2pteta_adsel = new TH2D("h2pteta_adsel", ";#eta;p_{T,ave} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->p2resad = new TProfile2D("p2resad", ";#eta;p_{T,ave} (GeV);"
+                                             "JES(probe)/JES(tag)",
+                                  nx, vx, npt, vpt);
+
+      // MPF decomposition for HDM method
+      h->p2m0ad = new TProfile2D("p2m0ad", ";#eta;p_{T,ave} (GeV);MPF0",
+                                 nx, vx, npt, vpt);
+      h->p2m2ad = new TProfile2D("p2m2ad", ";#eta;p_{T,ave} (GeV);MPF2",
+                                 nx, vx, npt, vpt);
+      h->p2mnad = new TProfile2D("p2mnad", ";#eta;p_{T,ave} (GeV);MPFn",
+                                 nx, vx, npt, vpt);
+      h->p2muad = new TProfile2D("p2muad", ";#eta;p_{T,ave} (GeV);MPFu",
+                                 nx, vx, npt, vpt);
+
+      h->h2pteta_tcall = new TH2D("h2pteta_tcall", ";#eta;p_{T,ave} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->h2pteta_tcsel = new TH2D("h2pteta_tcsel", ";#eta;p_{T,ave} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->p2restc = new TProfile2D("p2restc", ";#eta;p_{T,ave} (GeV);"
+                                             "JES(probe)/JES(tag)",
+                                  nx, vx, npt, vpt);
+
+      h->p2m0tc = new TProfile2D("p2m0tc", ";#eta;p_{T,tag} (GeV);MPF0",
+                                 nx, vx, npt, vpt);
+      h->p2m2tc = new TProfile2D("p2m2tc", ";#eta;p_{T,tag} (GeV);MPF2",
+                                 nx, vx, npt, vpt);
+      h->p2mntc = new TProfile2D("p2mntc", ";#eta;p_{T,tag} (GeV);MPFn",
+                                 nx, vx, npt, vpt);
+      h->p2mutc = new TProfile2D("p2mutc", ";#eta;p_{T,tag} (GeV);MPFu",
+                                 nx, vx, npt, vpt);
+
+      h->h2pteta_pfall = new TH2D("h2pteta_pfall", ";#eta;p_{T,ave} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->h2pteta_pfsel = new TH2D("h2pteta_pfsel", ";#eta;p_{T,ave} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      h->p2respf = new TProfile2D("p2respf", ";#eta;p_{T,ave} (GeV);"
+                                             "JES(probe)/JES(tag)",
+                                  nx, vx, npt, vpt);
+
+      h->p2m0pf = new TProfile2D("p2m0pf", ";#eta;p_{T,probe} (GeV);MPF0",
+                                 nx, vx, npt, vpt);
+      h->p2m2pf = new TProfile2D("p2m2pf", ";#eta;p_{T,probe} (GeV);MPF2",
+                                 nx, vx, npt, vpt);
+      h->p2mnpf = new TProfile2D("p2mnpf", ";#eta;p_{T,probe} (GeV);MPFn",
+                                 nx, vx, npt, vpt);
+      h->p2mupf = new TProfile2D("p2mupf", ";#eta;p_{T,probe} (GeV);MPFu",
+                                 nx, vx, npt, vpt);
+
+      if (doDijetJER)
+      {
+        dout->mkdir("GluonJets/JER");
+        dout->cd("GluonJets/JER");
+
+        // Basic profiles with RMS as error ("S") for JER studies
+        h->p2m0 = new TProfile2D("p2m0", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF0 (MPF)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m0x = new TProfile2D("p2m0x", ";#eta;p_{T,avp} (GeV);"
+                                           "MPFX0 (MPFX)",
+                                  nx, vx, npt, vpt, "S");
+        h->p2m2 = new TProfile2D("p2m2", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF2 (DB)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m2x = new TProfile2D("p2m2x", ";#eta;p_{T,avp} (GeV);"
+                                           "MPF2 (DBX)",
+                                  nx, vx, npt, vpt, "S");
+	
+	dout->mkdir("GluonJets/JER/tight");
+        // Histogrmas for WP tight
+        h->p2m0_t = new TProfile2D("p2m0_t", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF0 (MPF)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m0x_t = new TProfile2D("p2m0x_t", ";#eta;p_{T,avp} (GeV);"
+                                           "MPFX0 (MPFX)",
+                                  nx, vx, npt, vpt, "S");
+        h->p2m2_t = new TProfile2D("p2m2_t", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF2 (DB)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m2x_t = new TProfile2D("p2m2x_t", ";#eta;p_{T,avp} (GeV);"
+                                           "MPF2 (DBX)",
+                                  nx, vx, npt, vpt, "S");
+	dout->mkdir("GluonJets/JER/medium");
+        // Histogrmas for WP medium
+        h->p2m0_m = new TProfile2D("p2m0_m", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF0 (MPF)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m0x_m = new TProfile2D("p2m0x_m", ";#eta;p_{T,avp} (GeV);"
+                                           "MPFX0 (MPFX)",
+                                  nx, vx, npt, vpt, "S");
+        h->p2m2_m = new TProfile2D("p2m2_m", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF2 (DB)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m2x_m = new TProfile2D("p2m2x_m", ";#eta;p_{T,avp} (GeV);"
+                                           "MPF2 (DBX)",
+                                  nx, vx, npt, vpt, "S");
+
+	dout->mkdir("GluonJets/JER/loose");
+        // Histogrmas for WP loose
+        h->p2m0_l = new TProfile2D("p2m0_l", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF0 (MPF)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m0x_l = new TProfile2D("p2m0x_l", ";#eta;p_{T,avp} (GeV);"
+                                           "MPFX0 (MPFX)",
+                                  nx, vx, npt, vpt, "S");
+        h->p2m2_l = new TProfile2D("p2m2_l", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF2 (DB)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m2x_l = new TProfile2D("p2m2x_l", ";#eta;p_{T,avp} (GeV);"
+                                           "MPF2 (DBX)",
+                                  nx, vx, npt, vpt, "S");
+	/*
+	if (Jet_btagPNetQvG[j] < 0.16)
+	{
+	  
+	}
+	if (Jet_btagPNetQvG[j] < 0.33)
+        {
+                
+        }
+        if (Jet_btagPNetQvG[j] < 0.55)
+        {
+
+        }
+	*/
+      }
+
+      if (doPFComposition)
+      {
+
+        dout->mkdir("GluonJet/PFcomposition");
+        dout->cd("GluonJet/PFcomposition");
+
+        h->p2pt = new TProfile2D("p2pt", ";#eta;p_{T,avp} (GeV);"
+                                         "p_{T,probe}",
+                                 nx, vx, npt, vpt);
+        h->p2rho = new TProfile2D("p2rho", ";#eta;p_{T,avp} (GeV);"
+                                           "#rho",
+                                  nx, vx, npt, vpt);
+        h->p2chf = new TProfile2D("p2chf", ";#eta;p_{T,avp} (GeV);"
+                                           "CHF",
+                                  nx, vx, npt, vpt);
+        h->p2nhf = new TProfile2D("p2nhf", ";#eta;p_{T,avp} (GeV);"
+                                           "NHF",
+                                  nx, vx, npt, vpt);
+        h->p2nef = new TProfile2D("p2nef", ";#eta;p_{T,avp} (GeV);"
+                                           "NEF",
+                                  nx, vx, npt, vpt);
+        h->p2cef = new TProfile2D("p2cef", ";#eta;p_{T,avp} (GeV);"
+                                           "CEF",
+                                  nx, vx, npt, vpt);
+        h->p2muf = new TProfile2D("p2muf", ";#eta;p_{T,avp} (GeV);"
+                                           "MUF",
+                                  nx, vx, npt, vpt);
+
+        h->ppt13 = new TProfile("ppt13", ";#eta;p_{T,avp} (GeV);"
+                                         "p_{T,tag}",
+                                npt, vpt);
+        h->prho13 = new TProfile("prho13", ";#eta;p_{T,avp} (GeV);"
+                                           "#rho",
+                                 npt, vpt);
+        h->pchf13 = new TProfile("pchf13", ";#eta;p_{T,avp} (GeV);"
+                                           "CHF",
+                                 npt, vpt);
+        h->pnhf13 = new TProfile("pnhf13", ";#eta;p_{T,avp} (GeV);"
+                                           "NHF",
+                                 npt, vpt);
+        h->pnef13 = new TProfile("pnef13", ";#eta;p_{T,avp} (GeV);"
+                                           "NEF",
+                                 npt, vpt);
+        h->pcef13 = new TProfile("pcef13", ";#eta;p_{T,avp} (GeV);"
+                                           "CEF",
+                                 npt, vpt);
+        h->pmuf13 = new TProfile("pmuf13", ";#eta;p_{T,avp} (GeV);"
+                                           "MUF",
+                                 npt, vpt);
+      }
+
+    } // GluonJets
+
+
+
     if (doDijet2)
     {
       if (debug)
@@ -2449,6 +2862,7 @@ void DijetHistosFill::Loop()
 
     } // doMultijet
 
+
     // Lumi per trigger
     if (dolumi)
     {
@@ -2475,7 +2889,7 @@ void DijetHistosFill::Loop()
       h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
     }
 
-    /*
+    
     // Jets per runs per triggers
     if (doJetsperRuns && dolumi)
     {
@@ -2484,8 +2898,8 @@ void DijetHistosFill::Loop()
         cout << "Setup doJetsperRuns " << trgpt << endl
              << flush;
 
-      fout->mkdir("JetsperRuns");
-      fout->cd("JetsperRuns");
+      dout->mkdir("JetsperRuns");
+      dout->cd("JetsperRuns");
 
       jetsperRuns *h = new jetsperRuns();
 
@@ -2513,13 +2927,14 @@ void DijetHistosFill::Loop()
        // }
       //}
       
-      //h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
-      //h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
-       //                                   "N_{events}",
-         //                      nxd, vxd, nptd, vptd);
+      h->h1jetrate_nolum = new TH1D("h1jetrate_nolum", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
+      h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
+      h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                          "N_{events}",
+                               nxd, vxd, nptd, vptd);
 
     } // doJetsperRuns
-    */ 
+    
 
   } // for itrg
 
@@ -2937,9 +3352,10 @@ void DijetHistosFill::Loop()
         Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
 	Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
 
-	if (bool dojv_andBPix = false)
+	if (bool dojv_andBPix = true)
 	{
 	  Jet_jetveto[i] = Jet_jetvetomap[i] || Jet_jetveto_BPix[i]; 
+	  //Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
 	}
 	else {
           Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
@@ -3305,6 +3721,46 @@ void DijetHistosFill::Loop()
           }   // JetID+METfilter
         }     // for itrg
       }       // doIncJet
+
+    //doJetsperRun
+      if (doJetsperRuns && dolumi)
+      {
+        auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
+        for (int itrg = 0; itrg != ntrg; ++itrg)
+        {
+          string &trg = vtrg[itrg];
+          //std::cout << "Trigger: " << trg << std::endl;
+          if (!(*mtrg[trg]))
+            continue;
+          jetsperRuns *h = mjet[trg];
+          //const range &r = mt[trg];
+
+          p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
+          if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0) // abs(p4g.Eta()) < 1.3
+          {
+
+            w = (isMC ? genWeight : 1.);
+	    h->h1jetrate_nolum->Fill(run, w);
+            if (it5 != _runNumberBin.end() && mlumi[trg][run] > 0){
+              //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
+              w = (isMC ? genWeight : 1./mlumi[trg][run]);
+            }
+            else {
+              //w = (isMC ? genWeight : 1.);
+	      //exit(0);
+	      continue;
+            }
+	    if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
+	        fabs(p4.Rapidity()) > h->absetamin &&
+		fabs(p4.Rapidity()) < h->absetamax) {
+                  //std::cout << "The p4.pt is: " << p4.Pt() << " and the pt min is: " << r.ptmin << " from the trg: " << itrg << " weight: " << w << " and the itrg is: " << itrg << std::endl;
+                h->h1jetrate->Fill(run, w);
+                h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+            }
+          }
+        }
+      } // doJetsperRun
+
 
       // Calculate type-I MET (L1L2L3-RC) and MHT
       if (p4.Pt() > 15.)
@@ -3739,6 +4195,98 @@ void DijetHistosFill::Loop()
             }
           } // doDijet
 
+          if (doGluonJets && isdijet)
+          {
+
+            gluonHistos *h = mhgj[trg];
+            double res = Jet_RES[iprobe] / Jet_RES[itag];
+
+            h->h2pteta_aball->Fill(eta, ptavp2, w);
+            h->h2pteta_adall->Fill(eta, ptave, w);
+            h->h2pteta_tcall->Fill(eta, pttag, w);
+            h->h2pteta_pfall->Fill(eta, ptprobe, w);
+
+            // Bisector (proper)
+            if (ptavp2 >= h->ptmin && ptavp2 < h->ptmax &&
+                fabs(eta) >= h->absetamin && fabs(eta) < h->absetamax)
+            {
+              h->h2pteta_absel->Fill(eta, ptavp2, w);
+            }
+            { // Bisector (proper)
+              if (doDijetJER)
+              {
+                h->p2m0->Fill(eta, ptavp2, m0b, w);
+                h->p2m0x->Fill(eta, ptavp2, m0bx, w);
+                h->p2m2->Fill(eta, ptavp2, m2b, w);
+                h->p2m2x->Fill(eta, ptavp2, m2bx, w);
+              }
+              if (doPFComposition)
+              {
+                h->p2pt->Fill(eta, ptavp2, Jet_pt[iprobe], w);
+                h->p2rho->Fill(eta, ptavp2, rho, w);
+                h->p2chf->Fill(eta, ptavp2, Jet_chHEF[iprobe], w);
+                h->p2nhf->Fill(eta, ptavp2, Jet_neHEF[iprobe], w);
+                h->p2nef->Fill(eta, ptavp2, Jet_neEmEF[iprobe], w);
+                h->p2cef->Fill(eta, ptavp2, Jet_chEmEF[iprobe], w);
+                h->p2muf->Fill(eta, ptavp2, Jet_muEF[iprobe], w);
+
+                h->ppt13->Fill(ptavp2, Jet_pt[itag], w);
+                h->prho13->Fill(ptavp2, rho, w);
+                h->pchf13->Fill(ptavp2, Jet_chHEF[itag], w);
+                h->pnhf13->Fill(ptavp2, Jet_neHEF[itag], w);
+                h->pnef13->Fill(ptavp2, Jet_neEmEF[itag], w);
+                h->pcef13->Fill(ptavp2, Jet_chEmEF[itag], w);
+                h->pmuf13->Fill(ptavp2, Jet_muEF[itag], w);
+              }
+
+              h->p2resab->Fill(eta, ptavp2, res, w);
+              h->p2m0ab->Fill(eta, ptavp2, m0b, w);
+              h->p2m2ab->Fill(eta, ptavp2, m2b, w);
+              h->p2mnab->Fill(eta, ptavp2, mnb, w);
+              h->p2muab->Fill(eta, ptavp2, mub, w);
+            }
+            // Dijet axis
+            if (ptave >= h->ptmin && ptave < h->ptmax &&
+                fabs(eta) >= h->absetamin && fabs(eta) < h->absetamax)
+            {
+              h->h2pteta_adsel->Fill(eta, ptave, w);
+            }
+            { // Dijet axis
+              h->p2resad->Fill(eta, ptave, res, w);
+              h->p2m0ad->Fill(eta, ptave, m0d, w);
+              h->p2m2ad->Fill(eta, ptave, m2d, w);
+              h->p2mnad->Fill(eta, ptave, mnd, w);
+              h->p2muad->Fill(eta, ptave, mud, w);
+            }
+            // Tag jet axis
+            if (pttag >= h->ptmin && pttag < h->ptmax)
+            {
+              h->h2pteta_tcsel->Fill(eta, pttag, w);
+            }
+            // Tag jet axis
+            {
+              h->p2restc->Fill(eta, pttag, res, w);
+              h->p2m0tc->Fill(eta, pttag, m0c, w);
+              h->p2m2tc->Fill(eta, pttag, m2c, w);
+              h->p2mntc->Fill(eta, pttag, mnc, w);
+              h->p2mutc->Fill(eta, pttag, muc, w);
+            }
+            // Probe jet axis
+            if (ptprobe >= h->ptmin && ptprobe < h->ptmax)
+            {
+              h->h2pteta_pfsel->Fill(eta, ptprobe, w);
+            }
+            // Probe jet axis
+            {
+              h->p2respf->Fill(eta, ptprobe, res, w);
+              h->p2m0pf->Fill(eta, ptprobe, m0f, w);
+              h->p2m2pf->Fill(eta, ptprobe, m2f, w);
+              h->p2mnpf->Fill(eta, ptprobe, mnf, w);
+              h->p2mupf->Fill(eta, ptprobe, muf, w);
+            }
+          } // doGluonJets
+
+
           if (doDijet2 && isdijet2)
           {
 
@@ -3994,50 +4542,7 @@ void DijetHistosFill::Loop()
       mrunls[run][luminosityBlock] = 1;
     } // doLumi
 
-    //doJetsperRun
-    
-    if (doJetsperRuns && dolumi)
-    {
-      for (int itrg = 0; itrg != ntrg; ++itrg)
-      {
-        for (int i = 0; i != njet; ++i)
-	{
-	  string &trg = vtrg[itrg];
-	  if (!(*mtrg[trg]))
-	    continue;
-          // uncomment for jet per run per trigger
-	  //jetsperRuns *h = mjet[trg];
-	  if (debugevent)
-	  {
-	    cout << "Analyze lumi" << endl
-	         << flush;
-	  }
-	  if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0) // abs(p4g.Eta()) < 1.3
-	  { 
-	    auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
-	    if (it5 != _runNumberBin.end()){
-              //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
-	      w = (isMC ? genWeight : 1./_lums[run]);
-	    }
-	    else {
-	      w = (isMC ? genWeight : 1.); 
-	    }
-	    const std::string &trg = vtrg[itrg];
-	    const range &r = mi[trg];
-	    //if jet rate per run per triggers, comment this loop
-	    if (p4.Pt() >= r.ptmin && p4.Pt() < r.ptmax &&
-                fabs(p4.Eta()) >= r.absetamin && fabs(p4.Eta()) < r.absetamax) {
-                h1jetrate->Fill(run, w);
-                h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
-                //std::cout << "The p4.pt is passing: " << p4.Pt() << "and the pt min is: " << r.ptmin << "from the trg: " << itrg << std::endl;
-            }
-	    //h->h1jetrate->Fill(run, w);
-	    //h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
-          }
-	}
-      }
-    } // doJetsperRun
-    
+
     h2mhtvsmet->Fill(p4t1met.Pt(), p4mht.Pt(), w);
   } // for jentry
   cout << endl
