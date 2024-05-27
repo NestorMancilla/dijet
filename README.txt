@@ -72,6 +72,13 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v57. Inclusive for 2023C. Add string version for luminosity files. Jet veto maps for 2023. The csv file for 2023lumi format was changed to use the same
+//	as 2024.
+// v56. Inclusive jet at abs eta < 1.3 for 2024BCD. Histograms name for jetsperrate corrected: h1jetrate and h2jetxsec.
+// v55. Adding histograms for GluonJets, same as in dijet. List of histograms (the rest from dijet are not considered):
+//		JER MPFX, DBX methods, pT,avp (bisector), pT,ave (dijet axis), pT,tag (central), pt,probe (forward).
+//	The WP were defined. 
+// 
 // v54. Add luminosity files per trigger. Test using Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json. 
 //      For 2023 test, jet veto bpix false. For 2024 jet veto bpix is included.
 //	The jet rate histograms were moved after the histograms are filled for IncJets (to be in the same loop). Required that lum > 0.
