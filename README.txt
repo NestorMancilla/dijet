@@ -72,6 +72,7 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v59. New Golden JSON file: Cert_Collisions2024_378981_380649_Golden.json it does not include all 2024D. TH2D h2pteta_lum added.
 // v58. Added 2024E.
 // v57. Inclusive for 2023C. Add string version for luminosity files. Jet veto maps for 2023. The csv file for 2023lumi format was changed to use the same
 //	as 2024.

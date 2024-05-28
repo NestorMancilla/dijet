@@ -125,7 +125,8 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380470_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
-constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381199_DCSOnly.csv";
+//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381199_DCSOnly.csv";
+constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_Golden.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 27> lumifiles = {{
     {"2022C", lumibyls2022C},
@@ -230,7 +231,7 @@ public:
   static const int ny = 10;
   TH2D *h2pteta_all;
   TH2D *h2pteta_sel;
-  TH2D *h2pteta;
+  TH2D *h2pteta, *h2pteta_lumi;
   TH1D *hpt13;
   TH1D *vpt[ny];
 
@@ -478,8 +479,9 @@ bool DijetHistosFill::LoadLumi()
       "HLT_DiPFJetAve220_HFJEC",
       "HLT_DiPFJetAve300_HFJEC"};
 
-  string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
+  //string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
   //string JSON_version = "366442_370790_Golden"; //2023 Golden
+  string JSON_version = "378981_380649_Golden";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1887,7 +1889,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_380470_Golden.json"); // May 16, 2024, 11:13
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 16, 2024, 19:30
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json"); // May 21, 2024, 19:31
-      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_381199_DCSOnly_TkPx.json"); // May 26, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_381199_DCSOnly_TkPx.json"); // May 26, 2024, 19:31
+      LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
 
   }
   int _nbadevts_json(0);
@@ -2142,6 +2145,8 @@ void DijetHistosFill::Loop()
       h->h2pteta_sel = new TH2D("h2pteta_sel", ";#eta;p_{T} (GeV);N_{jet}",
                                 nx, vx, npti, vpti);
       h->h2pteta = new TH2D("h2pteta", ";#eta;p_{T} (GeV);N_{jet}",
+                            nx, vx, npti, vpti);
+      h->h2pteta_lumi = new TH2D("h2pteta_lumi", ";#eta;p_{T} (GeV);N_{jet}",
                             nx, vx, npti, vpti);
 
       // For pileup cleaning checks
@@ -3544,6 +3549,9 @@ void DijetHistosFill::Loop()
           {
 
             h->h2pteta->Fill(p4.Eta(), p4.Pt(), w);
+	    if (1./mlumi[trg][run] > 0){
+	      h->h2pteta_lumi->Fill(p4.Eta(), p4.Pt(), 1./mlumi[trg][run]);
+            }
 
             if (isMG && i == 0)
             {
