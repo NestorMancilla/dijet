@@ -72,6 +72,7 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v58. Added 2024E.
 // v57. Inclusive for 2023C. Add string version for luminosity files. Jet veto maps for 2023. The csv file for 2023lumi format was changed to use the same
 //	as 2024.
 // v56. Inclusive jet at abs eta < 1.3 for 2024BCD. Histograms name for jetsperrate corrected: h1jetrate and h2jetxsec.

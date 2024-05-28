@@ -7,8 +7,8 @@
 //     #include "../interface/DijetHistosFill.h" // Specific for NanoV12 (assumed default)
 //#endif
 //#include "../interface/DijetHistosFillNanoV9.h"
-#include "../interface/DijetHistosFill.h"
-//#include "../interface/DijetHistosFill_2024Prompt.h"
+//#include "../interface/DijetHistosFill.h"
+#include "../interface/DijetHistosFill_2024Prompt.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -123,10 +123,11 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
-constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380470_Golden.csv";
-//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
+//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380470_Golden.csv";
+//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
+constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381199_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 25> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 27> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -146,12 +147,14 @@ constexpr std::array<std::pair<const char*, const char*>, 25> lumifiles = {{
     {"20223Cv123_ZB", lumibyls2023C123},
     {"2023D", lumibyls2023D},
     {"2023D_ZB", lumibyls2023D},
-    {"2024B", lumibyls2024BC}, //Luminosity per run for prompt 2024BC 
-    {"2024B_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024BC 
-    {"2024C", lumibyls2024BC}, //Luminosity per run for prompt 2024BC
-    {"2024C_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024BC
-    {"2024D", lumibyls2024BC}, //Luminosity per run for prompt 2024D
-    {"2024D_ZB", lumibyls2024BC}, //Luminosity per run for prompt 2024D
+    {"2024B", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC 
+    {"2024B_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC 
+    {"2024C", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC
+    {"2024C_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC
+    {"2024D", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
+    {"2024D_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
+    {"2024E", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
+    {"2024E_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -475,8 +478,8 @@ bool DijetHistosFill::LoadLumi()
       "HLT_DiPFJetAve220_HFJEC",
       "HLT_DiPFJetAve300_HFJEC"};
 
-  //string JSON_version = "378981_380963_DCSOnly"; // 2024 Prompt
-  string JSON_version = "366442_370790_Golden"; //2023 Golden
+  string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
+  //string JSON_version = "366442_370790_Golden"; //2023 Golden
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1496,6 +1499,18 @@ void DijetHistosFill::Loop()
 
   }
 
+  if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024E_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
   if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
     cout << "Missing files for " << dataset << endl
          << flush;
@@ -1871,7 +1886,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 14, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_380470_Golden.json"); // May 16, 2024, 11:13
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 16, 2024, 19:30
-      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json"); // May 21, 2024, 19:31
+      //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json"); // May 21, 2024, 19:31
+      LoadJSON("rootfiles/Collisions24_13p6TeV_378981_381199_DCSOnly_TkPx.json"); // May 26, 2024, 19:31
 
   }
   int _nbadevts_json(0);
@@ -2778,8 +2794,8 @@ void DijetHistosFill::Loop()
          //   std::cout << ", ";
        // }
       //}
-      h->h1pt13 = new TH1D("hpt13", ";p_{T,jet} (GeV);Jets;", npti, vpti);
-      h->h1pt13_w = new TH1D("hpt13_w", ";p_{T,jet} (GeV);xsec;", npti, vpti); 
+      h->h1pt13 = new TH1D("h1pt13", ";p_{T,jet} (GeV);Jets;", npti, vpti);
+      h->h1pt13_w = new TH1D("h1pt13_w", ";p_{T,jet} (GeV);xsec;", npti, vpti); 
       h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;Rate;", _runNumberBin.size()-1, _runNumberBin.data());
       h->h1jetxsec = new TH1D("h1jetxsec", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
       h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
@@ -3200,12 +3216,12 @@ void DijetHistosFill::Loop()
       { // check jet veto
         int i1 = h2jv->GetXaxis()->FindBin(Jet_eta[i]);
         int j1 = h2jv->GetYaxis()->FindBin(Jet_phi[i]);
-        //int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
-        //int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
+        int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
+        int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
         Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
-	//Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
+	Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
 
-	if (bool dojv_andBPix = false)
+	if (bool dojv_andBPix = true)
 	{
 	  Jet_jetveto[i] = Jet_jetvetomap[i] || Jet_jetveto_BPix[i]; 
 	  //Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
