@@ -127,8 +127,9 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381199_DCSOnly.csv";
 constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_Golden.csv";
+constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 27> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 29> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -156,6 +157,8 @@ constexpr std::array<std::pair<const char*, const char*>, 27> lumifiles = {{
     {"2024D_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
     {"2024E", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
     {"2024E_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
+    {"2024B_ECALv1", lumibyls2024ECALB},
+    {"2024B_ECALv2", lumibyls2024ECALB},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -481,7 +484,8 @@ bool DijetHistosFill::LoadLumi()
 
   //string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
   //string JSON_version = "366442_370790_Golden"; //2023 Golden
-  string JSON_version = "378981_380649_Golden";
+  //string JSON_version = "378981_380649_Golden";
+  string JSON_version = "eraB_Golden";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1890,7 +1894,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 16, 2024, 19:30
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json"); // May 21, 2024, 19:31
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_381199_DCSOnly_TkPx.json"); // May 26, 2024, 19:31
-      LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
+      LoadJSON("rootfiles/Cert_Collisions2024_eraB_Golden.json");
 
   }
   int _nbadevts_json(0);
