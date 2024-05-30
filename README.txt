@@ -72,6 +72,7 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v62. Fix issues for Inc h2pt13. The weight was affected by the luminosity from the xsec block. Re reco 2024B processed.
 // v61. Gluon histograms per working point. Golden JSON Cert_Collisions2024_378981_380649_Golden.json
 // v60. Re reco 2024B files, using Cert_Collisions2024_eraB_Golden.json
 // v59. New Golden JSON file: Cert_Collisions2024_378981_380649_Golden.json it does not include all 2024D. TH2D h2pteta_lum added.

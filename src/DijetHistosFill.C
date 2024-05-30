@@ -496,12 +496,11 @@ bool DijetHistosFill::LoadLumi()
 
   //string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
   //string JSON_version = "366442_370790_Golden"; //2023 Golden
-  string JSON_version = "378981_380649_Golden";
-  //string JSON_version = "eraB_Golden";
+  //string JSON_version = "378981_380649_Golden";
+  string JSON_version = "eraB_Golden";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
-    //"luminosityscripts/csvfiles/lumi_HLT_PFJet40_378981_380963_DCSOnly.csv",
     "luminosityscripts/csvfiles/lumi_HLT_PFJet60_"+JSON_version+".csv",
     "luminosityscripts/csvfiles/lumi_HLT_PFJet80_"+JSON_version+".csv",
     "luminosityscripts/csvfiles/lumi_HLT_PFJet140_"+JSON_version+".csv",
@@ -521,7 +520,6 @@ bool DijetHistosFill::LoadLumi()
     "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
     "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
     "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
-    //"luminosityscripts/csvfiles/lumi_HLT_PFJet500_366442_370790_Golden.csv", //2023 data
     "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
     "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
     "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
@@ -1906,8 +1904,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 16, 2024, 19:30
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json"); // May 21, 2024, 19:31
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_381199_DCSOnly_TkPx.json"); // May 26, 2024, 19:31
-      LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
-      //LoadJSON("rootfiles/Cert_Collisions2024_eraB_Golden.json");
+      //LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
+      LoadJSON("rootfiles/Cert_Collisions2024_eraB_Golden.json");
 
   }
   int _nbadevts_json(0);
@@ -3729,8 +3727,9 @@ void DijetHistosFill::Loop()
           if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0)
           {
 
+	    //std::cout << run << " Inclusive h2pteta weight: " << w << std::endl;
             h->h2pteta->Fill(p4.Eta(), p4.Pt(), w);
-	    if (1./mlumi[trg][run] > 0){
+	    if (mlumi[trg][run] > 0){
 	      h->h2pteta_lumi->Fill(p4.Eta(), p4.Pt(), 1./mlumi[trg][run]);
             }
 
@@ -3746,8 +3745,10 @@ void DijetHistosFill::Loop()
 
               h->h2pteta_sel->Fill(p4.Eta(), p4.Pt(), w);
 
-            if (fabs(p4.Rapidity()) < 1.3)
+            if (fabs(p4.Rapidity()) < 1.3){
+	      //std::cout << run << " Inclusive hpt13 weight: " << w << std::endl;
               h->hpt13->Fill(p4.Pt(), w);
+	    }
             int iy = int(fabs(p4.Rapidity()) / 0.5);
             if (iy < h->ny)
               h->vpt[iy]->Fill(p4.Pt(), w);
@@ -3821,6 +3822,7 @@ void DijetHistosFill::Loop()
             }
           }
         }
+        w = (isMC ? genWeight : 1.);
       } // doJetsperRun
 
 
