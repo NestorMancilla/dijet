@@ -10,7 +10,7 @@
 #include <iostream>
 
 int debug = 1; // 1=trg, 2=dir, 3=all
-string version = "v39_2024_Prompt_eta_SFD_DCSOnly_Filter_HLT_MPF";
+string version = "v63_2024";
 void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 			 string trg, string folder);
 //void mergeDijet(TDirectory *dir, TDirectory *dout);
@@ -34,25 +34,39 @@ void DijetHistosCombine() {
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2023D_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022C_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022D_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022E_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022F_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022G_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022CD_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022E_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022F_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022G_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024E_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_ECAL_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024BC_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv4_JME_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2023D_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv4_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023D_JME_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024_skim_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_Sv9_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_Sv10_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2022CD_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_ECALv2_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_ECALv1_"+version+".root");
 
   // Really slow on this after all the others, rerun separately (then sec)
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22MG_full_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22EEMG_full_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_Cv123_"+version+".root");
-  DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_Cv4_"+version+".root");
+  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MG_Cv4_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/v35a/2022E/jmenano_mc_out_Summer22MG_"+version+".root");
-  //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_Sv9_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_Sv10_"+version+".root");
 
 
   //DijetHistosCombines("rootfiles/jmenano_mc_out_v23ul16flat.root");
@@ -162,6 +176,7 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	outdir->mkdir(subdir->GetName());
       outdir->cd(subdir->GetName());
       TDirectory *suboutdir = gDirectory;
+      //cout << "subdir " << subdir << "suboutdir " << suboutdir << "and trg " << trg << "in folder " << folder << endl << flush;
 
       loopOverDirectories(subdir, suboutdir,
 			  trg=="" ? key->GetName() : trg,
@@ -352,6 +367,7 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	    // copy (if needed) bin sum of weight square
 	    if ( p->GetBinSumw2()->fN > ibin ) { 
 	      //po->Sumw2(); // already copied when cloning
+	      //cout  << ibin << " , " << key->GetName() << endl << flush; //to seach the problem with prompt skim data
 	      (*po->GetBinSumw2())[ibin] = (*p->GetBinSumw2())[ibin];   
 	    }
 	  }
@@ -368,11 +384,21 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	for (int ibin = 1; ibin != h->GetNbinsX()+1; ++ibin) {
 	  int ieta(0);
 	  if (folder=="Incjet") sscanf(key->GetName(),"hpt%d",&ieta);
-	  if (copyBin(trg, folder, key->GetName(),
-		      ho->GetBinCenter(ibin),0.1*ieta)) {
-	    ho->SetBinContent(ibin, h->GetBinContent(ibin));
-	    ho->SetBinError(ibin, h->GetBinError(ibin));
-	  }
+          if (folder=="JetsperRuns") {
+            if (copyBin(trg, folder, key->GetName(),
+                        //ho->GetBinCenter(ibin),0)) {
+                        0.,0.)) {
+              ho->SetBinContent(ibin, h->GetBinContent(ibin));
+              ho->SetBinError(ibin, h->GetBinError(ibin));
+            }
+          }
+          else {
+            if (copyBin(trg, folder, key->GetName(),
+                        ho->GetBinCenter(ibin),0.1*ieta)) {
+              ho->SetBinContent(ibin, h->GetBinContent(ibin));
+              ho->SetBinError(ibin, h->GetBinError(ibin));
+            }
+          }
 	} // for ibin
       } // TH1D
 
@@ -563,6 +589,8 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
 				      hist=="p2mnpf" || hist=="p2mupf"));
   bool h3MPF = (folder=="Dijet2" && (hist=="h3m0" || hist=="h3m2"));
 
+  bool h1JetRuns = (folder=="JetsperRuns" && (hist=="h1jetrate"));
+
   bool h3asymm = (folder=="Jetveto" && (hist=="Asymm"||hist=="h3asymm"));
   
   if (folder=="Jetveto" && (hist=="p2chf" || hist=="p2nhf" || hist=="p2nef" ||
@@ -638,6 +666,20 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
 	pt >= k*mi[trg].ptmin && pt < k*mi[trg].ptmax &&
 	fabs(eta) >= mi[trg].absetamin && fabs(eta) < mi[trg].absetamax)
     return true;
+  }
+  if (folder=="JetsperRuns") {
+    if (h1JetRuns) {
+      if (md2pf.find(trg)!=md2pf.end() &&
+          pt >= md2pf[trg].ptmin && pt < md2pf[trg].ptmax &&
+          fabs(eta) >= md2pf[trg].absetamin && fabs(eta) < md2pf[trg].absetamax)
+        return true;
+    }
+    else {
+      if (mi.find(trg)!=mi.end() &&
+          pt >= mi[trg].ptmin && pt < mi[trg].ptmax &&
+          fabs(eta) >= mi[trg].absetamin && fabs(eta) < mi[trg].absetamax)
+        return true;
+    }
   }
 
   // else
