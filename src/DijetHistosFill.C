@@ -128,8 +128,9 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381199_DCSOnly.csv";
 constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_Golden.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
+constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 29> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 30> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -149,6 +150,8 @@ constexpr std::array<std::pair<const char*, const char*>, 29> lumifiles = {{
     {"20223Cv123_ZB", lumibyls2023C123},
     {"2023D", lumibyls2023D},
     {"2023D_ZB", lumibyls2023D},
+    //{"2024B", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
+    //{"2024B_ZB", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
     {"2024B", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC 
     {"2024B_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC 
     {"2024C", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC
@@ -159,6 +162,7 @@ constexpr std::array<std::pair<const char*, const char*>, 29> lumifiles = {{
     {"2024E_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
     {"2024B_ECALv1", lumibyls2024ECALB},
     {"2024B_ECALv2", lumibyls2024ECALB},
+    {"2024C_ECAL", lumibyls2024BCDE},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -496,8 +500,8 @@ bool DijetHistosFill::LoadLumi()
 
   //string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
   //string JSON_version = "366442_370790_Golden"; //2023 Golden
-  //string JSON_version = "378981_380649_Golden";
-  string JSON_version = "eraB_Golden";
+  string JSON_version = "378981_380649_Golden";
+  //string JSON_version = "eraB_Golden";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1582,10 +1586,12 @@ void DijetHistosFill::Loop()
   // Monitor trigger rates
   TH1D *htrg = new TH1D("htrg", "Triggers;Trigger;N_{events}",
                         vtrg.size(), 0, vtrg.size());
+  //cout << "AAAA :"  <<htrg->GetNbinsX() << endl;
   for (int i = 1; i != htrg->GetNbinsX() + 1; ++i)
   {
     htrg->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
   }
+  //cout << "BBB :"  <<htrg->GetNbinsX() << endl;
 
   // trigger vs lumi
   TH2D *h_trgvslumi = new TH2D("h_trgvslumi", "Triggers;Trigger;Lumi",
@@ -1904,8 +1910,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380649_DCSOnly_TkPx.json"); // May 16, 2024, 19:30
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_380963_DCSOnly_TkPx.json"); // May 21, 2024, 19:31
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_381199_DCSOnly_TkPx.json"); // May 26, 2024, 19:31
-      //LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
-      LoadJSON("rootfiles/Cert_Collisions2024_eraB_Golden.json");
+      LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
+      //LoadJSON("rootfiles/Cert_Collisions2024_eraB_Golden.json");
 
   }
   int _nbadevts_json(0);
@@ -4658,6 +4664,7 @@ void DijetHistosFill::Loop()
   cout << "Finished looping over " << nevt << " of which " << _ngoodevts
        << " passed trigger. Start writing file." << endl
        << flush;
+  //cout << "CCCC :"  <<htrg->GetNbinsX() << endl;
   fout->Write();
   fout->Close();
   cout << "File written and closed." << endl

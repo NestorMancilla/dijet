@@ -72,6 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v66. Re reco 2024C JetMET0. 378981_380649_Golden.
+// v65. Test for triggers.
+// v64. Process for 2024 Prompt for Gluon jets. 378981_380649_Golden.
+// v63. Process for 2024B Prompt to compare with Re reco. Same Golden JSON. eraB_Golden.
 // v62. Fix issues for Inc h2pt13. The weight was affected by the luminosity from the xsec block. Re reco 2024B processed.
 // v61. Gluon histograms per working point. Golden JSON Cert_Collisions2024_378981_380649_Golden.json
 // v60. Re reco 2024B files, using Cert_Collisions2024_eraB_Golden.json
