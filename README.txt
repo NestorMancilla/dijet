@@ -72,6 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v70. Re reco 2024C using 378981_380649_Golden.
+// v69. Re reco 2024B using eraB_Goldenl. CR L2L3Res.
+// v68. Prompt 2024E.
+// v67. Fix WP error for loose. Prompt 2024 B, C and D. 378981_380649_Golden. New L2L3Res and Jet veto map.
 // v66. Re reco 2024C JetMET0. 378981_380649_Golden.
 // v65. Test for triggers.
 // v64. Process for 2024 Prompt for Gluon jets. 378981_380649_Golden.
