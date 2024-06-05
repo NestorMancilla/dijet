@@ -72,6 +72,7 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v71. bool dolumi = false; GoldenRuns_378985to380945_DCSRuns_380946to381516. 2024E_v2.
 // v70. Re reco 2024C using 378981_380649_Golden.
 // v69. Re reco 2024B using eraB_Goldenl. CR L2L3Res.
 // v68. Prompt 2024E.
