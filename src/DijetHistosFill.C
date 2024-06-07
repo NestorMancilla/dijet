@@ -162,8 +162,7 @@ constexpr std::array<std::pair<const char*, const char*>, 31> lumifiles = {{
     {"2024D_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
     {"2024E", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
     {"2024E_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
-    {"2024B_ECALv1", lumibyls2024ECALB},
-    {"2024B_ECALv2", lumibyls2024ECALB},
+    {"2024B_ECAL", lumibyls2024BCDE},
     {"2024C_ECAL", lumibyls2024BCDE},
     {"2024E_v2", lumibyls2024BCDE},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
@@ -380,6 +379,8 @@ public:
   // Jet rate per trigger
   TH1D *h1jetxsec, *h1jetrate, *h1pt13, *h1pt13_w;
   TH2D *h2jetpteta;
+  TProfile *pMPF_500, *pMPF_500b, *pMPF_600, *pMPF_600b, *pMPF_800, *pMPF_800b, *pMPF_1000, *pMPF_1000b;
+  TProfile2D *p2MPF, *p2MPF_bar;
 };
 
 // Helper function to retrieve FactorizedJetCorrector
@@ -1839,7 +1840,7 @@ void DijetHistosFill::Loop()
   fout->cd("Refs");
   TH1D *hnjet = new TH1D("hnjet", "hnjet", 500, 0, 500);
 
-  bool dolumi = false; //Nestor. xsection plot. April 17, 2024.
+  bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
   if (dolumi)
     LoadLumi();
 
@@ -3015,6 +3016,22 @@ void DijetHistosFill::Loop()
       h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                           "N_{events}",
                                nxd, vxd, nptd, vptd);
+      /*
+      h->p2MPF = new TProfile2D("p2MPF", ";RunNumber;p_{T,lead} (GeV);"
+                                         "MPF",
+                                 _runNumberBin.size()-1, _runNumberBin.data(), npti, vpti);
+      h->p2MPF_bar = new TProfile2D("p2MPF_bar", ";RunNumber;p_{T,lead} (GeV);"
+                                         "MPF",
+                                 _runNumberBin.size()-1, _runNumberBin.data(), npti, vpti);
+      */
+      h->pMPF_500 = new TProfile("pMPF_500", "", _runNumberBin.size()-1, _runNumberBin.data());
+      h->pMPF_500b = new TProfile("pMPF_500b", "", _runNumberBin.size()-1, _runNumberBin.data());
+      h->pMPF_600 = new TProfile("pMPF_600", "", _runNumberBin.size()-1, _runNumberBin.data());
+      h->pMPF_600b = new TProfile("pMPF_600b", "", _runNumberBin.size()-1, _runNumberBin.data());
+      h->pMPF_800 = new TProfile("pMPF_800", "", _runNumberBin.size()-1, _runNumberBin.data());
+      h->pMPF_800b = new TProfile("pMPF_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
+      h->pMPF_1000 = new TProfile("pMPF_1000", "", _runNumberBin.size()-1, _runNumberBin.data());
+      h->pMPF_1000b = new TProfile("pMPF_1000b", "", _runNumberBin.size()-1, _runNumberBin.data());
 
     } // doJetsperRuns
     
@@ -3812,6 +3829,7 @@ void DijetHistosFill::Loop()
         }     // for itrg
       }       // doIncJet
 
+    /*
     //doJetsperRun
       if (doJetsperRuns && dolumi)
       {
@@ -3846,6 +3864,7 @@ void DijetHistosFill::Loop()
                   //std::cout << "The p4.pt is: " << p4.Pt() << " and the pt min is: " << r.ptmin << " from the trg: " << itrg << " weight: " << w << " and the itrg is: " << itrg << std::endl;
                 h->h1jetxsec->Fill(run, w);
                 h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+		h->p2MPF->Fill(ptlead, run, m0l, w);
 		if (fabs(p4.Eta()) < 1.3) {
                   h->h1pt13_w->Fill(p4.Pt(), w);
 		  h->h1pt13->Fill(p4.Pt(), 1.);
@@ -3855,7 +3874,7 @@ void DijetHistosFill::Loop()
         }
         w = (isMC ? genWeight : 1.);
       } // doJetsperRun
-
+      */
 
       // Calculate type-I MET (L1L2L3-RC) and MHT
       if (p4.Pt() > 15.)
@@ -4624,6 +4643,89 @@ void DijetHistosFill::Loop()
 
       } // for itrg
     }   // ismultijet
+
+    //doJetsperRun
+    if (doJetsperRuns && dolumi)
+    {
+      auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
+      double ptlead = p4lead.Pt();
+      p4l.SetPtEtaPhiM(0, 0, 0, 0);
+      p4l -= p4lead;
+      p4l.SetPtEtaPhiM(p4l.Pt(), 0., p4l.Phi(), 0.);
+      p4m0.SetPtEtaPhiM(p4m0.Pt(), 0., p4m0.Phi(), 0.);
+      p4l *= 1. / p4l.Pt();
+      double m0l = 1 + (p4m0.Vect().Dot(p4l.Vect())) / ptlead;
+      for (int itrg = 0; itrg != ntrg; ++itrg)
+      {
+        string &trg = vtrg[itrg];
+        //std::cout << "Trigger: " << trg << std::endl;
+        if (!(*mtrg[trg]))
+          continue;
+        jetsperRuns *h = mjet[trg];
+        //const range &r = mt[trg];
+
+	for (int i = 0; i != njet; ++i)
+        {
+          p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
+          if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0 ) //&& fabs(p4.Eta()) < 1.3)  
+          {
+
+            w = (isMC ? genWeight : 1.);
+            h->h1jetrate->Fill(run, w);
+            if (it5 != _runNumberBin.end() && mlumi[trg][run] > 0){
+              //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
+              w = (isMC ? genWeight : 1./mlumi[trg][run]);
+            }
+            else {
+              //w = (isMC ? genWeight : 1.);
+              //exit(0);
+              continue;
+            }
+            if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
+                fabs(p4.Rapidity()) > h->absetamin &&
+                fabs(p4.Rapidity()) < h->absetamax) {
+                  //std::cout << "The p4.pt is: " << p4.Pt() << " and the pt min is: " << r.ptmin << " from the trg: " << itrg << " weight: " << w << " and the itrg is: " << itrg << std::endl;
+                h->h1jetxsec->Fill(run, w);
+                h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
+		//h->p2MPF->Fill(run, ptlead, m0l, w);
+		if (ptlead < 500){
+		  h->pMPF_500->Fill(run, m0l, w);
+		}
+                if (ptlead < 600){
+                  h->pMPF_600->Fill(run, m0l, w);
+                }
+                if (ptlead < 800){
+                  h->pMPF_800->Fill(run, m0l, w);
+                }
+                if (ptlead < 1000){
+                  h->pMPF_1000->Fill(run, m0l, w);
+                }
+		//std::cout << "The ptlead is: " << ptlead << " , the run is: " << run << " and the m0l: " << m0l << std::endl;
+                if (fabs(p4.Eta()) < 1.3) {
+                  h->h1pt13_w->Fill(p4.Pt(), w);
+                  h->h1pt13->Fill(p4.Pt(), 1.);
+		  //h->p2MPF_bar->Fill(run, ptlead, m0l, w);
+                  if (ptlead < 500){
+                    h->pMPF_500b->Fill(run, m0l, w);
+                  }
+                  if (ptlead < 600){
+                    h->pMPF_600b->Fill(run, m0l, w);
+                  }
+                  if (ptlead < 800){
+                    h->pMPF_800b->Fill(run, m0l, w);
+                  }
+                  if (ptlead < 1000){
+                    h->pMPF_1000b->Fill(run, m0l, w);
+                  }
+                }
+            }
+          }
+        }
+      }
+      w = (isMC ? genWeight : 1.);
+    } // doJetsperRun
+
+
 
     // Lumi
     if (dolumi && mrunls[run][luminosityBlock] == 0)
