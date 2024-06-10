@@ -72,7 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
-// v74. TProfile at different pt.
+// v77. Re-reco 2024CS using re-reco L2L3Res.
+// v76. 2024C re reco ECAL and HCAL.
+// v75. Adding TProfile for DB method.
+// v74. TProfile at different pt and eta < 1.3.
 // v73. TProfile2D for MPF pT lead response.
 // v72. Runs for all the eras including Re reco B and C and 2024Ev2 using the hybrid JSON file.
 // v71. bool dolumi = false; GoldenRuns_378985to380945_DCSRuns_380946to381516. 2024E_v2.

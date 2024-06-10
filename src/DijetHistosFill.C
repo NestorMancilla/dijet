@@ -132,7 +132,7 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 31> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 33> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -165,6 +165,8 @@ constexpr std::array<std::pair<const char*, const char*>, 31> lumifiles = {{
     {"2024B_ECAL", lumibyls2024BCDE},
     {"2024C_ECAL", lumibyls2024BCDE},
     {"2024E_v2", lumibyls2024BCDE},
+    {"2024Ev2_ZB", lumibyls2024BCDE},
+    {"2024CS", lumibyls2024BCDE},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -379,7 +381,8 @@ public:
   // Jet rate per trigger
   TH1D *h1jetxsec, *h1jetrate, *h1pt13, *h1pt13_w;
   TH2D *h2jetpteta;
-  TProfile *pMPF_500, *pMPF_500b, *pMPF_600, *pMPF_600b, *pMPF_800, *pMPF_800b, *pMPF_1000, *pMPF_1000b;
+  TProfile *pMPF_500, *pMPF_500b, *pMPF_600, *pMPF_600b, *pMPF_800, *pMPF_800b, *pMPF_1000, *pMPF_1000b, *pMPF_1200, *pMPF_1200b;
+  TProfile *pDB_500, *pDB_500b, *pDB_600, *pDB_600b, *pDB_800, *pDB_800b, *pDB_1000, *pDB_1000b, *pDB_1200, *pDB_1200b;
   TProfile2D *p2MPF, *p2MPF_bar;
 };
 
@@ -1511,7 +1514,7 @@ void DijetHistosFill::Loop()
 
   if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
   { 
-    if (TString(dataset.c_str()).Contains("2024C_ECAL"))
+    if (TString(dataset.c_str()).Contains("2024C_ECAL") || dataset == "2024CS")
     {
       jec = getFJC(""
                    "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -1541,7 +1544,7 @@ void DijetHistosFill::Loop()
                  "Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
   }
 
-  if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024E_ZB")
+  if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024E_ZB" || dataset == "2024Ev2_ZB" )
   {
     jec = getFJC("",
                  "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3024,14 +3027,30 @@ void DijetHistosFill::Loop()
                                          "MPF",
                                  _runNumberBin.size()-1, _runNumberBin.data(), npti, vpti);
       */
-      h->pMPF_500 = new TProfile("pMPF_500", "", _runNumberBin.size()-1, _runNumberBin.data());
-      h->pMPF_500b = new TProfile("pMPF_500b", "", _runNumberBin.size()-1, _runNumberBin.data());
-      h->pMPF_600 = new TProfile("pMPF_600", "", _runNumberBin.size()-1, _runNumberBin.data());
-      h->pMPF_600b = new TProfile("pMPF_600b", "", _runNumberBin.size()-1, _runNumberBin.data());
-      h->pMPF_800 = new TProfile("pMPF_800", "", _runNumberBin.size()-1, _runNumberBin.data());
-      h->pMPF_800b = new TProfile("pMPF_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
-      h->pMPF_1000 = new TProfile("pMPF_1000", "", _runNumberBin.size()-1, _runNumberBin.data());
-      h->pMPF_1000b = new TProfile("pMPF_1000b", "", _runNumberBin.size()-1, _runNumberBin.data());
+      if (itrg == 9)
+      { 
+        h->pMPF_500 = new TProfile("pMPF_500", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_500b = new TProfile("pMPF_500b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_600 = new TProfile("pMPF_600", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_600b = new TProfile("pMPF_600b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_800 = new TProfile("pMPF_800", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_800b = new TProfile("pMPF_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_1000 = new TProfile("pMPF_1000", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_1000b = new TProfile("pMPF_1000b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_1200 = new TProfile("pMPF_1200", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pMPF_1200b = new TProfile("pMPF_1200b", "", _runNumberBin.size()-1, _runNumberBin.data());
+
+        h->pDB_500 = new TProfile("pDB_500", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_500b = new TProfile("pDB_500b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_600 = new TProfile("pDB_600", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_600b = new TProfile("pDB_600b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_800 = new TProfile("pDB_800", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_800b = new TProfile("pDB_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_1000 = new TProfile("pDB_1000", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_1000b = new TProfile("pDB_1000b", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_1200 = new TProfile("pDB_1200", "", _runNumberBin.size()-1, _runNumberBin.data());
+        h->pDB_1200b = new TProfile("pDB_1200b", "", _runNumberBin.size()-1, _runNumberBin.data());
+      }
 
     } // doJetsperRuns
     
@@ -4653,8 +4672,10 @@ void DijetHistosFill::Loop()
       p4l -= p4lead;
       p4l.SetPtEtaPhiM(p4l.Pt(), 0., p4l.Phi(), 0.);
       p4m0.SetPtEtaPhiM(p4m0.Pt(), 0., p4m0.Phi(), 0.);
+      p4m3.SetPtEtaPhiM(p4m3.Pt(), 0., p4m3.Phi(), 0.);
       p4l *= 1. / p4l.Pt();
-      double m0l = 1 + (p4m0.Vect().Dot(p4l.Vect())) / ptlead;
+      double m0l = 1 + (p4m0.Vect().Dot(p4l.Vect())) / ptlead; // MPF leading
+      double m3l = 1 + (p4m3.Vect().Dot(p4l.Vect())) / ptlead; // DB leading
       for (int itrg = 0; itrg != ntrg; ++itrg)
       {
         string &trg = vtrg[itrg];
@@ -4663,7 +4684,58 @@ void DijetHistosFill::Loop()
           continue;
         jetsperRuns *h = mjet[trg];
         //const range &r = mt[trg];
-
+	
+	//HLT_PFJet500
+        if (ismultijet && itrg == 9 && p4lead.Pt() >= h->ptmin && p4lead.Pt() < h->ptmax &&
+            fabs(p4lead.Eta()) > h->absetamin &&
+            fabs(p4lead.Eta()) < h->absetamax &&
+	    it5 != _runNumberBin.end() && mlumi[trg][run] > 0 ) //Jet_jetId[itag] >= 4
+	{
+          if (ptlead > 500){
+            h->pMPF_500->Fill(run, m0l, 1./mlumi[trg][run]);
+            h->pDB_500->Fill(run, m3l, 1./mlumi[trg][run]);
+          }
+          if (ptlead > 600){
+            h->pMPF_600->Fill(run, m0l, 1./mlumi[trg][run]);
+            h->pDB_600->Fill(run, m3l, 1./mlumi[trg][run]);
+          }
+          if (ptlead > 800){
+            h->pMPF_800->Fill(run, m0l, 1./mlumi[trg][run]);
+            h->pDB_800->Fill(run, m3l, 1./mlumi[trg][run]);
+          }
+          if (ptlead > 1000){
+            h->pMPF_1000->Fill(run, m0l, 1./mlumi[trg][run]);
+            h->pDB_1000->Fill(run, m3l, 1./mlumi[trg][run]);
+          }
+          if (ptlead > 1200){
+            h->pMPF_1200->Fill(run, m0l, 1./mlumi[trg][run]);
+            h->pDB_1200->Fill(run, m3l, 1./mlumi[trg][run]);
+          }
+          // Barrel region	  
+	  if (p4lead.Eta() < 1.3)
+	  {
+	    if (ptlead > 500){
+              h->pMPF_500b->Fill(run, m0l, 1./mlumi[trg][run]);
+              h->pDB_500b->Fill(run, m3l, 1./mlumi[trg][run]);
+            }
+            if (ptlead > 600){
+              h->pMPF_600b->Fill(run, m0l, 1./mlumi[trg][run]);
+              h->pDB_600b->Fill(run, m3l, 1./mlumi[trg][run]);
+            }
+            if (ptlead > 800){
+              h->pMPF_800b->Fill(run, m0l, 1./mlumi[trg][run]);
+              h->pDB_800b->Fill(run, m3l, 1./mlumi[trg][run]);
+            }
+            if (ptlead > 1000){
+              h->pMPF_1000b->Fill(run, m0l, 1./mlumi[trg][run]);
+              h->pDB_1000b->Fill(run, m3l, 1./mlumi[trg][run]);
+            }
+            if (ptlead > 1200){
+              h->pMPF_1200b->Fill(run, m0l, 1./mlumi[trg][run]);
+              h->pDB_1200b->Fill(run, m3l, 1./mlumi[trg][run]);
+            }
+	  }
+	}
 	for (int i = 0; i != njet; ++i)
         {
           p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
@@ -4688,35 +4760,11 @@ void DijetHistosFill::Loop()
                 h->h1jetxsec->Fill(run, w);
                 h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
 		//h->p2MPF->Fill(run, ptlead, m0l, w);
-		if (ptlead < 500){
-		  h->pMPF_500->Fill(run, m0l, w);
-		}
-                if (ptlead < 600){
-                  h->pMPF_600->Fill(run, m0l, w);
-                }
-                if (ptlead < 800){
-                  h->pMPF_800->Fill(run, m0l, w);
-                }
-                if (ptlead < 1000){
-                  h->pMPF_1000->Fill(run, m0l, w);
-                }
 		//std::cout << "The ptlead is: " << ptlead << " , the run is: " << run << " and the m0l: " << m0l << std::endl;
                 if (fabs(p4.Eta()) < 1.3) {
                   h->h1pt13_w->Fill(p4.Pt(), w);
                   h->h1pt13->Fill(p4.Pt(), 1.);
 		  //h->p2MPF_bar->Fill(run, ptlead, m0l, w);
-                  if (ptlead < 500){
-                    h->pMPF_500b->Fill(run, m0l, w);
-                  }
-                  if (ptlead < 600){
-                    h->pMPF_600b->Fill(run, m0l, w);
-                  }
-                  if (ptlead < 800){
-                    h->pMPF_800b->Fill(run, m0l, w);
-                  }
-                  if (ptlead < 1000){
-                    h->pMPF_1000b->Fill(run, m0l, w);
-                  }
                 }
             }
           }
