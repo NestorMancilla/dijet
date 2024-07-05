@@ -10,7 +10,7 @@
 #include <iostream>
 
 int debug = 1; // 1=trg, 2=dir, 3=all
-string version = "v63_2024";
+string version = "v79_2024";
 void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 			 string trg, string folder);
 //void mergeDijet(TDirectory *dir, TDirectory *dout);
@@ -39,10 +39,15 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022F_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022G_"+version+".root");
   DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024E_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_ECAL_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024E_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev1_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev2_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024BR_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024CR_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024CS_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024BC_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
