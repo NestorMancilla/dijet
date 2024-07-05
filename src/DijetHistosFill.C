@@ -127,12 +127,15 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381199_DCSOnly.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_Golden.csv";
-constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to380945_DCSRuns_380946to381516.csv";
+//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to380945_DCSRuns_380946to381516.csv";
+//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381152_DCSRuns_381153to381594.csv";
+//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381417_DCSRuns_381418to381594.csv";
+constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 33> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 35> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -160,13 +163,15 @@ constexpr std::array<std::pair<const char*, const char*>, 33> lumifiles = {{
     {"2024C_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC
     {"2024D", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
     {"2024D_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
-    {"2024E", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
-    {"2024E_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
-    {"2024B_ECAL", lumibyls2024BCDE},
-    {"2024C_ECAL", lumibyls2024BCDE},
-    {"2024E_v2", lumibyls2024BCDE},
+    {"2024Ev1", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
+    {"2024Ev1_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
+    {"2024BR", lumibyls2024BCDE},
+    {"2024CR", lumibyls2024BCDE},
+    {"2024Ev2", lumibyls2024BCDE},
     {"2024Ev2_ZB", lumibyls2024BCDE},
     {"2024CS", lumibyls2024BCDE},
+    {"2024F", lumibyls2024BCDE},
+    {"2024F_ZB", lumibyls2024BCDE},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -510,7 +515,9 @@ bool DijetHistosFill::LoadLumi()
   //string JSON_version = "378981_380649_Golden";
   //string JSON_version = "eraB_Golden";
   //string JSON_version = "378981_381478_DCSOnly";
-  string JSON_version = "GoldenRuns_378985to380945_DCSRuns_380946to381516";
+  //string JSON_version = "GoldenRuns_378985to380945_DCSRuns_380946to381516";
+  //string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
+  string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1494,11 +1501,12 @@ void DijetHistosFill::Loop()
 
   if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
   {
-    if (TString(dataset.c_str()).Contains("2024B_ECAL"))
+    if (TString(dataset.c_str()).Contains("2024BR"))
     {
       jec = getFJC(""
                    "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                   "Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
     }
     else {
       jec = getFJC("",
@@ -1508,18 +1516,28 @@ void DijetHistosFill::Loop()
                    //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
                    //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                    //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-                   "Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
     }
   }
 
   if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
   { 
-    if (TString(dataset.c_str()).Contains("2024C_ECAL") || dataset == "2024CS")
+    if (TString(dataset.c_str()).Contains("2024CR"))
     {
       jec = getFJC(""
                    "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-		   "Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+		   //"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
     }
+    else if (dataset == "2024CS")
+    {
+      jec = getFJC(""
+                   "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                   //"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
+    }
+
     else {
       jec = getFJC("",
                    "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -1528,7 +1546,8 @@ void DijetHistosFill::Loop()
                    //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
                    //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                    //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-                   "Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
     }
   }
 
@@ -1541,10 +1560,11 @@ void DijetHistosFill::Loop()
                  //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
                  //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-                 "Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
   }
 
-  if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024E_ZB" || dataset == "2024Ev2_ZB" )
+  if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
   {
     jec = getFJC("",
                  "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -1553,7 +1573,22 @@ void DijetHistosFill::Loop()
                  //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
                  //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-                 "Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (dataset == "2024F"  || dataset == "2024F_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1939,7 +1974,10 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/Cert_Collisions2024_378981_380649_Golden.json"); // May 27, 2024, 19:31
       //LoadJSON("rootfiles/Cert_Collisions2024_eraB_Golden.json");
       //LoadJSON("rootfiles/Collisions24_13p6TeV_378981_381478_DCSOnly_TkPx.json"); // June 2, 2024.
-      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to380945_DCSRuns_380946to381516.json");
+      //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to380945_DCSRuns_380946to381516.json");
+      //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to381152_DCSRuns_381153to381594.json");
+      //LoadJSON("rootfiles/CombinedJSONS_GoldenRuns_378985to381417_DCSRuns_381418to381594.json");
+      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to382329_DCSRuns_382330to382686.json");
 
   }
   int _nbadevts_json(0);

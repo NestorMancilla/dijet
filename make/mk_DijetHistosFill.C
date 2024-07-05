@@ -13,6 +13,7 @@
 #include "../CondFormats/JetMETObjects/interface/JetResolutionObject.h"
 #include "../JetMETCorrections/Modules/interface/JetResolution.h"
 
+//#include "../interface/DijetHistosFillNanoV9.h"
 //#include "../interface/DijetHistosFill.h"
 #include "../interface/DijetHistosFill_2024Prompt.h" // For Prompt 2024 and to add the luminosity in the Loop function. Nestor. April 19.
 
@@ -88,7 +89,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer23MG_new_1", "Summer23MG_new_2", "Summer23MG_new_3", "Summer23MG_new_4",
      "TestSummer23MGBPix", "Summer23MCFlat", "Summer23MCBPixFlat",
      "Summer23MCBPix_Cas", "Summer23MC_Cas",
-     "Winter24MCFlat"
+     "Winter24MCFlat", "Winter24MCFlat_Sv10", "Winter24MCFlat_Sv9"
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 
@@ -98,10 +99,15 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "UL2016GH_ZB", "UL2017B_ZB", "UL2017C_ZB", "UL2017D_ZB", 
   "UL2017E_ZB", "UL2017F_ZB", "UL2018A_ZB", "UL2018B_ZB", 
   "UL2018C_ZB", "UL2018D_ZB", "2022C", "2022D", "2022E", 
-  "2022F", "2022G", "2022F1", "2022F2", "2023BCv123", "2023B", "2023Cv123", "2023Cv123_ZB","2023Cv4", 
+  "2022F", "2022G", "2022F1", "2022F2", "2022D_prompt", "2022D_ZB_prompt", "2022C_prompt", "2022C_ZB_prompt",
+  "2023BCv123", "2023B", "2023Cv123", "2023Cv123_ZB","2023Cv4", 
   "2023D", "2022C_ZB", "2022D_ZB", "2022E_ZB", "2022F_ZB", "2022G_ZB", 
   "2023BCv123_ZB", "2023Cv4_ZB", "2023D_ZB",
-  "2024B", "2024B_JME", "2024B_ZB", "2024C", "2024C_JME", "2024C_ZB"
+  "2023Cv123_prompt", "2023Cv123_ZB_prompt", "2023Cv4_prompt", "2023Cv4_ZB_prompt", "2023D_prompt", "2023D_ZB_prompt",
+  "2024B", "2024B_JME", "2024B_ZB", "2024C", "2024C_JME", "2024C_ZB", "2024D", "2024D_ZB", "2024Ev1", "2024Ev1_ZB", "2024Ev2_ZB",
+  "2024F", "2024F_ZB",
+  "2024BR", "2024CR", "2024Ev2", "2024Crs", "2024CS",
+  "2024_skim"
   };
 
   // Check if dataset is supported

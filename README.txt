@@ -72,6 +72,8 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v79. Prompt 2024F. Hybrid Golden
+// v78. L2L3Res V4.
 // v77. Re-reco 2024CS using re-reco L2L3Res.
 // v76. 2024C re reco ECAL and HCAL.
 // v75. Adding TProfile for DB method.
