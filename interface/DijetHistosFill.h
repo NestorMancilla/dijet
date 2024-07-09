@@ -44,17 +44,23 @@ public :
    TString          _filename; // file name for debugging purposes
    int             HT_bin_idx;
 
+   map<string, map<int, double>> mlumi;
    map<string, map<int, int> > _prescales;
    map<int, map<int, int> > _json;
-   map<int, map<int, float> > _lums;
+   //map<int, map<int, float> > _lums;
+   map<int, float> _lums;
+   double _lumsum;
+   std::vector<double> _runNumberBin;
    map<int, map<int, float> > _lums2;
    map<int, map<int, float> > _avgpu;
 //    map<string, TH1D*> _pudist;
   std::map<TString, pair<int, pair<int, int>>> HT_bins;
+   //map<int, map<int, float> > _lums;
 
    Bool_t HLT_MC = kTRUE;
    Bool_t Jet_jetveto[100];
-
+   Bool_t Jet_jetveto_BPix[100];
+   Bool_t Jet_jetvetomap[100];
    
   
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -3560,6 +3566,7 @@ DijetHistosFill::DijetHistosFill(TTree *tree, int itype, string datasetname, str
 		 0))))));
   isRun3 = (TString(datasetname.c_str()).Contains("2022") ||
 	    TString(datasetname.c_str()).Contains("2023") ||
+	    TString(datasetname.c_str()).Contains("2024") ||
 	    TString(datasetname.c_str()).Contains("Summer22") ||
 	    TString(datasetname.c_str()).Contains("Summer23") ||
 	    TString(datasetname.c_str()).Contains("Winter24"));

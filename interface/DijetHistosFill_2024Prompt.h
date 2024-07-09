@@ -45,6 +45,7 @@ public :
    TString          _filename; // file name for debugging purposes
    int             HT_bin_idx;
 
+   map<string, map<int, double>> mlumi;
    map<string, map<int, int> > _prescales;
    map<int, map<int, int> > _json;
    //map<int, map<int, float> > _lums;
@@ -264,6 +265,7 @@ public :
    //   Float_t         Jet_btagDeepFlavG[nJetMax];   //[nJet]
    Float_t         Jet_btagDeepFlavQG[nJetMax];   //[nJet]
    //   Float_t         Jet_btagDeepFlavUDS[nJetMax];   //[nJet]
+   Float_t         Jet_btagPNetQvG[nJetMax];  //[nJet] Gluon Jets, Nestor. May20, 2024.
    Float_t         Jet_chEmEF[nJetMax];   //[nJet]
    Float_t         Jet_chHEF[nJetMax];   //[nJet]
    Float_t         Jet_eta[nJetMax];   //[nJet]
@@ -2009,6 +2011,7 @@ public :
    //   TBranch        *b_Jet_btagDeepFlavG;   //!
    TBranch        *b_Jet_btagDeepFlavQG;   //!
    //   TBranch        *b_Jet_btagDeepFlavUDS;   //!
+   TBranch        *b_Jet_btagPNetQvG; //! Gluon Jets, Nestor May20, 2024.
    TBranch        *b_Jet_chEmEF;   //!
    TBranch        *b_Jet_chHEF;   //!
    TBranch        *b_Jet_eta;   //!
@@ -4301,6 +4304,7 @@ void DijetHistosFill::Init(TTree *tree)
    //   fChain->SetBranchAddress("Jet_btagDeepFlavG", Jet_btagDeepFlavG, &b_Jet_btagDeepFlavG);
    fChain->SetBranchAddress("Jet_btagDeepFlavQG", Jet_btagDeepFlavQG, &b_Jet_btagDeepFlavQG);
    //   fChain->SetBranchAddress("Jet_btagDeepFlavUDS", Jet_btagDeepFlavUDS, &b_Jet_btagDeepFlavUDS);
+   fChain->SetBranchAddress("Jet_btagPNetQvG", Jet_btagPNetQvG, &b_Jet_btagPNetQvG); // Gluon jets, Nestor. May20,2024.
    fChain->SetBranchAddress("Jet_chEmEF", Jet_chEmEF, &b_Jet_chEmEF);
    fChain->SetBranchAddress("Jet_chHEF", Jet_chHEF, &b_Jet_chHEF);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
