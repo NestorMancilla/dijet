@@ -130,7 +130,7 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to380945_DCSRuns_380946to381516.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381152_DCSRuns_381153to381594.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381417_DCSRuns_381418to381594.csv";
-constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
+constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
@@ -157,21 +157,21 @@ constexpr std::array<std::pair<const char*, const char*>, 35> lumifiles = {{
     {"2023D_ZB", lumibyls2023D},
     //{"2024B", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
     //{"2024B_ZB", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
-    {"2024B", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC 
-    {"2024B_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC 
-    {"2024C", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC
-    {"2024C_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024BC
-    {"2024D", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
-    {"2024D_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024D
-    {"2024Ev1", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
-    {"2024Ev1_ZB", lumibyls2024BCDE}, //Luminosity per run for prompt 2024E
-    {"2024BR", lumibyls2024BCDE},
-    {"2024CR", lumibyls2024BCDE},
-    {"2024Ev2", lumibyls2024BCDE},
-    {"2024Ev2_ZB", lumibyls2024BCDE},
-    {"2024CS", lumibyls2024BCDE},
-    {"2024F", lumibyls2024BCDE},
-    {"2024F_ZB", lumibyls2024BCDE},
+    {"2024B", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC 
+    {"2024B_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC 
+    {"2024C", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC
+    {"2024C_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC
+    {"2024D", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024D
+    {"2024D_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024D
+    {"2024Ev1", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024E
+    {"2024Ev1_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024E
+    {"2024BR", lumibyls2024BCDEF},
+    {"2024CR", lumibyls2024BCDEF},
+    {"2024Ev2", lumibyls2024BCDEF},
+    {"2024Ev2_ZB", lumibyls2024BCDEF},
+    {"2024CS", lumibyls2024BCDEF},
+    {"2024F", lumibyls2024BCDEF},
+    {"2024F_ZB", lumibyls2024BCDEF},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -447,32 +447,7 @@ FactorizedJetCorrector *getFJC(string l1 = "", string l2 = "", string res = "",
 /////////////////////////
 bool DijetHistosFill::LoadLumi()
 {
-  // For calculating luminosity on the fly based on .csv file and take only events with non-zero luminosity
-  /*
-  vector<string> vtrg = {
-    "HLT_PFJet40",
-    "HLT_PFJet60",
-    "HLT_PFJet80",
-    "HLT_PFJet140",
-    "HLT_PFJet200",
-    "HLT_PFJet260",
-    "HLT_PFJet320",
-    "HLT_PFJet400",
-    "HLT_PFJet450",
-    "HLT_PFJet500",
-    "HLT_PFJetFwd40",
-    "HLT_PFJetFwd60",
-    "HLT_PFJetFwd80",
-    "HLT_PFJetFwd140",
-    "HLT_PFJetFwd200",
-    "HLT_PFJetFwd260",
-    "HLT_PFJetFwd320",
-    "HLT_PFJetFwd400",
-    "HLT_PFJetFwd450",
-    "HLT_PFJetFwd500",
-    //"HLT_ZeroBias"
-  };
-  */
+  // To read the luminosity based on the .csv file and take only events with non-zero luminosity
     vector<string> vtrg = {
       "HLT_PFJet40",
       "HLT_PFJet60",
@@ -597,7 +572,6 @@ bool DijetHistosFill::LoadLumi()
               mlumi[trigger][run] = lum; // * 1000. to have it in pb
           }
       }
-
       // Close the file
       file.close();
   }
@@ -697,31 +671,10 @@ bool DijetHistosFill::LoadLumi()
       runNumbers.insert(rn);
     }
 
-    /*
-    double runWithOffset = rn + 0.5;
-    if (runNumbers.find(runWithOffset) == runNumbers.end()) {
-        runNumbers.insert(runWithOffset);
-        std::cout << "rn_with_offset: " << runWithOffset << std::endl;
-    }
-    std::cout << "Contents of runNumbers:" << std::endl;
-    for (const auto& num : runNumbers) {
-        std::cout << num << std::endl;
-    }
-    */
     std::vector<double> binEdges(runNumbers.begin(), runNumbers.end());
     binEdges.push_back(*runNumbers.rbegin() + 1);
     _runNumberBin = binEdges;
-    /*
-    std::cout << "binEdges: ";
-    for (auto it2 = binEdges.begin(); it2 != binEdges.end(); ++it2) {
-        std::cout << *it2;
-        if (it2 != binEdges.end() - 1) { // Print a comma after all elements except the last one
-            std::cout << ", ";
-        }
-    }
-    std::cout << std::endl;
-    */
-    //
+
     if (lum == 0 and goodruns.find(rn) != goodruns.end() and (_json[rn][numls] == 1)) // The second condition had !jp::dojson or
       nolums.insert(pair<int, int>(rn, nls));
 
@@ -1478,26 +1431,7 @@ void DijetHistosFill::Loop()
 
     useJERSFvsPt = true;
   }
- 
-  if (TString(dataset.c_str()).Contains("2024A")  || dataset == "2024A_ZB")
-  {
-    jec = getFJC("",
-                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-                 "Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi");
 
-  }
-
-  if (TString(dataset.c_str()).Contains("2024_skim")  || dataset == "2024_skim_ZB")
-  {
-    jec = getFJC("",
-                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
-                 "Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-
-  }
 
   if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
   {
@@ -1881,13 +1815,6 @@ void DijetHistosFill::Loop()
   bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
   if (dolumi)
     LoadLumi();
-
-  //fout->mkdir("JetsperRuns");
-  //fout->cd("JetsperRuns");
-  //TH1D *h1jetrate = new TH1D("h1jetrate", ";RunNumber;xsec;", _runNumberBin.size()-1, _runNumberBin.data());
-  //TH2D *h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
-  //                                       "N_{events}",
-  //                            nxd, vxd, nptd, vptd);
 
   /*
   // PF composition plots
@@ -2987,7 +2914,9 @@ void DijetHistosFill::Loop()
     } // doMultijet
 
 
+    
     // Lumi per trigger
+    /* 
     if (dolumi)
     {
       dout->mkdir("LumiInfo");
@@ -3012,6 +2941,7 @@ void DijetHistosFill::Loop()
       //h->hnpv = new TH1D("hnpv", "", 100, 0, 100);
       h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
     }
+    */
 
     
     // Jets per runs per triggers
@@ -4814,6 +4744,7 @@ void DijetHistosFill::Loop()
 
 
     // Lumi
+    /*
     if (dolumi && mrunls[run][luminosityBlock] == 0)
     {
       // DOES THIS WORK FOR ALL THE TRIGGERS?
@@ -4841,7 +4772,7 @@ void DijetHistosFill::Loop()
         //h->lum2 += lum2; // /prescale
         // TODO:
         // PRESCALE INFORMATION
-        /*
+        
         double prescale(0);
         auto ip = _prescales[h->trigname].find(run);
         if (ip==_prescales[h->trigname].end()) {
@@ -4855,7 +4786,7 @@ void DijetHistosFill::Loop()
             assert(false);
           }
         }
-        */
+        
         h->htrglumi->Fill(lum, w); //  / prescale
         h->htrgpu->Fill(trpu, w);
 	//h->hLumiPerRun->Fill(run, lum, w);
@@ -4867,7 +4798,7 @@ void DijetHistosFill::Loop()
       }
       mrunls[run][luminosityBlock] = 1;
     } // doLumi
-
+    */
 
     h2mhtvsmet->Fill(p4t1met.Pt(), p4mht.Pt(), w);
   } // for jentry
