@@ -7,8 +7,8 @@
 //     #include "../interface/DijetHistosFill.h" // Specific for NanoV12 (assumed default)
 //#endif
 //#include "../interface/DijetHistosFillNanoV9.h"
-//#include "../interface/DijetHistosFill.h"
-#include "../interface/DijetHistosFill_2024Prompt.h"
+#include "../interface/DijetHistosFill.h"
+//#include "../interface/DijetHistosFill_2024Prompt.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -55,7 +55,7 @@ bool doJetveto = true; // eta-phi maps
 bool doMCtruth = true;
 bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
-bool doGluonJets = true; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
+bool doGluonJets = false; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
 bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
@@ -492,7 +492,8 @@ bool DijetHistosFill::LoadLumi()
   //string JSON_version = "378981_381478_DCSOnly";
   //string JSON_version = "GoldenRuns_378985to380945_DCSRuns_380946to381516";
   //string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
-  string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
+  //string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
+  string JSON_version = "2022_Golden";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -626,9 +627,16 @@ bool DijetHistosFill::LoadLumi()
   if (!getsuccess2)
     return false;
   PrintInfo(string("\nstring: ") + s + " !", true);
-  //if (s != "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source")
-  if (s != "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)")
-    return false;
+  if (TString(dataset.c_str()).Contains("2022") || TString(dataset.c_str()).Contains("2023")){
+    if (s != "#run:fill,nls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source")
+    //if (s != "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source")
+      return false;
+  }
+  else {
+    if (s != "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)")
+      return false;
+  }
+    //return false;
 
   int nls(0);
   double lumsum(0);
@@ -640,11 +648,18 @@ bool DijetHistosFill::LoadLumi()
   {
     // Skip if not STABLE BEAMS or wrong number of arguments
     // STABLE BEAMS alts: ADJUST, BEAM DUMP, FLAT TOP, INJECTION PHYSICS BEAM, N/A, RAMP DOWN, SETUP, SQUEEZE
-    //if (sscanf(s.c_str(), "%d:%d,%d:%d,%d/%d/%d %d:%d:%d,STABLE BEAMS,%f,%f,%f,%f,%s",
-               //&rn, &fill, &ls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
-    if (sscanf(s.c_str(), "%d:%d,%d/%d/%d %d:%d:%d,%d,%d,%f,%f",
-               &rn, &fill, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &numls, &ifoo, &del, &rec) != 12)
-      skip = true;
+    if (TString(dataset.c_str()).Contains("2022") || TString(dataset.c_str()).Contains("2023")){
+      if (sscanf(s.c_str(), "%d:%d,%d:%d,%d/%d/%d %d:%d:%d,STABLE BEAMS,%f,%f,%f,%f,%s",
+                 &rn, &fill, &numls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
+	         //&rn, &fill, &ls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
+        skip = true;
+    }
+    else {
+      if (sscanf(s.c_str(), "%d:%d,%d/%d/%d %d:%d:%d,%d,%d,%f,%f",
+                 &rn, &fill, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &numls, &ifoo, &del, &rec) != 12)
+        skip = true;
+    }
+      //skip = true;
 
     if (debugevent)
       PrintInfo(Form("Run %d ls %d lumi %f/pb", rn, numls, rec * 1e-6), true);
@@ -1300,10 +1315,10 @@ void DijetHistosFill::Loop()
                                                            //"Winter22Run3_V2_MC_L2Relative_AK4PFPuppi",
                  "Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
                  "");                                      // Winter22Run3_V2_MC_L2L3Residual_AK4PFPuppi");
-    jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
-    jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
-    //jerpath = "";
-    //jerpathsf = "";
+    //jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
+    //jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
+    jerpath = "";
+    jerpathsf = "";
     useJERSFvsPt = false;
   }
   if (dataset == "Summer22EE" ||
@@ -1812,9 +1827,18 @@ void DijetHistosFill::Loop()
   fout->cd("Refs");
   TH1D *hnjet = new TH1D("hnjet", "hnjet", 500, 0, 500);
 
-  bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
-  if (dolumi)
-    LoadLumi();
+  // Nestor, 22 July 2024: Add the option to use the luminosity.
+  bool doluminosity = false; //Nestor. xsection plot. April 17, 2024.
+  bool dolumi;
+  if (doluminosity)
+  {  if (isMC)
+       dolumi = false;
+     else
+       dolumi = true;
+       LoadLumi();
+  }
+  std::cout << "dolumi: " << dolumi << std::endl;
+    //LoadLumi();
 
   /*
   // PF composition plots
@@ -3435,15 +3459,15 @@ void DijetHistosFill::Loop()
       { // check jet veto
         int i1 = h2jv->GetXaxis()->FindBin(Jet_eta[i]);
         int j1 = h2jv->GetYaxis()->FindBin(Jet_phi[i]);
-        int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
-        int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
-        Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
-	Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
+        //int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
+        //int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
+        //Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
+	//Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
 
-	if (bool dojv_andBPix = true)
+	if (bool dojv_andBPix = false)
 	{
-	  Jet_jetveto[i] = Jet_jetvetomap[i] || Jet_jetveto_BPix[i]; 
-	  //Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
+	  //Jet_jetveto[i] = Jet_jetvetomap[i] || Jet_jetveto_BPix[i]; 
+	  Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
 	}
 	else {
           Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
@@ -4298,19 +4322,9 @@ void DijetHistosFill::Loop()
 
           if (doGluonJets && isdijet)
           {
-
+            /*
             gluonHistos *h = mhgj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
-	    /*
-	    if (Jet_btagPNetQvG[i] < WP_l)
-	    {
-	      std::cout << "We pass the WP that is: " << Jet_btagPNetQvG[i] << std::endl;
-	    }
-	    else {
-	      std::cout << "The WP did not pass: " << Jet_btagPNetQvG[i] << std::endl;
-	    } 
-            //std::cout << "We are able to take the wp loose: " << WP_l << std::endl;
-            */
 	    for (int i = 0; i != njet; ++i){
 	      if (Jet_btagPNetQvG[i] < WP_t){
 	        //std::cout << "We pass the WP that is: " << Jet_btagPNetQvG[i] << std::endl;
@@ -4427,8 +4441,9 @@ void DijetHistosFill::Loop()
               } // WP_l
 
 	    } //njets 
-
+          */
           } // doGluonJets
+          
 
 
           if (doDijet2 && isdijet2)
