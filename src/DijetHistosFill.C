@@ -613,51 +613,118 @@ bool DijetHistosFill::LoadLumi()
   //int rn, fill, ls, ifoo;
   float del, rec, avgpu, energy;
   char sfoo[512];
+
+  // Determine expected data tags based on the lumifile year
+  std::string expectedTag;
+  std::string expectedHeader;
+  TString lumifile_str(lumifile);
+  // Check the lumifile year and set the expected data tag and header accordingly
+  if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
+      expectedTag = "#Data tag : 23v1 , Norm tag: None";
+      expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source";
+  } else {
+      expectedTag = "#Data tag : 24v1 , Norm tag: None";
+      expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
+  }
+
+  // Read and validate the first line
+  bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess1) {
+      std::cout << "Error reading the first line" << std::endl;
+      return false;
+  }
+
+  PrintInfo("First line: " + s + " !", true);
+  
+  if (s != expectedTag) {
+      std::cout << "First line does not match expected data tag" << std::endl;
+      return false;
+  }
+
+  // Read and validate the second line
+  bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess2) {
+      std::cout << "Error reading the second line" << std::endl;
+      return false;
+  }
+
+  PrintInfo("Second line: " + s + " !", true);
+  
+  if (s != expectedHeader) {
+      std::cout << "Second line does not match expected header" << std::endl;
+      return false;
+  }
+
+  /*
   bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
   if (!getsuccess1)
     return false;
   PrintInfo(string("\nstring: ") + s + " !", true);
 
+  TString lumifile_str(lumifile);
   // HOX: the lumi file format has been changing. Change the conditions when needed.
-  //if (s != "#Data tag : 23v1 , Norm tag: None")
-  if (s != "#Data tag : 24v1 , Norm tag: None")
-    return false;
-
-  bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
-  if (!getsuccess2)
-    return false;
-  PrintInfo(string("\nstring: ") + s + " !", true);
-  if (TString(dataset.c_str()).Contains("2022") || TString(dataset.c_str()).Contains("2023")){
-    if (s != "#run:fill,nls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source")
-    //if (s != "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source")
+  if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
+    if (s != "#Data tag : 23v1 , Norm tag: None")
       return false;
   }
   else {
-    if (s != "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)")
-      return false;
+  if (s != "#Data tag : 24v1 , Norm tag: None")
+    return false;
   }
+  //if (s != "#Data tag : 23v1 , Norm tag: None")
+  //if (s != "#Data tag : 24v1 , Norm tag: None") {
+    //return false;
+  //}
+
+  bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess2) {
+    std::cout << "It is not passing the second line" << std::endl;
+    return false;
+  }
+  PrintInfo(string("\nstring: ") + s + " !", true);
+
+  //TString lumifile_str(lumifile);
+  if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")){
+    //if (s != "#run:fill,nls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source") {
+    if (s != "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source") {
+      std::cout << "2022 and 2023 marked as false" << std::endl;
+      return false;
+    }
+  }
+  else {
+    if (s != "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)") {
+      std::cout << "The rest is marked as false" << std::endl;
+      return false;
+    }
+  }
+  */
     //return false;
 
   int nls(0);
   double lumsum(0);
   double lumsum_good(0);
   double lumsum_json(0);
+  double lum = 0.0;
+  double lum2 = 0.0;
   bool skip(false);
   std::set<double> runNumbers;
   while (getline(f, s, '\n'))
   {
+    //std::cout << "Processing line: " << s << std::endl;
     // Skip if not STABLE BEAMS or wrong number of arguments
     // STABLE BEAMS alts: ADJUST, BEAM DUMP, FLAT TOP, INJECTION PHYSICS BEAM, N/A, RAMP DOWN, SETUP, SQUEEZE
-    if (TString(dataset.c_str()).Contains("2022") || TString(dataset.c_str()).Contains("2023")){
+    if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")){
       if (sscanf(s.c_str(), "%d:%d,%d:%d,%d/%d/%d %d:%d:%d,STABLE BEAMS,%f,%f,%f,%f,%s",
-                 &rn, &fill, &numls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
+                       &rn, &fill, &numls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15) { 
 	         //&rn, &fill, &ls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
         skip = true;
+      } 
     }
     else {
       if (sscanf(s.c_str(), "%d:%d,%d/%d/%d %d:%d:%d,%d,%d,%f,%f",
-                 &rn, &fill, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &numls, &ifoo, &del, &rec) != 12)
+                 &rn, &fill, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &numls, &ifoo, &del, &rec) != 12) {
         skip = true;
+      }
     }
       //skip = true;
 
@@ -672,14 +739,42 @@ bool DijetHistosFill::LoadLumi()
       continue;
     }
 
+    //double lum = 0.0;
+    //double lum2 = 0.0;
+    if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
+      // Pass from /ub to /pb
+      lum = rec * 1e-6;
+      lum2 = del * 1e-6;
+    } else {
+      // Pass from /fb to /pb
+      lum = rec * 1000.; //* 1e-6;
+      lum2 = del * 1000.; //* 1e-6;
+    }
+    //double lum = rec * 1000.; //* 1e-6;
+    //double lum2 = del * 1000.; //* 1e-6;
+    
     //if (_lums[rn][numls] != 0)
-    if (_lums[rn] != 0)
-      return false;
+    if (_lums[rn] != 0) {
+	//Flag for luminoisty per lumisection instead of run
+        //std::cout << "_lums already has a value for run " << rn << ", accumulating values." << std::endl;
+        _lums[rn] += lum;
+        _lums2[rn][numls] += lum2;
+    } else {
+        _lums[rn] = lum;
+        _lums2[rn][numls] = lum2;
+    }
+    //if (_lums[rn] != 0) {
+      //std::cout << "_lums already has a value for run " << rn << std::endl;
+      //std::cout << "Exiting loop due to existing _lums value for run " << rn << std::endl;
+      //return false;
+    //}
+
     //if (_avgpu[rn][numls] != 0)
       //return false;
     // lumiCalc.py returns lumi in units of mub-1 (=>nb-1=>pb-1)
-    double lum = rec * 1000.; //* 1e-6;
-    double lum2 = del * 1000.; //* 1e-6;
+    
+    //double lum = rec * 1000.; //* 1e-6;
+    //double lum2 = del * 1000.; //* 1e-6;
     //Runs dictionary
     
     if (runNumbers.find(rn) == runNumbers.end()) {
@@ -695,8 +790,11 @@ bool DijetHistosFill::LoadLumi()
 
     //_avgpu[rn][numls] = avgpu * 69000. / 80000.; // brilcalc --minBiasXsec patch
     //_lums[rn][numls] = lum;
-    _lums[rn] = lum;
-    _lums2[rn][numls] = lum2;
+    
+    // Not used anymore since is already used above. Nestor 23 July, 2024.
+    //_lums[rn] = lum;
+    //_lums2[rn][numls] = lum2;
+    
     lumsum += lum;
     if (goodruns.find(rn) != goodruns.end()) // Apr 17
       lumsum_good += lum;
@@ -743,7 +841,8 @@ bool DijetHistosFill::LoadLumi()
   _lumsum = lumsum;
   cout << "_lumsum value: " << _lumsum << endl;
   //Unique run numbers
-  /*
+  
+  /* 
   for (const auto& number : runNumbers) {
       std::cout << number << std::endl;
   }
@@ -1828,14 +1927,15 @@ void DijetHistosFill::Loop()
   TH1D *hnjet = new TH1D("hnjet", "hnjet", 500, 0, 500);
 
   // Nestor, 22 July 2024: Add the option to use the luminosity.
-  bool doluminosity = false; //Nestor. xsection plot. April 17, 2024.
+  bool doluminosity = true; //Nestor. xsection plot. April 17, 2024.
   bool dolumi;
   if (doluminosity)
   {  if (isMC)
        dolumi = false;
-     else
+     else{
        dolumi = true;
        LoadLumi();
+     }
   }
   std::cout << "dolumi: " << dolumi << std::endl;
     //LoadLumi();
@@ -4739,7 +4839,7 @@ void DijetHistosFill::Loop()
             if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
                 fabs(p4.Rapidity()) > h->absetamin &&
                 fabs(p4.Rapidity()) < h->absetamax) {
-                  //std::cout << "The p4.pt is: " << p4.Pt() << " and the pt min is: " << r.ptmin << " from the trg: " << itrg << " weight: " << w << " and the itrg is: " << itrg << std::endl;
+                  //std::cout << "The p4.pt is: " << p4.Pt() << " and the pt min is: " << h->ptmin << " and the pt max is: " << h->ptmax << " from the trg: " << itrg << " weight: " << w << " and the itrg is: " << itrg << std::endl;
                 h->h1jetxsec->Fill(run, w);
                 h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
 		//h->p2MPF->Fill(run, ptlead, m0l, w);
@@ -4749,8 +4849,18 @@ void DijetHistosFill::Loop()
                   h->h1pt13->Fill(p4.Pt(), 1.);
 		  //h->p2MPF_bar->Fill(run, ptlead, m0l, w);
                 }
-            }
-          }
+            } //else {
+	      //std::cout << "It is not passing the pt and eta requirements " << std::endl;
+	    //}
+          } //else {
+	    //std::cout << "It is not passing the jet ID, the jet veto and the filters requirements " << std::endl;
+	    //std::cout << "Jet ID is: " << Jet_jetId[i] << " Jet veto: " << !Jet_jetveto[i] << " and pass Filters" << pass_METfilter << std::endl;
+	    //if (Jet_jetId[i] >= 4) {
+	      //std::cout << "Jet ID is bigger or equal than 4" << std::endl;
+	    //} else {
+	      //std::cout << "Jet ID less than 4" << std::endl;
+	   // }
+	  //}
         }
       }
       w = (isMC ? genWeight : 1.);

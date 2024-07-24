@@ -74,6 +74,7 @@ Bugs:
 
 // v81. ReRun 19Dec2023 re-reco samples. 2022 C, D, E, F and G (including ZB) and Summer22MG and Summer22EEMG MC. NO SF for MC.
 //      Option to use the Luminosity and corrections for MC.
+//	Luminosity for 2022 and 2023 per lumisection using the previous csv files. 
 // v80. Test, cleaning. Removed dolumi histograms (empty)
 // v79. Prompt 2024F. Hybrid Golden
 // v78. L2L3Res V4.
