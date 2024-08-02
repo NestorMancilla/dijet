@@ -72,6 +72,9 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v83. Process 2024 using the CombinedJSON_GoldenRuns_378985to383163_DCSRuns_383164to383467.json file.
+//	Replacing again jet veto to include BPix, and interface file for Nano12.
+// v82. ReRun 19Dec2023 re-reco samples. 2023 Cv123, Cv4, D. Summer23MG and Summer23MGBPix.
 // v81. ReRun 19Dec2023 re-reco samples. 2022 C, D, E, F and G (including ZB) and Summer22MG and Summer22EEMG MC. NO SF for MC.
 //      Option to use the Luminosity and corrections for MC.
 //	Luminosity for 2022 and 2023 per lumisection using the previous csv files. 

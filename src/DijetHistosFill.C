@@ -7,8 +7,8 @@
 //     #include "../interface/DijetHistosFill.h" // Specific for NanoV12 (assumed default)
 //#endif
 //#include "../interface/DijetHistosFillNanoV9.h"
-#include "../interface/DijetHistosFill.h"
-//#include "../interface/DijetHistosFill_2024Prompt.h"
+//#include "../interface/DijetHistosFill.h"
+#include "../interface/DijetHistosFill_2024Prompt.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -118,8 +118,8 @@ constexpr const char lumibyls2023B[] = "luminosityscripts/csvfiles/lumibyls2023A
 constexpr const char lumibyls2023C4[] = "luminosityscripts/csvfiles/lumibyls2023C4.csv";
 constexpr const char lumibyls2023C123[] = "luminosityscripts/csvfiles/lumibyls2023C123.csv";
 constexpr const char lumibyls2023ABC[] = "luminosityscripts/csvfiles/lumibyls2023ABC.csv";
-//constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
-constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023_366442_370790_Golden.csv";
+constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
+//constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023_366442_370790_Golden.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
 //constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
@@ -130,7 +130,8 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to380945_DCSRuns_380946to381516.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381152_DCSRuns_381153to381594.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381417_DCSRuns_381418to381594.csv";
-constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
+//constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
+constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to383163_DCSRuns_383164to383467.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
@@ -152,7 +153,7 @@ constexpr std::array<std::pair<const char*, const char*>, 35> lumifiles = {{
     {"2023Cv4_ZB", lumibyls2023C4},
     {"2023Cv123", lumibyls2023C123},
     {"2023BCv123", lumibyls2023ABC},
-    {"20223Cv123_ZB", lumibyls2023C123},
+    {"2023Cv123_ZB", lumibyls2023C123},
     {"2023D", lumibyls2023D},
     {"2023D_ZB", lumibyls2023D},
     //{"2024B", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
@@ -493,7 +494,8 @@ bool DijetHistosFill::LoadLumi()
   //string JSON_version = "GoldenRuns_378985to380945_DCSRuns_380946to381516";
   //string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
   //string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
-  string JSON_version = "2022_Golden";
+  //string JSON_version = "2022_Golden";
+  string JSON_version = "GoldenRuns_378985to383163_DCSRuns_383164to383467";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1443,28 +1445,30 @@ void DijetHistosFill::Loop()
                   "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
                   "");
       //jerpathsf = "";
-      //jersfvspt = getFJC("", "", "");
+      jersfvspt = getFJC("", "", "");
       jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
       //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
-      jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
     } else {
       jec = getFJC("", 
                   "Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
                   "");
+      //jerpathsf = "";
+      jersfvspt = getFJC("", "", "");
       jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
       //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
       //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
       // Resolution SF version 2: https://indico.cern.ch/event/1399194/
       // April 3, 2024
       //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV2_MC_SF_AK4PFPuppi", "");
-      jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
     }
     //jec = getFJC("", // Winter23Prompt23_V2_MC_L1FastJet_AK4PFPuppi",
     //             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
     //             "");                                                                                   // Winter23Prompt23_V2_MC_L2L3Residual_AK4PFPuppi");
     //jerpath = "";
     jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
-    useJERSFvsPt = true;
+    useJERSFvsPt = false; //Nestor, 24 July, 2024.
 
     if (reweightPU)
     {
@@ -2028,7 +2032,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to380945_DCSRuns_380946to381516.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to381152_DCSRuns_381153to381594.json");
       //LoadJSON("rootfiles/CombinedJSONS_GoldenRuns_378985to381417_DCSRuns_381418to381594.json");
-      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to382329_DCSRuns_382330to382686.json");
+      //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to382329_DCSRuns_382330to382686.json");
+      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to383163_DCSRuns_383164to383467.json");
 
   }
   int _nbadevts_json(0);
@@ -3119,7 +3124,7 @@ void DijetHistosFill::Loop()
                                          "MPF",
                                  _runNumberBin.size()-1, _runNumberBin.data(), npti, vpti);
       */
-      if (itrg == 9)
+      if (itrg == 9) // itrg 9 represents a specific trigger
       { 
         h->pMPF_500 = new TProfile("pMPF_500", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pMPF_500b = new TProfile("pMPF_500b", "", _runNumberBin.size()-1, _runNumberBin.data());
@@ -3555,19 +3560,20 @@ void DijetHistosFill::Loop()
 	//Jet_l1rcFactor[i] = Jet_pt[i] * (1.0 - Jet_rawFactor[i]); //To test raw pt response, Nestor. April 16, 2024.
       }
       
+      bool dojv_andBPix = true; 
       if (true)//Nestor: changed March 27,2024
       { // check jet veto
         int i1 = h2jv->GetXaxis()->FindBin(Jet_eta[i]);
         int j1 = h2jv->GetYaxis()->FindBin(Jet_phi[i]);
-        //int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
-        //int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
-        //Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
-	//Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
+        int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
+        int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
+        Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
+	Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
 
-	if (bool dojv_andBPix = false)
+	if (dojv_andBPix)
 	{
-	  //Jet_jetveto[i] = Jet_jetvetomap[i] || Jet_jetveto_BPix[i]; 
-	  Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
+	  Jet_jetveto[i] = Jet_jetvetomap[i] || Jet_jetveto_BPix[i]; 
+	  //Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
 	}
 	else {
           Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
@@ -4859,7 +4865,7 @@ void DijetHistosFill::Loop()
 	      //std::cout << "Jet ID is bigger or equal than 4" << std::endl;
 	    //} else {
 	      //std::cout << "Jet ID less than 4" << std::endl;
-	   // }
+	    //}
 	  //}
         }
       }
