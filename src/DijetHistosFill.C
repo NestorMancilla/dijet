@@ -94,7 +94,7 @@ std::set<std::string> mcIOV = {"Summer22",
                                "Summer22EEMG1", "Summer22EEMG2", "Summer22EEMG3", "Summer22EEMG4",
                                "TestSummer23MGBPix",
 			       "Summer23MC_Cas"
-                               "Winter24MCFlat"};
+                               "Winter24MCFlat", "Winter24MG"};
 
 // UTILITIES
 double DELTAPHI(double phi1, double phi2)
@@ -1549,6 +1549,43 @@ void DijetHistosFill::Loop()
 
     useJERSFvsPt = true;
   }
+
+  if (TString(dataset.c_str()).Contains("Winter24MG"))
+  {
+    jec = getFJC("",
+                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                "");
+    jerpathsf = "";
+    jersfvspt = getFJC("", "", "");
+    //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
+    //jerpath = "";
+    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
+    useJERSFvsPt = false; //Nestor, 24 July, 2024.
+
+    if (reweightPU)
+    {
+      if (TString(dataset.c_str()).Contains("Summer23MGBPix")) {
+        TFile f("luminosityscripts/PUWeights/Summer23BPix_PUWeight.root");
+        pileupRatio = (TH1D *)f.Get("pileup");
+        pileupRatio->SetDirectory(0);
+        // Print mean, min weight, max weight
+        cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+        cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+        cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+
+      } else {
+        TFile f("luminosityscripts/PUWeights/Summer23_PUWeight.root");
+        pileupRatio = (TH1D *)f.Get("pileup");
+        pileupRatio->SetDirectory(0);
+        // Print mean, min weight, max weight
+        cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+        cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+        cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+
+      }
+    }
+  }
+
 
 
   if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
@@ -3198,7 +3235,7 @@ void DijetHistosFill::Loop()
       dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
-  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat"))
+  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
     fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
@@ -3251,7 +3288,7 @@ void DijetHistosFill::Loop()
       dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
-  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat"))
+  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
     h2jvBPix = (TH2D *)fjv->Get("jetvetomap_bpix");
   assert(h2jv);
