@@ -34,7 +34,8 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2024F', '2024F_ZB',
     '2024BR', '2024CR', '2024Crs', '2024CS',
     '2024_skim',
-    'Winter24MG_1', 'Winter24MG_2', 'Winter24MG_3', 'Winter24MG_4', 'Winter24MG_5'
+    'Winter24MG_1', 'Winter24MG_2', 'Winter24MG_3', 'Winter24MG_4', 'Winter24MG_5',
+    'Winter24MGV14_1', 'Winter24MGV14_2', 'Winter24MGV14_3', 'Winter24MGV14_4', 'Winter24MGV14_5'
 ]
 
 # Run 3 is all samples with year 2023 and 2022 from the full IOV_list
@@ -43,7 +44,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v84_2024'
+version = 'v85_2024'
 
 IOV_input = []
 
