@@ -82,5 +82,5 @@ def main(file_list_path, output_json_path):
     print(f"Processing completed in {elapsed_time:.2f} seconds.")
     
 if __name__ == "__main__":
-    main('dataFiles_2024CS_XS_v1.txt', 'dataFiles_2024CS_XS_v1.json')
+    main('dataFiles_2024CS_XS_v3.txt', 'dataFiles_2024CS_XS_v1.json')
 

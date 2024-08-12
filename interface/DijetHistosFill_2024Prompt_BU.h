@@ -266,7 +266,6 @@ public :
    Float_t         Jet_btagDeepFlavQG[nJetMax];   //[nJet]
    //   Float_t         Jet_btagDeepFlavUDS[nJetMax];   //[nJet]
    Float_t         Jet_btagPNetQvG[nJetMax];  //[nJet] Gluon Jets, Nestor. May20, 2024.
-   Float_t         Jet_btagUParTAK4QvG[nJetMax]; //[nJet] Winter24MGV14 studies. Nestor Aug8, 2024.
    Float_t         Jet_chEmEF[nJetMax];   //[nJet]
    Float_t         Jet_chHEF[nJetMax];   //[nJet]
    Float_t         Jet_eta[nJetMax];   //[nJet]
@@ -730,8 +729,8 @@ public :
    UChar_t         Muon_genPartFlav[58];   //[nMuon]
    Int_t           Photon_genPartIdx[8];   //[nPhoton]
    UChar_t         Photon_genPartFlav[8];   //[nPhoton]
-   //Float_t         MET_fiducialGenPhi; // Not included in Winter24MGV14, Nestor Aug 9, 2024.
-   //Float_t         MET_fiducialGenPt; // Not included in Winter24MGV14, Nestor Aug 9, 2024.
+   Float_t         MET_fiducialGenPhi;
+   Float_t         MET_fiducialGenPt;
    //   UChar_t         Electron_cleanmask[7];   //[nElectron]
    //   UChar_t         Jet_cleanmask[nJetMax];   //[nJet]
   //UChar_t         LowPtElectron_cleanmask[11];   //[nLowPtElectron]
@@ -1096,7 +1095,7 @@ public :
    Bool_t          L1_UnpairedBunchBptxPlus;
    Bool_t          L1_ZeroBias;
    Bool_t          L1_ZeroBias_copy;
-   //Bool_t          L1_UnprefireableEvent; //Prompt 2024 data
+   Bool_t          L1_UnprefireableEvent; //Prompt 2024 data
    Bool_t          Flag_HBHENoiseFilter;
    Bool_t          Flag_HBHENoiseIsoFilter;
    Bool_t          Flag_CSCTightHaloFilter;
@@ -2013,7 +2012,6 @@ public :
    TBranch        *b_Jet_btagDeepFlavQG;   //!
    //   TBranch        *b_Jet_btagDeepFlavUDS;   //!
    TBranch        *b_Jet_btagPNetQvG; //! Gluon Jets, Nestor May20, 2024.
-   TBranch        *b_Jet_btagUParTAK4QvG; //! Winter24MGV14 studies. Nestor Aug 8, 2024.
    TBranch        *b_Jet_chEmEF;   //!
    TBranch        *b_Jet_chHEF;   //!
    TBranch        *b_Jet_eta;   //!
@@ -2450,8 +2448,8 @@ public :
    TBranch        *b_Muon_genPartFlav;   //!
    TBranch        *b_Photon_genPartIdx;   //!
    TBranch        *b_Photon_genPartFlav;   //!
-   //TBranch        *b_MET_fiducialGenPhi;   //! // Not included in Winter24MGV14, Nestor Aug 9, 2024.
-   //TBranch        *b_MET_fiducialGenPt;   //! Not included in Winter24MGV14, Nestor Aug 9, 2024.
+   TBranch        *b_MET_fiducialGenPhi;   //!
+   TBranch        *b_MET_fiducialGenPt;   //!
    //   TBranch        *b_Electron_cleanmask;   //!
    //   TBranch        *b_Jet_cleanmask;   //!
   //TBranch        *b_LowPtElectron_cleanmask;   //!
@@ -2816,7 +2814,7 @@ public :
    TBranch        *b_L1_UnpairedBunchBptxPlus;   //!
    TBranch        *b_L1_ZeroBias;   //!
    TBranch        *b_L1_ZeroBias_copy;   //!
-   //TBranch        *b_L1_UnprefireableEvent;   //! //Prompt 2024 data
+   TBranch        *b_L1_UnprefireableEvent;   //! //Prompt 2024 data
    TBranch        *b_Flag_HBHENoiseFilter;   //!
    TBranch        *b_Flag_HBHENoiseIsoFilter;   //!
    TBranch        *b_Flag_CSCTightHaloFilter;   //!
@@ -4307,7 +4305,6 @@ void DijetHistosFill::Init(TTree *tree)
    fChain->SetBranchAddress("Jet_btagDeepFlavQG", Jet_btagDeepFlavQG, &b_Jet_btagDeepFlavQG);
    //   fChain->SetBranchAddress("Jet_btagDeepFlavUDS", Jet_btagDeepFlavUDS, &b_Jet_btagDeepFlavUDS);
    fChain->SetBranchAddress("Jet_btagPNetQvG", Jet_btagPNetQvG, &b_Jet_btagPNetQvG); // Gluon jets, Nestor. May20,2024.
-   fChain->SetBranchAddress("Jet_btagUParTAK4QvG", Jet_btagUParTAK4QvG, &b_Jet_btagUParTAK4QvG); // Winter24MGV14 studies, Nestor Aug 8, 2024.
    fChain->SetBranchAddress("Jet_chEmEF", Jet_chEmEF, &b_Jet_chEmEF);
    fChain->SetBranchAddress("Jet_chHEF", Jet_chHEF, &b_Jet_chHEF);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
@@ -4753,8 +4750,8 @@ void DijetHistosFill::Init(TTree *tree)
    if (isMC) fChain->SetBranchAddress("Muon_genPartFlav", Muon_genPartFlav, &b_Muon_genPartFlav);
    if (isMC) fChain->SetBranchAddress("Photon_genPartIdx", Photon_genPartIdx, &b_Photon_genPartIdx);
    if (isMC) fChain->SetBranchAddress("Photon_genPartFlav", Photon_genPartFlav, &b_Photon_genPartFlav);
-   //if (isMC) fChain->SetBranchAddress("MET_fiducialGenPhi", &MET_fiducialGenPhi, &b_MET_fiducialGenPhi); // Not included in Winter24MGV14, Nestor Aug 9, 2024.
-   //if (isMC) fChain->SetBranchAddress("MET_fiducialGenPt", &MET_fiducialGenPt, &b_MET_fiducialGenPt); // Not included in Winter24MGV14, Nestor Aug 9, 2024.
+   if (isMC) fChain->SetBranchAddress("MET_fiducialGenPhi", &MET_fiducialGenPhi, &b_MET_fiducialGenPhi);
+   if (isMC) fChain->SetBranchAddress("MET_fiducialGenPt", &MET_fiducialGenPt, &b_MET_fiducialGenPt);
    //   fChain->SetBranchAddress("Electron_cleanmask", Electron_cleanmask, &b_Electron_cleanmask);
    //   fChain->SetBranchAddress("Jet_cleanmask", Jet_cleanmask, &b_Jet_cleanmask);
    //fChain->SetBranchAddress("LowPtElectron_cleanmask", LowPtElectron_cleanmask, &b_LowPtElectron_cleanmask);

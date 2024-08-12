@@ -1,5 +1,6 @@
 import ROOT
 import json
+import time
 
 def read_file_list(file_path):
     """Reads a list of file paths from a text file."""
@@ -30,6 +31,24 @@ def extract_run_lumi_blocks(root_file_path):
     file.Close()
     return run_lumi_blocks
 
+def convert_to_ranges(lumi_blocks):
+    """Convert a set of luminosity blocks to a list of ranges."""
+    sorted_lumis = sorted(lumi_blocks)
+    ranges = []
+    start = sorted_lumis[0]
+    end = sorted_lumis[0]
+    
+    for lumi in sorted_lumis[1:]:
+        if lumi == end + 1:
+            end = lumi
+        else:
+            ranges.append([start, end])
+            start = lumi
+            end = lumi
+    
+    ranges.append([start, end])
+    return ranges
+
 def write_to_json(data, output_file):
     """Writes data to a JSON file."""
     with open(output_file, 'w') as f:
@@ -40,19 +59,28 @@ def main(file_list_path, output_json_path):
     file_list = read_file_list(file_list_path)
     combined_data = {}
     
-    for root_file in file_list:
+    total_files = len(file_list)
+    print(f"Total files to process: {total_files}")
+
+    start_time = time.time()
+    
+    for i, root_file in enumerate(file_list, 1):
+        print(f"Processing file {i}/{total_files}: {root_file}")
         run_lumi_blocks = extract_run_lumi_blocks(root_file)
         for run, lumis in run_lumi_blocks.items():
             if run not in combined_data:
                 combined_data[run] = set()
             combined_data[run].update(lumis)
+
+    # Convert sets to lists of ranges for JSON serialization
+    combined_data_ranges = {run: convert_to_ranges(lumis) for run, lumis in combined_data.items()}
     
-    # Convert sets to lists for JSON serialization
-    for run in combined_data:
-        combined_data[run] = list(combined_data[run])
-    
-    write_to_json(combined_data, output_json_path)
+    write_to_json(combined_data_ranges, output_json_path)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Processing completed in {elapsed_time:.2f} seconds.")
     
 if __name__ == "__main__":
-    main('dataFiles_2024CS_XS_v2.txt', 'output.json')
+    main('part2.txt', 'part2.json')
 

@@ -207,7 +207,7 @@ class mctruthHistos
 {
 public:
   TH1D *ptreco_ptgen; //, *h1res_bar;
-  TH2D *h2pteta, *h2pteta_gen, *h2pteta_rec, *h2res_ptgen, *h2res_etagen;//, *h2res_bar;
+  TH2D *h2pteta, *h2pteta_gen, *h2pteta_rec, *h2res_ptgen, *h2res_etagen, *h2_btagUpar;//, *h2res_bar;
   TH3D *h3res, *h3res_Match, *h3res_raw;
   TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff, *p2pur;
 };
@@ -964,8 +964,8 @@ void DijetHistosFill::Loop()
   if (isRun3)
   //if (isRun3 || isMG )
     fChain->SetBranchStatus("Rho_fixedGridRhoFastjetAll", 1);
-  if (!TString(dataset.c_str()).Contains("2024"))
-    fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
+  //if (!TString(dataset.c_str()).Contains("2024") || !TString(dataset.c_str()).Contains("Winter24MGV14"))
+    //fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
   //fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
 
   // Listing of available triggers
@@ -1057,6 +1057,7 @@ void DijetHistosFill::Loop()
 
   fChain->SetBranchStatus("nJet", 1);
   fChain->SetBranchStatus("Jet_btagPNetQvG", 1);
+  fChain->SetBranchStatus("Jet_btagUParTAK4QvG", 1);
   fChain->SetBranchStatus("Jet_pt", 1);
   fChain->SetBranchStatus("Jet_eta", 1);
   fChain->SetBranchStatus("Jet_phi", 1);
@@ -1677,7 +1678,8 @@ void DijetHistosFill::Loop()
                  //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-                 "Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -2165,6 +2167,11 @@ void DijetHistosFill::Loop()
       h->h2res_ptgen = new TH2D("response_ptgen","p_{T,gen} (GeV);p_{T,gen} (GeV);"
 		                       "p_{T,reco}/p_{T,gen} (GeV)",
 		            nptd, vptd, 100, 0.0, 2.0);
+      // Jet_btagUParTAK4QvG
+      h->h2_btagUpar = new TH2D("h2_btagUpar","Jet_btagUParTAK4QvG;p_{T,gen} (GeV);"
+                                       "Fraction",
+                            nptd, vptd, 100, 0.0, 1.0);
+      //
       h->h2res_etagen = new TH2D("response_etagen","|#eta_{gen}|;|#eta_{gen}|;"
 		                       "p_{T,reco}/p_{T,gen} (GeV)",
 		            nxd, vxd, 100, 0.0, 2.0);
@@ -3783,6 +3790,7 @@ void DijetHistosFill::Loop()
         {
           h->ptreco_ptgen->Fill(p4.Pt()/p4g.Pt(), w);
 	  h->h2res_ptgen->Fill(p4g.Pt(), p4.Pt()/p4g.Pt(), w);
+	  h->h2_btagUpar->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 	  h->h2res_etagen->Fill(p4g.Eta(), p4.Pt()/p4g.Pt(), w);
 	  h->h3res->Fill(p4g.Eta(), p4g.Pt(), p4.Pt()/p4g.Pt(), w);
 	  h->p2r_NoMatch->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
