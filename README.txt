@@ -72,6 +72,9 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v89. Prompt 2024 using Prompt24_V5M files and new hybrid JSON file. hpteta_(GeV) added to study the HF spiles
+//	https://indico.cern.ch/event/1445491/#5-l2l3res-global-fit-2024f
+//      CombinedJSON_GoldenRuns_378981to383724_DCSRuns_383725to384446.json
 // v88. 2024F in Vulcan. Initially was a test, but now is fixed. Not the full data, just a 50 files test.
 // v87. Jet_btagUParTAK4QvG Branch for Winter24MGV14 studies.
 // v86. Process 2024F using CS L2L3Res instead of 2024Ev2 corrections.

@@ -41,7 +41,7 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = false;
+bool smearJets = true;
 bool useJERSFvsPt = true; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
@@ -131,12 +131,13 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381152_DCSRuns_381153to381594.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381417_DCSRuns_381418to381594.csv";
 //constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
-constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to383163_DCSRuns_383164to383467.csv";
+//constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to383163_DCSRuns_383164to383467.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to383724_DCSRuns_383725to384446.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 35> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 37> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -158,21 +159,23 @@ constexpr std::array<std::pair<const char*, const char*>, 35> lumifiles = {{
     {"2023D_ZB", lumibyls2023D},
     //{"2024B", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
     //{"2024B_ZB", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
-    {"2024B", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC 
-    {"2024B_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC 
-    {"2024C", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC
-    {"2024C_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024BC
-    {"2024D", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024D
-    {"2024D_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024D
-    {"2024Ev1", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024E
-    {"2024Ev1_ZB", lumibyls2024BCDEF}, //Luminosity per run for prompt 2024E
-    {"2024BR", lumibyls2024BCDEF},
-    {"2024CR", lumibyls2024BCDEF},
-    {"2024Ev2", lumibyls2024BCDEF},
-    {"2024Ev2_ZB", lumibyls2024BCDEF},
-    {"2024CS", lumibyls2024BCDEF},
-    {"2024F", lumibyls2024BCDEF},
-    {"2024F_ZB", lumibyls2024BCDEF},
+    {"2024B", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC 
+    {"2024B_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC 
+    {"2024C", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC
+    {"2024C_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC
+    {"2024D", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024D
+    {"2024D_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024D
+    {"2024Ev1", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024E
+    {"2024Ev1_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024E
+    {"2024BR", lumibyls2024BCDEFG},
+    {"2024CR", lumibyls2024BCDEFG},
+    {"2024Ev2", lumibyls2024BCDEFG},
+    {"2024Ev2_ZB", lumibyls2024BCDEFG},
+    {"2024CS", lumibyls2024BCDEFG},
+    {"2024F", lumibyls2024BCDEFG},
+    {"2024F_ZB", lumibyls2024BCDEFG},
+    {"2024G", lumibyls2024BCDEFG},
+    {"2024G_ZB", lumibyls2024BCDEFG},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -249,7 +252,7 @@ public:
   TH2D *h2pteta_all;
   TH2D *h2pteta_sel;
   TH2D *h2pteta, *h2pteta_lumi;
-  TH1D *hpt13;
+  TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50;
   TH1D *vpt[ny];
 
   // Control plots for pileup
@@ -495,7 +498,7 @@ bool DijetHistosFill::LoadLumi()
   //string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
   //string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
   //string JSON_version = "2022_Golden";
-  string JSON_version = "GoldenRuns_378985to383163_DCSRuns_383164to383467";
+  string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
   // List of filenames
   vector<string> filenames = {
     "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -844,7 +847,7 @@ bool DijetHistosFill::LoadLumi()
   cout << "_lumsum value: " << _lumsum << endl;
   //Unique run numbers
   
-  /* 
+  /*  
   for (const auto& number : runNumbers) {
       std::cout << number << std::endl;
   }
@@ -863,6 +866,7 @@ bool DijetHistosFill::LoadLumi()
       std::cout << "run_example is not included in binEdges." << std::endl;
   }
   */
+
   return true;
 } // LoadLumi
 
@@ -1468,7 +1472,8 @@ void DijetHistosFill::Loop()
     //             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
     //             "");                                                                                   // Winter23Prompt23_V2_MC_L2L3Residual_AK4PFPuppi");
     //jerpath = "";
-    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
+    //jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
+    jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
     useJERSFvsPt = false; //Nestor, 24 July, 2024.
 
     if (reweightPU)
@@ -1556,12 +1561,13 @@ void DijetHistosFill::Loop()
     jec = getFJC("",
                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                 "");
-    jerpathsf = "";
-    jersfvspt = getFJC("", "", "");
-    //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
+    //jerpathsf = "";
+    jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
+    jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
+    //jersfvspt = getFJC("", "", "");
+    jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
     //jerpath = "";
-    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
-    useJERSFvsPt = false; //Nestor, 24 July, 2024.
+    useJERSFvsPt = true; //Nestor, Aug16, 2024.
 
     if (reweightPU)
     {
@@ -1607,7 +1613,8 @@ void DijetHistosFill::Loop()
                    //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                    //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
                    //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-                   "Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
     }
   }
 
@@ -1637,7 +1644,8 @@ void DijetHistosFill::Loop()
                    //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                    //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
                    //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-                   "Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
     }
   }
 
@@ -1651,7 +1659,8 @@ void DijetHistosFill::Loop()
                  //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-                 "Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
   }
 
   if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
@@ -1664,7 +1673,8 @@ void DijetHistosFill::Loop()
                  //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-                 "Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024E_V5M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1679,7 +1689,16 @@ void DijetHistosFill::Loop()
                  //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
                  //"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
-                 "Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (dataset == "2024G"  || dataset == "2024G_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 "Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
 
   }
 
@@ -1713,6 +1732,8 @@ void DijetHistosFill::Loop()
     jer = new JME::JetResolution(jerpath.c_str());
     if (!useJERSFvsPt)
       jersf = new JME::JetResolutionScaleFactor(jerpathsf.c_str());
+      //cout << "jersf from the SF file" << endl
+        //   << flush;
     if (!jer || (!jersf && !useJERSFvsPt) || (!jersfvspt && useJERSFvsPt))
       cout << "Missing JER files for " << dataset << endl
            << flush;
@@ -2072,7 +2093,8 @@ void DijetHistosFill::Loop()
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to381152_DCSRuns_381153to381594.json");
       //LoadJSON("rootfiles/CombinedJSONS_GoldenRuns_378985to381417_DCSRuns_381418to381594.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to382329_DCSRuns_382330to382686.json");
-      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to383163_DCSRuns_383164to383467.json");
+      //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to383163_DCSRuns_383164to383467.json");
+      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to383724_DCSRuns_383725to384446.json");
 
   }
   int _nbadevts_json(0);
@@ -2346,6 +2368,16 @@ void DijetHistosFill::Loop()
       }
 
       h->hpt13 = new TH1D("hpt13", ";p_{T,jet} (GeV)", npti, vpti);
+
+      h->hpteta20 = new TH1D("hpteta20", ";#eta;Number of entries", nx, vx);
+
+      h->hpteta30 = new TH1D("hpteta30", ";#eta;Number of entries", nx, vx);
+
+      h->hpteta40 = new TH1D("hpteta40", ";#eta;Number of entries", nx, vx);
+
+      h->hpteta50 = new TH1D("hpteta50", ";#eta;Number of entries", nx, vx);
+
+
       for (int iy = 0; iy != h->ny; ++iy)
       {
         h->vpt[iy] = new TH1D(Form("hpt%02d", 5 * (iy + 1)), ";p_{T} (GeV);"
@@ -3242,10 +3274,17 @@ void DijetHistosFill::Loop()
       dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     fjv = new TFile("rootfiles/jetveto2023D.root", "READ");
-  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
+  if (dataset == "2024B" || dataset == "2024B_ZB" || dataset == "2024C" || dataset == "2024C_ZB" ||
+      dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
+      dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
+      dataset == "2024CS" ||
+      TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
-    fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
+    //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
+    fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
+  if (dataset == "2024F" || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
+    fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -3295,9 +3334,17 @@ void DijetHistosFill::Loop()
       dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt" ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
-  if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
-    h2jv = (TH2D *)fjv->Get("jetvetomap");
-    h2jvBPix = (TH2D *)fjv->Get("jetvetomap_bpix");
+  //if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
+    //h2jv = (TH2D *)fjv->Get("jetvetomap");
+    //h2jvBPix = (TH2D *)fjv->Get("jetvetomap_bpix");
+  if (dataset == "2024B" || dataset == "2024B_ZB" || dataset == "2024C" || dataset == "2024C_ZB" ||
+      dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
+      dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
+      dataset == "2024CS" ||
+      TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
+    h2jv = (TH2D *)fjv->Get("jetvetomap_all");
+  if (dataset == "2024F" || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
+    h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
 
@@ -3365,9 +3412,9 @@ void DijetHistosFill::Loop()
   /*
   //To check the luminosity and the function Load Lumi is called 
   bool is_load_lumi = LoadLumi(); // try to load lumi information
-  cout << "Load Lumi: " << is_load_lumi << endl;
-  cout << "_lumsum: " << _lumsum << endl;
-  */
+  cout << "Load Lumi test: " << is_load_lumi << endl;
+  cout << "_lumsum test: " << _lumsum << endl;
+  */ 
 
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry = 0; jentry < nentries; jentry++)
@@ -3375,7 +3422,6 @@ void DijetHistosFill::Loop()
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0)
       break;
-
     if (jentry % 100000 == 0)
       cout << "." << flush;
     if (jentry % 5000000 == 0)
@@ -3439,13 +3485,45 @@ void DijetHistosFill::Loop()
 
       b_run->GetEntry(ientry);
       b_luminosityBlock->GetEntry(ientry);
-
+ 
+      
       // Does the run/LS pass the latest JSON selection?
       if (_json[run][luminosityBlock] == 0)
       {
         ++_nbadevts_json;
+	//cout << "run: " << run << endl;
+	//cout << "luminosityBlock: " << luminosityBlock << endl;
+	//cout << "nbadevts: " << _nbadevts_json << endl;
         continue;
       }
+      
+
+      /*
+      if (_json.find(run) != _json.end())
+      {
+          if (_json[run].find(luminosityBlock) != _json[run].end())
+          {
+              if (_json[run][luminosityBlock] == 0)
+              {
+                  ++_nbadevts_json;
+                  cout << "run: " << run << endl;
+                  cout << "luminosityBlock: " << luminosityBlock << endl;
+                  cout << "nbadevts: " << _nbadevts_json << endl;
+                  continue;
+              }
+          }
+          else
+          {
+             // Handle the case where the luminosityBlock does not exist for this run
+             cout << "luminosityBlock " << luminosityBlock << " does not exist for run " << run << "." << endl;
+          }
+      }
+      else
+      {
+         // Handle the case where the run does not exist in the map
+         cout << "run " << run << " does not exist in the map." << endl;
+      }
+      */
 
       // Separate 2023Cv123 and 2023Cv4
       if (((dataset == "2023Cv123") && (run >= 367765) ) || ((dataset == "2023Cv123") && (run >= 367765))) {
@@ -3456,7 +3534,7 @@ void DijetHistosFill::Loop()
       }
     } // doJSON
 
-
+    
 
     if (debugevent)
       cout << "Read in entry" << endl
@@ -3568,6 +3646,15 @@ void DijetHistosFill::Loop()
     {
 
 
+      //Nestor Aug16, 2024.
+      //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
+      if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3 && Jet_eta[0] != Jet_eta[1])
+      {
+        std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
+	std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
+      }
+      //
+
       if (redoJEC)
       {
         double rawJetPt = Jet_pt[i] * (1.0 - Jet_rawFactor[i]);
@@ -3604,15 +3691,15 @@ void DijetHistosFill::Loop()
 	//Jet_l1rcFactor[i] = Jet_pt[i] * (1.0 - Jet_rawFactor[i]); //To test raw pt response, Nestor. April 16, 2024.
       }
       
-      bool dojv_andBPix = true; 
+      bool dojv_andBPix = false; // Nestor. Aug15, 2024 
       if (true)//Nestor: changed March 27,2024
       { // check jet veto
         int i1 = h2jv->GetXaxis()->FindBin(Jet_eta[i]);
         int j1 = h2jv->GetYaxis()->FindBin(Jet_phi[i]);
-        int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
-        int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
+        //int i2 = h2jvBPix->GetXaxis()->FindBin(Jet_eta[i]);
+        //int j2 = h2jvBPix->GetYaxis()->FindBin(Jet_phi[i]);
         Jet_jetvetomap[i] = (h2jv->GetBinContent(i1, j1) > 0);
-	Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
+	//Jet_jetveto_BPix[i] = (h2jvBPix->GetBinContent(i2, j2) > 0);
 
 	if (dojv_andBPix)
 	{
@@ -3620,6 +3707,7 @@ void DijetHistosFill::Loop()
 	  //Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
 	}
 	else {
+	  //cout << "Using jetvetomap all" << endl;
           Jet_jetveto[i] = (h2jv->GetBinContent(i1, j1) > 0);
 	}
       } // jet veto
@@ -3939,6 +4027,20 @@ void DijetHistosFill::Loop()
 
 	    //std::cout << run << " Inclusive h2pteta weight: " << w << std::endl;
             h->h2pteta->Fill(p4.Eta(), p4.Pt(), w);
+
+	    if (p4.Pt()>20){
+	      h->hpteta20->Fill(p4.Eta(), w);
+	    }
+            if (p4.Pt()>30){
+              h->hpteta30->Fill(p4.Eta(), w);
+            }
+            if (p4.Pt()>40){
+              h->hpteta40->Fill(p4.Eta(), w);
+            }
+            if (p4.Pt()>50){
+              h->hpteta50->Fill(p4.Eta(), w);
+            }
+
 	    if (mlumi[trg][run] > 0){
 	      h->h2pteta_lumi->Fill(p4.Eta(), p4.Pt(), 1./mlumi[trg][run]);
             }
@@ -4884,6 +4986,7 @@ void DijetHistosFill::Loop()
             }
             else {
               //w = (isMC ? genWeight : 1.);
+	      //std::cout << run << " is not included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
               //exit(0);
               continue;
             }
