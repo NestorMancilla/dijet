@@ -137,7 +137,7 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 37> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 38> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -172,6 +172,7 @@ constexpr std::array<std::pair<const char*, const char*>, 37> lumifiles = {{
     {"2024Ev2", lumibyls2024BCDEFG},
     {"2024Ev2_ZB", lumibyls2024BCDEFG},
     {"2024CS", lumibyls2024BCDEFG},
+    {"2024CT", lumibyls2024BCDEFG},
     {"2024F", lumibyls2024BCDEFG},
     {"2024F_ZB", lumibyls2024BCDEFG},
     {"2024G", lumibyls2024BCDEFG},
@@ -1627,7 +1628,7 @@ void DijetHistosFill::Loop()
 		   //"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
                    "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
     }
-    else if (dataset == "2024CS")
+    else if (dataset == "2024CS" || dataset == "2024CT")
     {
       jec = getFJC(""
                    "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3277,7 +3278,7 @@ void DijetHistosFill::Loop()
   if (dataset == "2024B" || dataset == "2024B_ZB" || dataset == "2024C" || dataset == "2024C_ZB" ||
       dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
       dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
-      dataset == "2024CS" ||
+      dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
@@ -3340,7 +3341,7 @@ void DijetHistosFill::Loop()
   if (dataset == "2024B" || dataset == "2024B_ZB" || dataset == "2024C" || dataset == "2024C_ZB" ||
       dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
       dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
-      dataset == "2024CS" ||
+      dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (dataset == "2024F" || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
@@ -3642,10 +3643,20 @@ void DijetHistosFill::Loop()
     // Do not re-sort (for now)
     bool allJetsGood(true);
     int njet = nJet;
+
+    //Nestor Aug16, 2024.
+    //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
+    if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3)
+    {
+      std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
+      std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
+    }
+    //
+    
     for (int i = 0; i != njet; ++i)
     {
 
-
+      /*
       //Nestor Aug16, 2024.
       //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
       if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3 && Jet_eta[0] != Jet_eta[1])
@@ -3653,7 +3664,7 @@ void DijetHistosFill::Loop()
         std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
 	std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
       }
-      //
+      */
 
       if (redoJEC)
       {

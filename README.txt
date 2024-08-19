@@ -72,6 +72,7 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v90. CT Third re-reco: JetMET[0,1]_Run2024C-ECAL_CC_HCAL_DI-v1_NANOAOD. Jet veto map: jetveto2024BCDE.root. Same L2L3Res as CS. 
 // v89. Prompt 2024 using Prompt24_V5M files and new hybrid JSON file. hpteta_(GeV) added to study the HF spikes. 
 //	MC SF 2024F: SmearJets and useJERSFvsPt. 
 //	https://indico.cern.ch/event/1445491/#5-l2l3res-global-fit-2024f

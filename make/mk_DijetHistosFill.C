@@ -107,8 +107,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2023BCv123_ZB", "2023Cv4_ZB", "2023D_ZB",
   "2023Cv123_prompt", "2023Cv123_ZB_prompt", "2023Cv4_prompt", "2023Cv4_ZB_prompt", "2023D_prompt", "2023D_ZB_prompt",
   "2024B", "2024B_JME", "2024B_ZB", "2024C", "2024C_JME", "2024C_ZB", "2024D", "2024D_ZB", "2024Ev1", "2024Ev1_ZB", "2024Ev2_ZB",
-  "2024F", "2024F_ZB",
-  "2024BR", "2024CR", "2024Ev2", "2024Crs", "2024CS",
+  "2024F", "2024F_ZB", "2024G", "2024G_ZB",
+  "2024BR", "2024CR", "2024Ev2", "2024Crs", "2024CS", "2024CT",
   "2024_skim"
   };
 
