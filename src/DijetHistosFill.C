@@ -1572,8 +1572,8 @@ void DijetHistosFill::Loop()
 
     if (reweightPU)
     {
-      if (TString(dataset.c_str()).Contains("Summer23MGBPix")) {
-        TFile f("luminosityscripts/PUWeights/Summer23BPix_PUWeight.root");
+      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
+        TFile f("luminosityscripts/PUWeights/Winter24MGV14_PUWeight.root");
         pileupRatio = (TH1D *)f.Get("pileup");
         pileupRatio->SetDirectory(0);
         // Print mean, min weight, max weight
@@ -1582,7 +1582,7 @@ void DijetHistosFill::Loop()
         cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
 
       } else {
-        TFile f("luminosityscripts/PUWeights/Summer23_PUWeight.root");
+        TFile f("luminosityscripts/PUWeights/Winter24MG_PUWeight.root");
         pileupRatio = (TH1D *)f.Get("pileup");
         pileupRatio->SetDirectory(0);
         // Print mean, min weight, max weight
