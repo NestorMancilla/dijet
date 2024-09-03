@@ -66,7 +66,7 @@ bool doDijetJER = true;
 
 
 // Additional variants and controls
-bool doJetvetoVariants = false;
+bool doJetvetoVariants = true;
 bool doMultijetControl = true;
 bool doMultijet2Drecoil = true;
 bool doDijet2NM = false; // true;
@@ -137,7 +137,7 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 38> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 42> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -174,6 +174,10 @@ constexpr std::array<std::pair<const char*, const char*>, 38> lumifiles = {{
     {"2024CS", lumibyls2024BCDEFG},
     {"2024CT", lumibyls2024BCDEFG},
     {"2024F", lumibyls2024BCDEFG},
+    {"2024F_1", lumibyls2024BCDEFG},
+    {"2024F_2", lumibyls2024BCDEFG},
+    {"2024F_3", lumibyls2024BCDEFG},
+    {"2024F_4", lumibyls2024BCDEFG},
     {"2024F_ZB", lumibyls2024BCDEFG},
     {"2024G", lumibyls2024BCDEFG},
     {"2024G_ZB", lumibyls2024BCDEFG},
@@ -227,18 +231,18 @@ public:
   // Jet counts
   TH2D *h2pteta_all, *h2pteta_sel, *h2phieta;
   TH2D *h2ptaeta_all, *h2ptaeta_sel, *h2phieta_ave;
-  TH2D *h2ptteta_all, *h2ptteta_sel, *h2phieta_tag;
+  TH2D *h2pteta_all_pttag, *h2pteta_sel_pttag, *h2phieta_pttag;
 
   // Asymm
   TH3D *h3asymm;
 
   // Balancing
-  TProfile2D *p2asymm, *p2asymm_noveto;
+  TProfile2D *p2asymm, *p2asymm_noveto, *p2asymm_pttag, *p2asymm_noveto_pttag;
   //Tprofile2D *p2asymm_noveto;
 
   // (Optional) composition plots
   TProfile2D *p2chf, *p2nhf, *p2nef;
-  TProfile2D *p2chftp, *p2nhftp, *p2neftp;
+  TProfile2D *p2chf_pttag, *p2nhf_pttag, *p2nef_pttag, *p2chf_noveto_pttag, *p2nhf_noveto_pttag, *p2nef_noveto_pttag;
 };
 
 class incjetHistos
@@ -1679,7 +1683,7 @@ void DijetHistosFill::Loop()
 
   }
 
-  if (dataset == "2024F"  || dataset == "2024F_ZB")
+  if (TString(dataset.c_str()).Contains("2024F")  || dataset == "2024F_ZB")
   {
     jec = getFJC("",
                  "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2299,6 +2303,8 @@ void DijetHistosFill::Loop()
                                   nx, vx, 72, -TMath::Pi(), +TMath::Pi());
       h->p2asymm_noveto = new TProfile2D("p2asymm_noveto", ";#eta;#phi;Asymmetry_noveto",
                                   nx, vx, 72, -TMath::Pi(), +TMath::Pi());
+      h->p2asymm_noveto_pttag = new TProfile2D("p2asymm_noveto_pttag", ";#eta;#phi;Asymmetry_noveto_pttag",
+                                  nx, vx, 72, -TMath::Pi(), +TMath::Pi());
       h->h3asymm = new TH3D("h3asymm", ";#eta;#phi;h3asymm",
 		        //nx, vx, 72, -TMath::Pi(), +TMath::Pi(), 200, -1, 1);
 			nx, vx, phi_vx.size()-1, phi_vx.data(),asymm_vx.size()-1, asymm_vx.data());
@@ -2307,21 +2313,29 @@ void DijetHistosFill::Loop()
       if (doJetvetoVariants)
       {
         // Plots with dijet selection, pTtag bins
-        h->h2ptteta_all = new TH2D("h2ptteta_all", ";#eta;p_{T} (GeV);N_{jet}",
+        h->h2pteta_all_pttag = new TH2D("h2pteta_all_pttag", ";#eta;p_{T} (GeV);N_{jet}",
                                    nx, vx, npti, vpti);
-        h->h2ptteta_sel = new TH2D("h2ptteta_sel", ";#eta;p_{T} (GeV);N_{jet}",
+        h->h2pteta_sel_pttag = new TH2D("h2pteta_sel_pttag", ";#eta;p_{T} (GeV);N_{jet}",
                                    nx, vx, npti, vpti);
-        h->h2phieta_tag = new TH2D("h2phieta_tag", ";#eta;#phi;N_{jet}",
+        h->h2phieta_pttag = new TH2D("h2phieta_pttag", ";#eta;#phi;N_{jet}",
                                    nx, vx, 72, -TMath::Pi(), +TMath::Pi());
 
         if (doPFComposition)
         {
 
-          h->p2chftp = new TProfile2D("p2chftp", ";#eta;#phi;CHF (TP)",
+          h->p2asymm_pttag = new TProfile2D("p2asymm_pttag", ";#eta;#phi;Asymmetry_pttag",
+                                  nx, vx, 72, -TMath::Pi(), +TMath::Pi());
+          h->p2chf_pttag = new TProfile2D("p2chf_pttag", ";#eta;#phi;CHF (TP)",
                                       nx, vx, 72, -TMath::Pi(), +TMath::Pi());
-          h->p2neftp = new TProfile2D("p2neftp", ";#eta;#phi;NEF (TP)",
+          h->p2nef_pttag = new TProfile2D("p2nef_pttag", ";#eta;#phi;NEF (TP)",
                                       nx, vx, 72, -TMath::Pi(), +TMath::Pi());
-          h->p2nhftp = new TProfile2D("p2nhftp", ";#eta;#phi;NHF (TP)",
+          h->p2nhf_pttag = new TProfile2D("p2nhf_pttag", ";#eta;#phi;NHF (TP)",
+                                      nx, vx, 72, -TMath::Pi(), +TMath::Pi());
+          h->p2chf_noveto_pttag = new TProfile2D("p2chf_noveto_pttag", ";#eta;#phi;CHF (TP)",
+                                      nx, vx, 72, -TMath::Pi(), +TMath::Pi());
+          h->p2nef_noveto_pttag = new TProfile2D("p2nef_noveto_pttag", ";#eta;#phi;NEF (TP)",
+                                      nx, vx, 72, -TMath::Pi(), +TMath::Pi());
+          h->p2nhf_noveto_pttag = new TProfile2D("p2nhf_noveto_pttag", ";#eta;#phi;NHF (TP)",
                                       nx, vx, 72, -TMath::Pi(), +TMath::Pi());
         }
       }
@@ -3284,7 +3298,7 @@ void DijetHistosFill::Loop()
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
     fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
-  if (dataset == "2024F" || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
+  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
     fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
   assert(fjv);
 
@@ -3344,7 +3358,7 @@ void DijetHistosFill::Loop()
       dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
-  if (dataset == "2024F" || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
+  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
@@ -4459,6 +4473,21 @@ void DijetHistosFill::Loop()
               h->p2asymm_noveto->Fill(eta, p4p.Phi(), asymm, w);
 	      h->h3asymm->Fill(eta, p4p.Phi(), asymm, w);
             }
+	    // HF studies. Nestor. Aug 27, 2024.
+	    if (doJetvetoVariants)
+            {
+              if (doPFComposition && fabs(p4t.Eta()) < 1.3)
+              {
+                if (pttag >= h->ptmin && pttag < h->ptmax)
+                {
+                  h->p2asymm_noveto_pttag->Fill(eta, p4p.Phi(), asymm, w);
+		  h->p2chf_noveto_pttag->Fill(eta, p4p.Phi(), Jet_chHEF[iprobe], w);
+                  h->p2nhf_noveto_pttag->Fill(eta, p4p.Phi(), Jet_neHEF[iprobe], w);
+                  h->p2nef_noveto_pttag->Fill(eta, p4p.Phi(), Jet_neEmEF[iprobe], w);
+                }
+              }
+            }
+	    ////
 	  }
 // end of the test 
           if (doJetveto && isdijet)
@@ -4480,14 +4509,17 @@ void DijetHistosFill::Loop()
             {
               if (doPFComposition && fabs(p4t.Eta()) < 1.3)
               {
-                h->h2ptteta_all->Fill(eta, ptave, w);
+                h->h2pteta_all_pttag->Fill(eta, ptave, w);
                 if (pttag >= h->ptmin && pttag < h->ptmax)
-                {
-                  h->h2ptteta_sel->Fill(eta, pttag, w);
-                  h->h2phieta_tag->Fill(eta, p4.Phi(), w);
-                  h->p2chftp->Fill(eta, p4p.Phi(), Jet_chHEF[iprobe], w);
-                  h->p2nhftp->Fill(eta, p4p.Phi(), Jet_neHEF[iprobe], w);
-                  h->p2neftp->Fill(eta, p4p.Phi(), Jet_neEmEF[iprobe], w);
+                { 
+	          // HF studies. Nestor. Aug 27, 2024.
+	          h->p2asymm_pttag->Fill(eta, p4p.Phi(), asymm, w);
+		  //
+                  h->h2pteta_sel_pttag->Fill(eta, pttag, w);
+                  h->h2phieta_pttag->Fill(eta, p4.Phi(), w);
+                  h->p2chf_pttag->Fill(eta, p4p.Phi(), Jet_chHEF[iprobe], w);
+                  h->p2nhf_pttag->Fill(eta, p4p.Phi(), Jet_neHEF[iprobe], w);
+                  h->p2nef_pttag->Fill(eta, p4p.Phi(), Jet_neEmEF[iprobe], w);
                 }
               }
             }

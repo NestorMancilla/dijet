@@ -72,6 +72,11 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v95. Adding pttag noveto histograms.
+// v94. Fixing p2chf empty histograms.
+// v93. p2asymm for pt tag.
+// v92. Processing Winter24MG and Winter24MGV14 including Smearing and implementing PU reweighting.
+// v91. Processing Winter24MGV14 to compare with the Winter24MG version. Same conditions: Smearing and no PU reweighting.
 // v90. CT Third re-reco: JetMET[0,1]_Run2024C-ECAL_CC_HCAL_DI-v1_NANOAOD. Jet veto map: jetveto2024BCDE.root. Same L2L3Res as CS. 
 // v89. Prompt 2024 using Prompt24_V5M files and new hybrid JSON file. hpteta_(GeV) added to study the HF spikes. 
 //	MC SF 2024F: SmearJets and useJERSFvsPt. 
