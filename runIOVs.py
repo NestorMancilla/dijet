@@ -45,7 +45,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v95_2024'
+version = 'v96_2024'
 
 IOV_input = []
 
@@ -104,7 +104,8 @@ for iov in IOV_input:
     # os.system(f"ls -ltrh rootfiles/jmenano_mc_out_{iov}_{version}.root")
     # os.system(f"ls -ltrh rootfiles/jmenano_data_out_{iov}_{version}.root")
     # os.system(f"ls -ltrh logs/log_{iov}_{version}.txt")
-    os.system(f"nohup root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
+    #os.system(f"nohup root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
+    os.system(f"nohup time root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
     print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
 
 #    os.system("fs flush")

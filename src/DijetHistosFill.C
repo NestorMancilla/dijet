@@ -48,17 +48,17 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting
-bool reweightPU = false;
+bool reweightPU = true;
 
 // Activate modules
 bool doJetveto = true; // eta-phi maps
-bool doMCtruth = true;
+bool doMCtruth = false;
 bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
 bool doGluonJets = false; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
-bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
+bool doJetsperRuns = false; // Jets rate per runs normalized by the luminosity
 
 // Core additions
 bool doPFComposition = true; // jetveto / incjet / dijet / multijet
@@ -1577,8 +1577,8 @@ void DijetHistosFill::Loop()
     if (reweightPU)
     {
       if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-        TFile f("luminosityscripts/PUWeights/Winter24MGV14_PUWeight.root");
-        pileupRatio = (TH1D *)f.Get("pileup");
+        TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
+        pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F");
         pileupRatio->SetDirectory(0);
         // Print mean, min weight, max weight
         cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
@@ -3755,6 +3755,31 @@ void DijetHistosFill::Loop()
       Jet_CF[i] = 1.;
     } // reset Jet_CF
 
+
+/*
+    std::string triggerString(double pt, double eta) {
+        std::map<std::string, range> *triggers;
+        if (analysis == "ismultijet") triggers = &mi;
+        else if (analysis == "isdijet") triggers = &md;
+        else if (analysis == "isdijet2") triggers = &md2;
+        else {
+            std::cerr << "Unknown analysis type: " << analysis << std::endl;
+            return "HLT_ZeroBias";
+        }
+
+        for (const auto &entry : *triggers) {
+            const std::string &trigger = entry.first;
+            const range &r = entry.second;
+            if (pt > r.pt_min && pt <= r.pt_max && eta >= r.eta_min && eta <= r.eta_max) {
+                return trigger;
+            }
+        }
+
+    return "HLT_ZeroBias"; // Default
+    } 
+
+
+*/
     if (isMC && reweightPU)
     {
       assert(pileupRatio);
