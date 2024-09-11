@@ -72,6 +72,7 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v97. Function to implement PU reweighting per trigger. (For now is just a test, not completed yet)
 // v96. Test for PFJet500 trigger for PU reweighting applied as a single file, no pt either eta treshold. Winter24MGV14. 
 // v95. Adding pttag noveto histograms.
 // v94. Fixing p2chf empty histograms.

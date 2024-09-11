@@ -10,7 +10,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
-
+#include "TH1D.h"
 
 #include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "../CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
@@ -44,18 +44,25 @@ public :
    static const bool debugFiles = true;
    TString          _filename; // file name for debugging purposes
    int             HT_bin_idx;
-
+   double          weight;
+   double          w_ptavp2;
+   double          w_ptave;
+   double          w_pttag;
+   double          w_ptprobe;
    map<string, map<int, double>> mlumi;
    map<string, map<int, int> > _prescales;
    map<int, map<int, int> > _json;
    //map<int, map<int, float> > _lums;
    map<int, float> _lums;
    double _lumsum;
+   double w_PUReweight;
    std::vector<double> _runNumberBin;
    map<int, map<int, float> > _lums2;
    map<int, map<int, float> > _avgpu;
+   map<string, TH1D*> pu_hist_map;
 //    map<string, TH1D*> _pudist;
   std::map<TString, pair<int, pair<int, int>>> HT_bins;
+
 
    Bool_t HLT_MC = kTRUE;
    Bool_t Jet_jetveto[100];
@@ -3546,6 +3553,11 @@ public :
    //bool LoadJSON();
    // Code originally from jetphys/HistosFill.C
    void PrintInfo(string info, bool printcout);
+   // PU Reweighting
+   void get_PU_hist(const std::string& dataset);
+   //void get_weight(const std::map<std::string, struct range>& trg_map, float pt, float eta, double weight, string pt_analysis);
+   void get_weight(string trg_name, float pt, float eta, double weight, string pt_analysis);
+   //
    bool LoadJSON(string json);
    bool LoadLumi();
    //bool LoadLumi(double lumsum);

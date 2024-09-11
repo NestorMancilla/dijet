@@ -52,13 +52,13 @@ bool reweightPU = true;
 
 // Activate modules
 bool doJetveto = true; // eta-phi maps
-bool doMCtruth = false;
+bool doMCtruth = true;
 bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
 bool doGluonJets = false; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
-bool doJetsperRuns = false; // Jets rate per runs normalized by the luminosity
+bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
 
 // Core additions
 bool doPFComposition = true; // jetveto / incjet / dijet / multijet
@@ -451,1791 +451,1364 @@ FactorizedJetCorrector *getFJC(string l1 = "", string l2 = "", string res = "",
 
   return jec;
 } // getFJC
-/////////////////////////
-/////////////////////////
-//// PU reweighting
-//// Nestor. 10, 2024.
-/////////////////////////
-/////////////////////////
-
-/////////////////////////
-//Get the PU from the root files
-/////////////////////////
-void DijetHistosFill::get_PU_hist(const std::string& dataset) {
-    // Open the ROOT file
-    std::string file_path = "luminosityscripts/PUWeights/PU_weights_2024_trgs.root";
-    TFile* root_file = TFile::Open(file_path.c_str(), "READ");
-
-    // Check if the file opened successfully
-    if (!root_file || root_file->IsZombie()) {
-        std::cerr << "Error opening file: " << file_path << std::endl;
-        return;
-    }
-
-    // Get the directory corresponding to the dataset
-    TDirectory* dir = (TDirectory*)root_file->Get(dataset.c_str());
-    if (!dir) {
-        std::cerr << "Directory " << dataset << " not found in file." << std::endl;
-        root_file->Close();
-        return;
-    }
-
-    // List of triggers
-    std::vector<std::string> vtrg = {
-        "HLT_PFJet40", "HLT_PFJet60", "HLT_PFJet80", "HLT_PFJet140", "HLT_PFJet200",
-        "HLT_PFJet260", "HLT_PFJet320", "HLT_PFJet400", "HLT_PFJet450", "HLT_PFJet500",
-        "HLT_PFJetFwd40", "HLT_PFJetFwd60", "HLT_PFJetFwd80", "HLT_PFJetFwd140", "HLT_PFJetFwd200",
-        "HLT_PFJetFwd260", "HLT_PFJetFwd320", "HLT_PFJetFwd400", "HLT_PFJetFwd450", "HLT_PFJetFwd500",
-        "HLT_DiPFJetAve40", "HLT_DiPFJetAve60", "HLT_DiPFJetAve80", "HLT_DiPFJetAve140", "HLT_DiPFJetAve200",
-        "HLT_DiPFJetAve260", "HLT_DiPFJetAve320", "HLT_DiPFJetAve400", "HLT_DiPFJetAve500",
-        "HLT_DiPFJetAve60_HFJEC", "HLT_DiPFJetAve80_HFJEC", "HLT_DiPFJetAve100_HFJEC",
-        "HLT_DiPFJetAve160_HFJEC", "HLT_DiPFJetAve220_HFJEC", "HLT_DiPFJetAve300_HFJEC"
-    };
-
-    // Clear the existing histograms (if necessary)
-    pu_hist_map.clear();
-
-    // Loop over each trigger and retrieve the corresponding histogram
-    for (const auto& trg : vtrg) {
-        std::string hist_name = "PU_weights_" + trg;
-        TH1D* hist = (TH1D*)dir->Get(hist_name.c_str());
-
-        if (hist) {
-            pu_hist_map[trg] = hist;
-        } //else {
-            //std::cerr << "Histogram " << hist_name << " not found in directory " << dataset << std::endl;
-        //}
-    }
-
-    // Close the ROOT file
-    root_file->Close();
-}
-/////////////////////////
-//End PU from the root files
-
-/////////////////////////
-//// Function to get the PU_weight
-/////////////////////////
-void DijetHistosFill::get_weight(string trg_name, float pt, float eta, double weight, string pt_analysis) {
-    eta = std::abs(eta);
-
-    auto hist_it = pu_hist_map.find(trg_name);
-    if (hist_it != pu_hist_map.end()) {
-        TH1D* h1_PU_weight = hist_it->second;
-        int ibin = h1_PU_weight->FindBin(Pileup_nTrueInt);
-        // Check that the bin is within bounds
-        if (ibin < 1 || ibin > h1_PU_weight->GetNbinsX()) {
-            std::cerr << "Pileup_nTrueInt out of histogram bounds for trigger: " << trg_name << std::endl;
-            return;  // Exit if the bin is out of range
-        }
-        double PU_weight = h1_PU_weight->GetBinContent(ibin);
-        weight *= PU_weight;
-        if (pt_analysis == "ptavp2") {
-            double w_ptavp2 = weight;  
-        } else if (pt_analysis == "ptave") {
-            double w_ptave = weight;  
-        } else if (pt_analysis == "pttag") {
-            double w_pttag = weight;  
-        } else if (pt_analysis == "ptprobe") {
-            double w_ptprobe = weight;  
-        } else {
-            w_PUReweight = weight;
-        }
-    } else {
-        // Histogram not found for the trigger
-        std::cerr << "No PU weight histogram found for trigger: " << trg_name << std::endl;
-    }
-}
-
-
-/*
-void DijetHistosFill::get_weight(const std::map<std::string, struct range>& trg_map, float pt, float eta, double weight, string pt_analysis) {
-    //get_PU_hist("PUWeight2024F");
-    for (const auto& trg_entry : trg_map) {
-        const std::string& trg_name = trg_entry.first;
-        const range& trg_range = trg_entry.second;
-
-	eta = abs(eta);
-        if (pt >= trg_range.ptmin && pt < trg_range.ptmax &&
-            eta >= trg_range.absetamin && eta < trg_range.absetamax) {
-
-            auto hist_it = pu_hist_map.find(trg_name);
-            if (hist_it != pu_hist_map.end()) {
-                TH1D* h1_PU_weight = hist_it->second;
-		int ibin = h1_PU_weight->FindBin(Pileup_nTrueInt);
-                double PU_weight = h1_PU_weight->GetBinContent(ibin);
-		weight *= PU_weight;
-		if (pt_analysis == "ptavp2"){
-		   double w_ptavp2 = weight;
-		}
-		else if (pt_analysis == "ptave"){
-                   double w_ptave = weight;
-                }
-		else if (pt_analysis == "pttag"){
-                   double w_pttag = weight;
-                }
-		else if (pt_analysis == "ptprobe"){
-                   double w_ptprobe = weight;
-                }
-		else {
-		   w_PUReweight = weight;
-		}
-                //int PU_weight_idx = h1_PU_weight->FindBin(PU_w);
-                //double PU_weight = h1_PU_weight->GetBinContent(PU_weight_idx);
-	    } //else {
-		//    std::cerr << "No PU weight histogram found for trigger: " << trg_name << std::endl;
-	    //}
-	}
-    }
-    std::cerr << "No matching range found for pt: " << pt << " and eta: " << eta << std::endl;
-}
-*/
-
-/*
-   double get_weight(trg,pt,eta,PU_w) {
-   for (auto const & trg_map : vtrg) {
-   if (trg_name == trg) {
-   range = vtrg[trg_name]
-   if (pt => ptmin && pt < ptmax && eta => absetamin && eta < absetamax) {
-   TH1D *h1_PU_weight = PUtrg[trg_name]
-   int PU_weight_idx =  h1_PU_weight->FindBin(PU_w);
-   double PU_weight = h1_PU_weight->GetBinContent(PU_weight_idx);
-   return PU_weight;    
-   } // end pt and eta range
-   } // end trg_name
-   } // end for vtg
-   return 0;
-   } // end get_weight
-   */
-
-
-
-/*
-   struct range {
-   int ptmin;
-   int ptmax;
-   double absetamin;
-   double absetamax;
-   };
-   std::map<std::string, struct range> md;
-   std::map<std::string, struct range> md2;
-   std::map<std::string, struct range> md2tc;
-   std::map<std::string, struct range> md2pf;
-   std::map<std::string, struct range> mj;
-   std::map<std::string, struct range> mi;
-
-   double fwdeta = 3.139; // was 2.853. 80% (100%) on negative (positive) side
-   double fwdeta0 = 2.964;//2.853; // 40 and 260 up
-   double fwdetad = 2.853;
-
-// dijet 
-md["HLT_DiPFJetAve40"]  = range{40,  85,  0, 5.2};
-md["HLT_DiPFJetAve60"]  = range{85,  100, 0, fwdeta};
-md["HLT_DiPFJetAve80"]  = range{100, 155, 0, fwdeta};
-md["HLT_DiPFJetAve140"] = range{155, 250, 0, fwdeta};
-md["HLT_DiPFJetAve200"] = range{250, 300, 0, fwdeta0}; // 210->250
-md["HLT_DiPFJetAve260"] = range{300, 400, 0, fwdeta0};
-md["HLT_DiPFJetAve320"] = range{400, 500, 0, fwdeta0};
-md["HLT_DiPFJetAve400"] = range{500, 600, 0, fwdeta0};
-md["HLT_DiPFJetAve500"] = range{600,3000, 0, fwdeta0};
-
-md["HLT_DiPFJetAve60_HFJEC"]  = range{85,  100, fwdeta, 5.2};
-md["HLT_DiPFJetAve80_HFJEC"]  = range{100, 125, fwdeta, 5.2};
-md["HLT_DiPFJetAve100_HFJEC"] = range{125, 180, fwdeta, 5.2};
-md["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
-md["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
-md["HLT_DiPFJetAve300_HFJEC"] = range{350,3000, fwdeta0, 5.2};
-
-// dijet2
-md2["HLT_DiPFJetAve40"]  = range{59,  86,  0, 5.2};
-md2["HLT_DiPFJetAve60"]  = range{86,  110, 0, fwdetad};
-md2["HLT_DiPFJetAve80"]  = range{110, 170, 0, fwdetad};
-md2["HLT_DiPFJetAve140"] = range{170, 236, 0, fwdetad};
-md2["HLT_DiPFJetAve200"] = range{236, 302, 0, fwdetad};
-md2["HLT_DiPFJetAve260"] = range{302, 373, 0, fwdetad};
-md2["HLT_DiPFJetAve320"] = range{373, 460, 0, fwdetad};
-md2["HLT_DiPFJetAve400"] = range{460, 575, 0, fwdetad};
-md2["HLT_DiPFJetAve500"] = range{575,6500, 0, fwdetad};
-
-md2["HLT_DiPFJetAve60_HFJEC"]  = range{86,  110, fwdetad, 5.2};
-md2["HLT_DiPFJetAve80_HFJEC"]  = range{110, 132, fwdetad, 5.2};
-md2["HLT_DiPFJetAve100_HFJEC"] = range{132, 204, fwdetad, 5.2};
-md2["HLT_DiPFJetAve160_HFJEC"] = range{204, 279, fwdetad, 5.2};
-md2["HLT_DiPFJetAve220_HFJEC"] = range{279, 373, fwdetad, 5.2};
-md2["HLT_DiPFJetAve300_HFJEC"] = range{373,3000, fwdetad, 5.2};
-
-// dijet2 -> probe binning
-md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-
-md2pf["HLT_PFJetFwd40"]  = range{49,  84,  fwdetad, 5.2};   //Added to check HLT PFJetFwd. Nestor. April 25, 2024.
-md2pf["HLT_PFJetFwd60"]  = range{84,  114, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd80"]  = range{114, 196, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd140"] = range{196, 272, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd200"] = range{272, 330, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd260"] = range{330, 395, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd320"] = range{395, 468, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd400"] = range{468, 548, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd450"] = range{548, 686, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd500"] = range{686,6500, fwdetad, 5.2};   //
-
-// dijet2 -> tag binning
-md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
-md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
-md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-
-// multijet, jetveto, incjet
-mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0};
-mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};
-mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta};
-mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
-mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0};
-mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0};
-mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0};
-mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0};
-mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0};
-mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0};
-//mi["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
-
-mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2};
-mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2};
-mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2};
-mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2};
-mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2};
-mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2};
-mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2};
-mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2};
-mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2};
-mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
-*/
-
-
-
-/////////////////////////
-//// End Function to get the PU_weight
-
-
 
 /////////////////////////
 /////////////////////////
 bool DijetHistosFill::LoadLumi()
 {
-	// To read the luminosity based on the .csv file and take only events with non-zero luminosity
-	vector<string> vtrg = {
-		"HLT_PFJet40",
-		"HLT_PFJet60",
-		"HLT_PFJet80",
-		"HLT_PFJet140",
-		"HLT_PFJet200",
-		"HLT_PFJet260",
-		"HLT_PFJet320",
-		"HLT_PFJet400",
-		"HLT_PFJet450",
-		"HLT_PFJet500",
-		"HLT_PFJetFwd40", //
-		"HLT_PFJetFwd60",
-		"HLT_PFJetFwd80",
-		"HLT_PFJetFwd140",
-		"HLT_PFJetFwd200",
-		"HLT_PFJetFwd260",
-		"HLT_PFJetFwd320",
-		"HLT_PFJetFwd400",
-		"HLT_PFJetFwd450",
-		"HLT_PFJetFwd500", //
-		"HLT_DiPFJetAve40",
-		"HLT_DiPFJetAve60",
-		"HLT_DiPFJetAve80",
-		"HLT_DiPFJetAve140",
-		"HLT_DiPFJetAve200",
-		"HLT_DiPFJetAve260",
-		"HLT_DiPFJetAve320",
-		"HLT_DiPFJetAve400",
-		"HLT_DiPFJetAve500",
-		"HLT_DiPFJetAve60_HFJEC",
-		"HLT_DiPFJetAve80_HFJEC",
-		"HLT_DiPFJetAve100_HFJEC",
-		"HLT_DiPFJetAve160_HFJEC",
-		"HLT_DiPFJetAve220_HFJEC",
-		"HLT_DiPFJetAve300_HFJEC"};
+  // To read the luminosity based on the .csv file and take only events with non-zero luminosity
+    vector<string> vtrg = {
+      "HLT_PFJet40",
+      "HLT_PFJet60",
+      "HLT_PFJet80",
+      "HLT_PFJet140",
+      "HLT_PFJet200",
+      "HLT_PFJet260",
+      "HLT_PFJet320",
+      "HLT_PFJet400",
+      "HLT_PFJet450",
+      "HLT_PFJet500",
+      "HLT_PFJetFwd40", //
+      "HLT_PFJetFwd60",
+      "HLT_PFJetFwd80",
+      "HLT_PFJetFwd140",
+      "HLT_PFJetFwd200",
+      "HLT_PFJetFwd260",
+      "HLT_PFJetFwd320",
+      "HLT_PFJetFwd400",
+      "HLT_PFJetFwd450",
+      "HLT_PFJetFwd500", //
+      "HLT_DiPFJetAve40",
+      "HLT_DiPFJetAve60",
+      "HLT_DiPFJetAve80",
+      "HLT_DiPFJetAve140",
+      "HLT_DiPFJetAve200",
+      "HLT_DiPFJetAve260",
+      "HLT_DiPFJetAve320",
+      "HLT_DiPFJetAve400",
+      "HLT_DiPFJetAve500",
+      "HLT_DiPFJetAve60_HFJEC",
+      "HLT_DiPFJetAve80_HFJEC",
+      "HLT_DiPFJetAve100_HFJEC",
+      "HLT_DiPFJetAve160_HFJEC",
+      "HLT_DiPFJetAve220_HFJEC",
+      "HLT_DiPFJetAve300_HFJEC"};
 
-	//string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
-	//string JSON_version = "366442_370790_Golden"; //2023 Golden
-	//string JSON_version = "378981_380649_Golden";
-	//string JSON_version = "eraB_Golden";
-	//string JSON_version = "378981_381478_DCSOnly";
-	//string JSON_version = "GoldenRuns_378985to380945_DCSRuns_380946to381516";
-	//string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
-	//string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
-	//string JSON_version = "2022_Golden";
-	string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
-	// List of filenames
-	vector<string> filenames = {
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
-	};
+  //string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
+  //string JSON_version = "366442_370790_Golden"; //2023 Golden
+  //string JSON_version = "378981_380649_Golden";
+  //string JSON_version = "eraB_Golden";
+  //string JSON_version = "378981_381478_DCSOnly";
+  //string JSON_version = "GoldenRuns_378985to380945_DCSRuns_380946to381516";
+  //string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
+  //string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
+  //string JSON_version = "2022_Golden";
+  string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
+  // List of filenames
+  vector<string> filenames = {
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet60_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet80_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet140_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet200_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet260_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet320_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet400_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet450_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJet500_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
+    "luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
+  };
 
-	for (size_t idx = 0; idx < vtrg.size(); ++idx) {
-		const string& trigger = vtrg[idx];
-		const string& filename = filenames[idx];
+  for (size_t idx = 0; idx < vtrg.size(); ++idx) {
+      const string& trigger = vtrg[idx];
+      const string& filename = filenames[idx];
 
-		ifstream file(filename);
+      ifstream file(filename);
 
-		// Check if the file opened successfully
-		if (!file.is_open()) {
-			cerr << "Error opening file: " << filename << endl;
-			continue;
-		}
+      // Check if the file opened successfully
+      if (!file.is_open()) {
+          cerr << "Error opening file: " << filename << endl;
+          continue;
+      }
 
-		string line;
-		while (getline(file, line)) {
-			// Skip comment lines
-			if (line[0] == '#') continue;
+      string line;
+      while (getline(file, line)) {
+          // Skip comment lines
+          if (line[0] == '#') continue;
 
-			stringstream ss(line);
-			string run_fill, time, ncms, hltpath, delivered, recorded;
+          stringstream ss(line);
+          string run_fill, time, ncms, hltpath, delivered, recorded;
 
-			// Parse the line
-			getline(ss, run_fill, ',');
-			getline(ss, time, ',');
-			getline(ss, ncms, ',');
-			getline(ss, hltpath, ',');
-			getline(ss, delivered, ',');
-			getline(ss, recorded, ',');
+          // Parse the line
+          getline(ss, run_fill, ',');
+          getline(ss, time, ',');
+          getline(ss, ncms, ',');
+          getline(ss, hltpath, ',');
+          getline(ss, delivered, ',');
+          getline(ss, recorded, ',');
 
-			// Check if the base trigger name matches
-			if (hltpath.find(trigger) != string::npos) {
-				// Extract run number from run:fill
-				int run = stoi(run_fill.substr(0, run_fill.find(':')));
+          // Check if the base trigger name matches
+          if (hltpath.find(trigger) != string::npos) {
+              // Extract run number from run:fill
+              int run = stoi(run_fill.substr(0, run_fill.find(':')));
 
-				// Convert recorded luminosity to double
-				double lum = stod(recorded);
+              // Convert recorded luminosity to double
+              double lum = stod(recorded);
 
-				// Store the run and luminosity in the map
-				mlumi[trigger][run] = lum; // * 1000. to have it in pb
-			}
-		}
-		// Close the file
-		file.close();
-	}
-	/*
-	   for (const auto& trigger : mlumi) {
-	   cout << "Trigger: " << trigger.first << endl;
-	   for (const auto& run : trigger.second) {
-	   cout << "  Run: " << run.first << ", Luminosity: " << run.second << endl;
-	   }
-	   }
-	   */
+              // Store the run and luminosity in the map
+              mlumi[trigger][run] = lum; // * 1000. to have it in pb
+          }
+      }
+      // Close the file
+      file.close();
+  }
+  /*
+  for (const auto& trigger : mlumi) {
+      cout << "Trigger: " << trigger.first << endl;
+      for (const auto& run : trigger.second) {
+          cout << "  Run: " << run.first << ", Luminosity: " << run.second << endl;
+      }
+  }
+  */
 
-	const char *lumifile = getLumifile(dataset.c_str());
+  const char *lumifile = getLumifile(dataset.c_str());
 
-	PrintInfo(string("Processing LoadLumi() with ") + lumifile + "...", true);
+  PrintInfo(string("Processing LoadLumi() with ") + lumifile + "...", true);
 
-	// Check lumi against the list of good runs
-	const int a_goodruns[] = {};
-	const int ngoodruns = sizeof(a_goodruns) / sizeof(a_goodruns[0]);
-	set<int> goodruns;
-	if (ngoodruns > 0)
-	{ // This is an old remnant
-		for (int runidx = 0; runidx != ngoodruns; ++runidx)
-			goodruns.insert(a_goodruns[runidx]);
+  // Check lumi against the list of good runs
+  const int a_goodruns[] = {};
+  const int ngoodruns = sizeof(a_goodruns) / sizeof(a_goodruns[0]);
+  set<int> goodruns;
+  if (ngoodruns > 0)
+  { // This is an old remnant
+    for (int runidx = 0; runidx != ngoodruns; ++runidx)
+      goodruns.insert(a_goodruns[runidx]);
 
-		for (auto runit = goodruns.begin(); runit != goodruns.end(); ++runit)
-			cout << *runit << ", ";
-		cout << endl;
-	}
-	set<pair<int, int>> nolums;
+    for (auto runit = goodruns.begin(); runit != goodruns.end(); ++runit)
+      cout << *runit << ", ";
+    cout << endl;
+  }
+  set<pair<int, int>> nolums;
 
-	ifstream f(lumifile, ios::in);
-	if (!f.is_open())
-		return false;
-	float secLS = 2.3310e+01;
-	string s;
-	int rn, fill, numls, ifoo;
-	//int rn, fill, ls, ifoo;
-	float del, rec, avgpu, energy;
-	char sfoo[512];
+  ifstream f(lumifile, ios::in);
+  if (!f.is_open())
+    return false;
+  float secLS = 2.3310e+01;
+  string s;
+  int rn, fill, numls, ifoo;
+  //int rn, fill, ls, ifoo;
+  float del, rec, avgpu, energy;
+  char sfoo[512];
 
-	// Determine expected data tags based on the lumifile year
-	std::string expectedTag;
-	std::string expectedHeader;
-	TString lumifile_str(lumifile);
-	// Check the lumifile year and set the expected data tag and header accordingly
-	if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
-		expectedTag = "#Data tag : 23v1 , Norm tag: None";
-		expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source";
-	} else {
-		expectedTag = "#Data tag : 24v1 , Norm tag: None";
-		expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
-	}
+  // Determine expected data tags based on the lumifile year
+  std::string expectedTag;
+  std::string expectedHeader;
+  TString lumifile_str(lumifile);
+  // Check the lumifile year and set the expected data tag and header accordingly
+  if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
+      expectedTag = "#Data tag : 23v1 , Norm tag: None";
+      expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source";
+  } else {
+      expectedTag = "#Data tag : 24v1 , Norm tag: None";
+      expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
+  }
 
-	// Read and validate the first line
-	bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
-	if (!getsuccess1) {
-		std::cout << "Error reading the first line" << std::endl;
-		return false;
-	}
+  // Read and validate the first line
+  bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess1) {
+      std::cout << "Error reading the first line" << std::endl;
+      return false;
+  }
 
-	PrintInfo("First line: " + s + " !", true);
+  PrintInfo("First line: " + s + " !", true);
+  
+  if (s != expectedTag) {
+      std::cout << "First line does not match expected data tag" << std::endl;
+      return false;
+  }
 
-	if (s != expectedTag) {
-		std::cout << "First line does not match expected data tag" << std::endl;
-		return false;
-	}
+  // Read and validate the second line
+  bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess2) {
+      std::cout << "Error reading the second line" << std::endl;
+      return false;
+  }
 
-	// Read and validate the second line
-	bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
-	if (!getsuccess2) {
-		std::cout << "Error reading the second line" << std::endl;
-		return false;
-	}
+  PrintInfo("Second line: " + s + " !", true);
+  
+  if (s != expectedHeader) {
+      std::cout << "Second line does not match expected header" << std::endl;
+      return false;
+  }
 
-	PrintInfo("Second line: " + s + " !", true);
+  /*
+  bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess1)
+    return false;
+  PrintInfo(string("\nstring: ") + s + " !", true);
 
-	if (s != expectedHeader) {
-		std::cout << "Second line does not match expected header" << std::endl;
-		return false;
-	}
+  TString lumifile_str(lumifile);
+  // HOX: the lumi file format has been changing. Change the conditions when needed.
+  if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
+    if (s != "#Data tag : 23v1 , Norm tag: None")
+      return false;
+  }
+  else {
+  if (s != "#Data tag : 24v1 , Norm tag: None")
+    return false;
+  }
+  //if (s != "#Data tag : 23v1 , Norm tag: None")
+  //if (s != "#Data tag : 24v1 , Norm tag: None") {
+    //return false;
+  //}
 
-	/*
-	   bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
-	   if (!getsuccess1)
-	   return false;
-	   PrintInfo(string("\nstring: ") + s + " !", true);
+  bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
+  if (!getsuccess2) {
+    std::cout << "It is not passing the second line" << std::endl;
+    return false;
+  }
+  PrintInfo(string("\nstring: ") + s + " !", true);
 
-	   TString lumifile_str(lumifile);
-	// HOX: the lumi file format has been changing. Change the conditions when needed.
-	if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
-	if (s != "#Data tag : 23v1 , Norm tag: None")
-	return false;
-	}
-	else {
-	if (s != "#Data tag : 24v1 , Norm tag: None")
-	return false;
-	}
-	//if (s != "#Data tag : 23v1 , Norm tag: None")
-	//if (s != "#Data tag : 24v1 , Norm tag: None") {
-	//return false;
-	//}
+  //TString lumifile_str(lumifile);
+  if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")){
+    //if (s != "#run:fill,nls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source") {
+    if (s != "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source") {
+      std::cout << "2022 and 2023 marked as false" << std::endl;
+      return false;
+    }
+  }
+  else {
+    if (s != "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)") {
+      std::cout << "The rest is marked as false" << std::endl;
+      return false;
+    }
+  }
+  */
+    //return false;
 
-	bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
-	if (!getsuccess2) {
-	std::cout << "It is not passing the second line" << std::endl;
-	return false;
-	}
-	PrintInfo(string("\nstring: ") + s + " !", true);
+  int nls(0);
+  double lumsum(0);
+  double lumsum_good(0);
+  double lumsum_json(0);
+  double lum = 0.0;
+  double lum2 = 0.0;
+  bool skip(false);
+  std::set<double> runNumbers;
+  while (getline(f, s, '\n'))
+  {
+    //std::cout << "Processing line: " << s << std::endl;
+    // Skip if not STABLE BEAMS or wrong number of arguments
+    // STABLE BEAMS alts: ADJUST, BEAM DUMP, FLAT TOP, INJECTION PHYSICS BEAM, N/A, RAMP DOWN, SETUP, SQUEEZE
+    if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")){
+      if (sscanf(s.c_str(), "%d:%d,%d:%d,%d/%d/%d %d:%d:%d,STABLE BEAMS,%f,%f,%f,%f,%s",
+                       &rn, &fill, &numls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15) { 
+	         //&rn, &fill, &ls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
+        skip = true;
+      } 
+    }
+    else {
+      if (sscanf(s.c_str(), "%d:%d,%d/%d/%d %d:%d:%d,%d,%d,%f,%f",
+                 &rn, &fill, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &numls, &ifoo, &del, &rec) != 12) {
+        skip = true;
+      }
+    }
+      //skip = true;
 
-	//TString lumifile_str(lumifile);
-	if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")){
-	//if (s != "#run:fill,nls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source") {
-	if (s != "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source") {
-	std::cout << "2022 and 2023 marked as false" << std::endl;
-	return false;
-	}
-	}
-	else {
-	if (s != "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)") {
-	std::cout << "The rest is marked as false" << std::endl;
-	return false;
-	}
-	}
-	*/
-	//return false;
+    if (debugevent)
+      PrintInfo(Form("Run %d ls %d lumi %f/pb", rn, numls, rec * 1e-6), true);
 
-	int nls(0);
-	double lumsum(0);
-	double lumsum_good(0);
-	double lumsum_json(0);
-	double lum = 0.0;
-	double lum2 = 0.0;
-	bool skip(false);
-	std::set<double> runNumbers;
-	while (getline(f, s, '\n'))
-	{
-		//std::cout << "Processing line: " << s << std::endl;
-		// Skip if not STABLE BEAMS or wrong number of arguments
-		// STABLE BEAMS alts: ADJUST, BEAM DUMP, FLAT TOP, INJECTION PHYSICS BEAM, N/A, RAMP DOWN, SETUP, SQUEEZE
-		if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")){
-			if (sscanf(s.c_str(), "%d:%d,%d:%d,%d/%d/%d %d:%d:%d,STABLE BEAMS,%f,%f,%f,%f,%s",
-						&rn, &fill, &numls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15) { 
-				//&rn, &fill, &ls, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &energy, &del, &rec, &avgpu, sfoo) != 15)
-				skip = true;
-			} 
-		}
-		else {
-			if (sscanf(s.c_str(), "%d:%d,%d/%d/%d %d:%d:%d,%d,%d,%f,%f",
-						&rn, &fill, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &ifoo, &numls, &ifoo, &del, &rec) != 12) {
-				skip = true;
-			}
-		}
-		//skip = true;
+    if (skip)
+    { // The user should know if this happens, since we can choose to use only STABLE BEAMS
+      if (skip)
+        PrintInfo(string("Skipping line (effects the recorded lumi):\n") + s, true);
+      skip = false;
+      continue;
+    }
 
-		if (debugevent)
-			PrintInfo(Form("Run %d ls %d lumi %f/pb", rn, numls, rec * 1e-6), true);
+    //double lum = 0.0;
+    //double lum2 = 0.0;
+    if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
+      // Pass from /ub to /pb
+      lum = rec * 1e-6;
+      lum2 = del * 1e-6;
+    } else {
+      // Pass from /fb to /pb
+      lum = rec * 1000.; //* 1e-6;
+      lum2 = del * 1000.; //* 1e-6;
+    }
+    //double lum = rec * 1000.; //* 1e-6;
+    //double lum2 = del * 1000.; //* 1e-6;
+    
+    //if (_lums[rn][numls] != 0)
+    if (_lums[rn] != 0) {
+	//Flag for luminoisty per lumisection instead of run
+        //std::cout << "_lums already has a value for run " << rn << ", accumulating values." << std::endl;
+        _lums[rn] += lum;
+        _lums2[rn][numls] += lum2;
+    } else {
+        _lums[rn] = lum;
+        _lums2[rn][numls] = lum2;
+    }
+    //if (_lums[rn] != 0) {
+      //std::cout << "_lums already has a value for run " << rn << std::endl;
+      //std::cout << "Exiting loop due to existing _lums value for run " << rn << std::endl;
+      //return false;
+    //}
 
-		if (skip)
-		{ // The user should know if this happens, since we can choose to use only STABLE BEAMS
-			if (skip)
-				PrintInfo(string("Skipping line (effects the recorded lumi):\n") + s, true);
-			skip = false;
-			continue;
-		}
+    //if (_avgpu[rn][numls] != 0)
+      //return false;
+    // lumiCalc.py returns lumi in units of mub-1 (=>nb-1=>pb-1)
+    
+    //double lum = rec * 1000.; //* 1e-6;
+    //double lum2 = del * 1000.; //* 1e-6;
+    //Runs dictionary
+    
+    if (runNumbers.find(rn) == runNumbers.end()) {
+      runNumbers.insert(rn);
+    }
 
-		//double lum = 0.0;
-		//double lum2 = 0.0;
-		if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
-			// Pass from /ub to /pb
-			lum = rec * 1e-6;
-			lum2 = del * 1e-6;
-		} else {
-			// Pass from /fb to /pb
-			lum = rec * 1000.; //* 1e-6;
-			lum2 = del * 1000.; //* 1e-6;
-		}
-		//double lum = rec * 1000.; //* 1e-6;
-		//double lum2 = del * 1000.; //* 1e-6;
+    std::vector<double> binEdges(runNumbers.begin(), runNumbers.end());
+    binEdges.push_back(*runNumbers.rbegin() + 1);
+    _runNumberBin = binEdges;
 
-		//if (_lums[rn][numls] != 0)
-		if (_lums[rn] != 0) {
-			//Flag for luminoisty per lumisection instead of run
-			//std::cout << "_lums already has a value for run " << rn << ", accumulating values." << std::endl;
-			_lums[rn] += lum;
-			_lums2[rn][numls] += lum2;
-		} else {
-			_lums[rn] = lum;
-			_lums2[rn][numls] = lum2;
-		}
-		//if (_lums[rn] != 0) {
-		//std::cout << "_lums already has a value for run " << rn << std::endl;
-		//std::cout << "Exiting loop due to existing _lums value for run " << rn << std::endl;
-		//return false;
-		//}
+    if (lum == 0 and goodruns.find(rn) != goodruns.end() and (_json[rn][numls] == 1)) // The second condition had !jp::dojson or
+      nolums.insert(pair<int, int>(rn, nls));
 
-		//if (_avgpu[rn][numls] != 0)
-		//return false;
-		// lumiCalc.py returns lumi in units of mub-1 (=>nb-1=>pb-1)
+    //_avgpu[rn][numls] = avgpu * 69000. / 80000.; // brilcalc --minBiasXsec patch
+    //_lums[rn][numls] = lum;
+    
+    // Not used anymore since is already used above. Nestor 23 July, 2024.
+    //_lums[rn] = lum;
+    //_lums2[rn][numls] = lum2;
+    
+    lumsum += lum;
+    if (goodruns.find(rn) != goodruns.end()) // Apr 17
+      lumsum_good += lum;
+    if ((_json[rn][numls]))
+      lumsum_json += lum;
+    ++nls;
+    if (nls > 100000000)
+      return false;
+  }
 
-		//double lum = rec * 1000.; //* 1e-6;
-		//double lum2 = del * 1000.; //* 1e-6;
-		//Runs dictionary
+  PrintInfo(Form("Called LoadLumi() with %s:\nLoaded %lu runs with %d lumi sections containing %f"
+                 " pb-1 of data,\n of which %f pb-1 is in good runs (%f%%)\nThis corresponds to %f"
+                 " hours of data-taking\nThe JSON file contains %f pb-1 (%f%%)",
+                 lumifile, _lums.size(), nls, lumsum, lumsum_good,
+                 100. * lumsum_good / lumsum, nls * secLS / 3600, lumsum_json, 100. * lumsum_json / lumsum),
+            true);
 
-		if (runNumbers.find(rn) == runNumbers.end()) {
-			runNumbers.insert(rn);
-		}
+  // Report any empty lumi section
+  if (nolums.size() != 0)
+  {
+    PrintInfo(Form("Warning, found %lu non-normalizable LS:", nolums.size()), true);
+    for (auto lumit = nolums.begin(); lumit != nolums.end(); ++lumit)
+    {
+      cout << " [" << lumit->first << "," << lumit->second;
+      auto lumit2 = lumit;
+      ++lumit2;
+      if (lumit2->first != lumit->first or lumit2->second != lumit->second + 1)
+        cout << "]";
+      else
+      {
+        for (int lumadd = 0; lumit2 != nolums.end() and lumit2->first == lumit->first and
+                             lumit2->second == lumit->second + lumadd + 1;
+             ++lumadd, ++lumit2)
+        {
+        };
+        lumit = --lumit2;
+        cout << "-" << lumit->second << "]";
+      }
+    } // for lumit
+    cout << endl;
+  } // nolums
+  cout << "lumsum value: " << lumsum << endl;
+  cout << endl;
+  _lumsum = lumsum;
+  cout << "_lumsum value: " << _lumsum << endl;
+  //Unique run numbers
+  
+  /*  
+  for (const auto& number : runNumbers) {
+      std::cout << number << std::endl;
+  }
+  
+  int run_example = 379866;
+  auto it = runNumbers.find(run_example);
+  if (it != runNumbers.end()) {
+      std::cout << run_example << " is included in runNumbers." << std::endl;
+  } else {
+      std::cout << run_example << " is not included in runNumbers." << std::endl;
+  }
+  auto it3 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run_example);
+  if (it3 != _runNumberBin.end()) {
+      std::cout << "run_example is included in binEdges." << std::endl;
+  } else {
+      std::cout << "run_example is not included in binEdges." << std::endl;
+  }
+  */
 
-		std::vector<double> binEdges(runNumbers.begin(), runNumbers.end());
-		binEdges.push_back(*runNumbers.rbegin() + 1);
-		_runNumberBin = binEdges;
-
-		if (lum == 0 and goodruns.find(rn) != goodruns.end() and (_json[rn][numls] == 1)) // The second condition had !jp::dojson or
-			nolums.insert(pair<int, int>(rn, nls));
-
-		//_avgpu[rn][numls] = avgpu * 69000. / 80000.; // brilcalc --minBiasXsec patch
-		//_lums[rn][numls] = lum;
-
-		// Not used anymore since is already used above. Nestor 23 July, 2024.
-		//_lums[rn] = lum;
-		//_lums2[rn][numls] = lum2;
-
-		lumsum += lum;
-		if (goodruns.find(rn) != goodruns.end()) // Apr 17
-			lumsum_good += lum;
-		if ((_json[rn][numls]))
-			lumsum_json += lum;
-		++nls;
-		if (nls > 100000000)
-			return false;
-	}
-
-	PrintInfo(Form("Called LoadLumi() with %s:\nLoaded %lu runs with %d lumi sections containing %f"
-				" pb-1 of data,\n of which %f pb-1 is in good runs (%f%%)\nThis corresponds to %f"
-				" hours of data-taking\nThe JSON file contains %f pb-1 (%f%%)",
-				lumifile, _lums.size(), nls, lumsum, lumsum_good,
-				100. * lumsum_good / lumsum, nls * secLS / 3600, lumsum_json, 100. * lumsum_json / lumsum),
-			true);
-
-	// Report any empty lumi section
-	if (nolums.size() != 0)
-	{
-		PrintInfo(Form("Warning, found %lu non-normalizable LS:", nolums.size()), true);
-		for (auto lumit = nolums.begin(); lumit != nolums.end(); ++lumit)
-		{
-			cout << " [" << lumit->first << "," << lumit->second;
-			auto lumit2 = lumit;
-			++lumit2;
-			if (lumit2->first != lumit->first or lumit2->second != lumit->second + 1)
-				cout << "]";
-			else
-			{
-				for (int lumadd = 0; lumit2 != nolums.end() and lumit2->first == lumit->first and
-						lumit2->second == lumit->second + lumadd + 1;
-						++lumadd, ++lumit2)
-				{
-				};
-				lumit = --lumit2;
-				cout << "-" << lumit->second << "]";
-			}
-		} // for lumit
-		cout << endl;
-	} // nolums
-	cout << "lumsum value: " << lumsum << endl;
-	cout << endl;
-	_lumsum = lumsum;
-	cout << "_lumsum value: " << _lumsum << endl;
-	//Unique run numbers
-
-	/*  
-	    for (const auto& number : runNumbers) {
-	    std::cout << number << std::endl;
-	    }
-
-	    int run_example = 379866;
-	    auto it = runNumbers.find(run_example);
-	    if (it != runNumbers.end()) {
-	    std::cout << run_example << " is included in runNumbers." << std::endl;
-	    } else {
-	    std::cout << run_example << " is not included in runNumbers." << std::endl;
-	    }
-	    auto it3 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run_example);
-	    if (it3 != _runNumberBin.end()) {
-	    std::cout << "run_example is included in binEdges." << std::endl;
-	    } else {
-	    std::cout << "run_example is not included in binEdges." << std::endl;
-	    }
-	    */
-
-	return true;
+  return true;
 } // LoadLumi
 
 /////////////////////////
 
 void DijetHistosFill::Loop()
 {
-	//   In a ROOT session, you can do:
-	//      root> .L DijetHistosFill.C
-	//      root> DijetHistosFill t
-	//      root> t.GetEntry(12); // Fill t data members with entry number 12
-	//      root> t.Show();       // Show values of entry 12
-	//      root> t.Show(16);     // Read and show values of entry 16
-	//      root> t.Loop();       // Loop on all entries
-	//
-
-	//     This is the loop skeleton where:
-	//    jentry is the global entry number in the chain
-	//    ientry is the entry number in the current Tree
-	//  Note that the argument to GetEntry must be:
-	//    jentry for TChain::GetEntry
-	//    ientry for TTree::GetEntry and TBranch::GetEntry
-	//
-	//       To read only selected branches, Insert statements like:
-	// METHOD1:
-	//    fChain->SetBranchStatus("*",0);  // disable all branches
-	//    fChain->SetBranchStatus("branchname",1);  // activate branchname
-	// METHOD2: replace line
-	//    fChain->GetEntry(jentry);       //read all branches
-	// by  b_branchname->GetEntry(ientry); //read only this branch
-	if (fChain == 0)
-		return;
-
-	// ROOT.EnableImplicitMT(); // From Nico on Skype, to parallelize processing
-
-	TStopwatch fulltime, laptime;
-	fulltime.Start();
-	TDatime bgn;
-	TDatime start_time;
-	start_time.Set();
-	int nlap(0);
-
-	fChain->SetBranchStatus("*", 0);
-
-	// if (debug)
-	cout << "Setting branch status for "
-		<< (isMC ? (isMG ? "MC (MG)" : "MC (Flat)") : (isZB ? "DATA (ZB)" : "DATA"))
-		<< " and " << (isRun2 ? "Run2" : "Run3")
-		<< " (isRun2=" << isRun2 << ", isRun3=" << isRun3 << ")"
-		<< endl
-		<< flush;
-
-	if (isMC)
-		fChain->SetBranchStatus("genWeight", 1);
-	if (isMC)
-		fChain->SetBranchStatus("Generator_binvar", 1); // pThat in Pythia8
-	if (isMC && !(isMG && isRun3))
-		fChain->SetBranchStatus("Pileup_pthatmax", 1);
-
-	if (isMC && reweightPU)
-	{
-		fChain->SetBranchStatus("Pileup_nTrueInt", 1);
-		fChain->SetBranchStatus("Pileup_nPU", 1);
-	}
-
-	if (isMC && (smearJets || doMCtruth))
-	{
-		cout << "Adding branches for GenJets ("
-			<< (smearJets ? " smearJets" : "")
-			<< (doMCtruth ? " doMCtruth" : "") << ")" << endl;
-		fChain->SetBranchStatus("Jet_genJetIdx", 1);
-		fChain->SetBranchStatus("nGenJet", 1);
-		fChain->SetBranchStatus("GenJet_pt", 1);
-		fChain->SetBranchStatus("GenJet_eta", 1);
-		fChain->SetBranchStatus("GenJet_phi", 1);
-		fChain->SetBranchStatus("GenJet_mass", 1);
-
-		if (doMCtruth)
-		{
-			fChain->SetBranchStatus("GenVtx_z", 1);
-			fChain->SetBranchStatus("PV_z", 1);
-		}
-
-		// At the value of _seed: the old question - should the seed of a rng be random itself?
-		// Here we prefer stability, but the user can vary the seed if necessary. Moreover, https://xkcd.com/221/
-		_seed = 4;
-		_mersennetwister = std::mt19937(_seed);
-	}
-
-	if (isMG)
-		fChain->SetBranchStatus("LHE_HT", 1); // HT in MadGraph
-
-	fChain->SetBranchStatus("run", 1);
-	fChain->SetBranchStatus("luminosityBlock", 1);
-	fChain->SetBranchStatus("event", 1);
-	// fChain->SetBranchStatus("Rho_fixedGridRhoAll",1);
-	if (isRun2)
-		fChain->SetBranchStatus("fixedGridRhoFastjetAll", 1);
-	if (isRun3)
-		//if (isRun3 || isMG )
-		fChain->SetBranchStatus("Rho_fixedGridRhoFastjetAll", 1);
-	//if (!TString(dataset.c_str()).Contains("2024") || !TString(dataset.c_str()).Contains("Winter24MGV14"))
-	//fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
-	//fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
-
-	// Listing of available triggers
-	vector<string> vtrg = {
-		"HLT_PFJet40",
-		"HLT_PFJet60",
-		"HLT_PFJet80",
-		"HLT_PFJet140",
-		"HLT_PFJet200",
-		"HLT_PFJet260",
-		"HLT_PFJet320",
-		"HLT_PFJet400",
-		"HLT_PFJet450",
-		"HLT_PFJet500",
-		"HLT_PFJetFwd40", //
-		"HLT_PFJetFwd60",
-		"HLT_PFJetFwd80",
-		"HLT_PFJetFwd140",
-		"HLT_PFJetFwd200",
-		"HLT_PFJetFwd260",
-		"HLT_PFJetFwd320",
-		"HLT_PFJetFwd400",
-		"HLT_PFJetFwd450",
-		"HLT_PFJetFwd500", //
-		"HLT_DiPFJetAve40",
-		"HLT_DiPFJetAve60",
-		"HLT_DiPFJetAve80",
-		"HLT_DiPFJetAve140",
-		"HLT_DiPFJetAve200",
-		"HLT_DiPFJetAve260",
-		"HLT_DiPFJetAve320",
-		"HLT_DiPFJetAve400",
-		"HLT_DiPFJetAve500",
-		"HLT_DiPFJetAve60_HFJEC",
-		"HLT_DiPFJetAve80_HFJEC",
-		"HLT_DiPFJetAve100_HFJEC",
-		"HLT_DiPFJetAve160_HFJEC",
-		"HLT_DiPFJetAve220_HFJEC",
-		"HLT_DiPFJetAve300_HFJEC"};
-
-	if (isZB)
-		vtrg.insert(vtrg.begin(), "HLT_ZeroBias");
-
-	if (isRun2 > 2)
-		vtrg.push_back("HLT_PFJet550");
-	//}
-
-	// vtrg.push_back("HLT_PFJetFwd15");
-	// vtrg.push_back("HLT_PFJetFwd25");
-if (isRun2 > 2)
-{ // && dataset!="UL2017B") {
-	vtrg.push_back("HLT_PFJetFwd40");
-	vtrg.push_back("HLT_PFJetFwd60");
-	vtrg.push_back("HLT_PFJetFwd80");
-	vtrg.push_back("HLT_PFJetFwd140");
-	vtrg.push_back("HLT_PFJetFwd200");
-	vtrg.push_back("HLT_PFJetFwd260");
-	vtrg.push_back("HLT_PFJetFwd320");
-	vtrg.push_back("HLT_PFJetFwd400");
-	vtrg.push_back("HLT_PFJetFwd450");
-	vtrg.push_back("HLT_PFJetFwd500");
-}
-
-if (doMCtrigOnly && isMC) //Set doMCtrigOnly = true and comment vtrg.clear(); to see the list of triggers
-{
-	vtrg.clear();
-	vtrg.push_back("HLT_MC");
-}
-
-if (isZB && !isMC)
-{
-	vtrg.clear(); // no jet triggers from ZeroBias PD
-	vtrg.push_back("HLT_ZeroBias");
-}
-
-int ntrg = vtrg.size();
-
-for (int i = 0; i != ntrg; ++i)
-{
-	if (vtrg[i] != "HLT_MC")
-		fChain->SetBranchStatus(vtrg[i].c_str(), 1); 
-	if (mtrg[vtrg[i]] == 0)
-	{
-		cout << "Missing branch info for " << vtrg[i] << endl
-			<< flush;
-	}
-	assert(mtrg[vtrg[i]] != 0);
-}
-
-fChain->SetBranchStatus("nJet", 1);
-fChain->SetBranchStatus("Jet_btagPNetQvG", 1);
-fChain->SetBranchStatus("Jet_btagUParTAK4QvG", 1);
-fChain->SetBranchStatus("Jet_pt", 1);
-fChain->SetBranchStatus("Jet_eta", 1);
-fChain->SetBranchStatus("Jet_phi", 1);
-fChain->SetBranchStatus("Jet_mass", 1);
-fChain->SetBranchStatus("Jet_jetId", 1);
-
-fChain->SetBranchStatus("Jet_rawFactor", 1);
-if (isRun2)
-	fChain->SetBranchStatus("Jet_area", 1);
-
-	// bool doPFComposition = true;
-if (doPFComposition)
-{
-	fChain->SetBranchStatus("Jet_chHEF", 1);  // h+
-	fChain->SetBranchStatus("Jet_neHEF", 1);  // h0
-	fChain->SetBranchStatus("Jet_neEmEF", 1); // gamma
-	fChain->SetBranchStatus("Jet_chEmEF", 1); // e
-	fChain->SetBranchStatus("Jet_muEF", 1);   // mu
-	// fChain->SetBranchStatus("Jet_hfEmEF",1); // HFe
-	// fChain->SetBranchStatus("Jet_hfHEF",1);  // HFh
-}
-
-double Jet_l1rcFactor[nJetMax]; // For L1L2L3-RC type-I MET
-if (isRun2)
-{
-	// raw chs PF MET
-	fChain->SetBranchStatus("ChsMET_pt", 1);
-	fChain->SetBranchStatus("ChsMET_phi", 1);
-}
-else
-{
-	// fChain->SetBranchStatus("PuppiMET_pt",1);
-	// fChain->SetBranchStatus("PuppiMET_phi",1);
-	fChain->SetBranchStatus("RawPuppiMET_pt", 1);
-	fChain->SetBranchStatus("RawPuppiMET_sumEt", 1);
-	fChain->SetBranchStatus("RawPuppiMET_phi", 1);
-	//fChain->SetBranchStatus("MET_pt", 1);
-	//fChain->SetBranchStatus("MET_sumEt", 1);
-}
-
-fChain->SetBranchStatus("Flag_METFilters", 1);
-if (isRun2 || isRun3) //April 2, 2024: Same filters for UL Run2 and Run3
-{
-	// https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Run_3_recommendations
-	fChain->SetBranchStatus("Flag_goodVertices", 1);
-	fChain->SetBranchStatus("Flag_globalSuperTightHalo2016Filter", 1);
-	fChain->SetBranchStatus("Flag_EcalDeadCellTriggerPrimitiveFilter", 1);
-	fChain->SetBranchStatus("Flag_BadPFMuonFilter", 1);
-	fChain->SetBranchStatus("Flag_BadPFMuonDzFilter", 1);
-	fChain->SetBranchStatus("Flag_hfNoisyHitsFilter", 1);
-	fChain->SetBranchStatus("Flag_eeBadScFilter", 1);
-	fChain->SetBranchStatus("Flag_ecalBadCalibFilter", 1);
-}
-
-// Trigger studies => TrigObjAK4 later (fixed now)
-bool doTriggerMatch = false;
-nTrigObjJMEAK4 = 0; // turn off
-if (doTriggerMatch)
-{
-	// https://github.com/cms-sw/cmssw/blob/CMSSW_12_4_8/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L136-L180
-	fChain->SetBranchStatus("nTrigObjJMEAK4", 1);
-	fChain->SetBranchStatus("TrigObjJMEAK4_pt", 1);
-	fChain->SetBranchStatus("TrigObjJMEAK4_eta", 1);
-	fChain->SetBranchStatus("TrigObjJMEAK4_phi", 1);
-}
-
-// List reference pT and abseta thresholds for triggers
-mt["HLT_MC"] = range{10, 3000, 0, 5.2};
-mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
-
-mt["HLT_DiPFJetAve40"] = range{40, 85, 0, 5.2};
-mt["HLT_DiPFJetAve60"] = range{85, 100, 0, 5.2};
-mt["HLT_DiPFJetAve80"] = range{100, 155, 0, 5.2};
-mt["HLT_DiPFJetAve140"] = range{155, 210, 0, 5.2};
-mt["HLT_DiPFJetAve200"] = range{210, 300, 0, 5.2};
-mt["HLT_DiPFJetAve260"] = range{300, 400, 0, 5.2};
-mt["HLT_DiPFJetAve320"] = range{400, 500, 0, 5.2};
-mt["HLT_DiPFJetAve400"] = range{500, 600, 0, 5.2};
-mt["HLT_DiPFJetAve500"] = range{600, 6500, 0, 5.2};
-
-// 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
-double fwdeta = 3.139;  // was 2.853. 80% (100%) on negative (positive) side
-double fwdeta0 = 2.964; // 2.853; // 40 and 260 up
-mt["HLT_DiPFJetAve60_HFJEC"] = range{85, 100, fwdeta, 5.2};
-mt["HLT_DiPFJetAve80_HFJEC"] = range{100, 125, fwdeta, 5.2};
-mt["HLT_DiPFJetAve100_HFJEC"] = range{125, 180, fwdeta, 5.2};
-mt["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
-mt["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
-mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
-
-mt["HLT_PFJet40"] = range{40, 85, 0, 5.2};
-mt["HLT_PFJet60"] = range{85, 100, 0, 5.2};
-mt["HLT_PFJet80"] = range{100, 155, 0, 5.2};
-mt["HLT_PFJet140"] = range{155, 210, 0, 5.2};
-mt["HLT_PFJet200"] = range{210, 300, 0, 5.2};
-mt["HLT_PFJet260"] = range{300, 400, 0, 5.2};
-mt["HLT_PFJet320"] = range{400, 500, 0, 5.2};
-mt["HLT_PFJet400"] = range{500, 600, 0, 5.2};
-mt["HLT_PFJet450"] = range{500, 600, 0, 5.2};
-mt["HLT_PFJet500"] = range{600, 6500, 0, 5.2};
-mt["HLT_PFJet550"] = range{700, 6500, 0, 5.2};
-
-mt["HLT_PFJetFwd40"] = range{40, 85, fwdeta0, 5.2};
-mt["HLT_PFJetFwd60"] = range{85, 100, fwdeta, 5.2};
-mt["HLT_PFJetFwd80"] = range{100, 155, fwdeta, 5.2};
-mt["HLT_PFJetFwd140"] = range{155, 210, fwdeta, 5.2};
-mt["HLT_PFJetFwd200"] = range{210, 300, fwdeta0, 5.2};
-mt["HLT_PFJetFwd260"] = range{300, 400, fwdeta0, 5.2};
-mt["HLT_PFJetFwd320"] = range{400, 500, fwdeta0, 5.2};
-mt["HLT_PFJetFwd400"] = range{500, 600, fwdeta0, 5.2};
-mt["HLT_PFJetFwd450"] = range{500, 600, fwdeta0, 5.2}; // x
-mt["HLT_PFJetFwd500"] = range{600, 6500, fwdeta0, 5.2};
-
-// For jetrate vs runs
-mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
-mi["HLT_MC"]       = range{15,6500,  0, 5.2};
-mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
-mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
-mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
-mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
-mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0}; // 4
-mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0}; // 5
-mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0}; // 6
-mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0}; // 7
-mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0}; // 8
-mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0}; // 9
-//mi["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
-
-mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2}; //  10
-mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2}; // 11
-mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2}; // 12
-mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2}; // 13
-mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2}; // 14
-mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2}; // 15
-mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2}; // 16
-mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2}; // 16
-mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2}; // 17
-mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2}; // 18
-///
-
-
-
-////
-//
-//
-/*
-   struct range {
-   int ptmin;
-   int ptmax;
-   double absetamin;
-   double absetamax;
-   };
-*/
-   std::map<std::string, struct range> md;
-   std::map<std::string, struct range> md2;
-   std::map<std::string, struct range> md2tc;
-   std::map<std::string, struct range> md2pf;
-   std::map<std::string, struct range> mj;
-   std::map<std::string, struct range> mi;
-   double fwdetad = 2.853;
-/*
-   double fwdeta = 3.139; // was 2.853. 80% (100%) on negative (positive) side
-   double fwdeta0 = 2.964;//2.853; // 40 and 260 up
-   double fwdetad = 2.853;
-*/
-// dijet 
-md["HLT_DiPFJetAve40"]  = range{40,  85,  0, 5.2};
-md["HLT_DiPFJetAve60"]  = range{85,  100, 0, fwdeta};
-md["HLT_DiPFJetAve80"]  = range{100, 155, 0, fwdeta};
-md["HLT_DiPFJetAve140"] = range{155, 250, 0, fwdeta};
-md["HLT_DiPFJetAve200"] = range{250, 300, 0, fwdeta0}; // 210->250
-md["HLT_DiPFJetAve260"] = range{300, 400, 0, fwdeta0};
-md["HLT_DiPFJetAve320"] = range{400, 500, 0, fwdeta0};
-md["HLT_DiPFJetAve400"] = range{500, 600, 0, fwdeta0};
-md["HLT_DiPFJetAve500"] = range{600,3000, 0, fwdeta0};
-
-md["HLT_DiPFJetAve60_HFJEC"]  = range{85,  100, fwdeta, 5.2};
-md["HLT_DiPFJetAve80_HFJEC"]  = range{100, 125, fwdeta, 5.2};
-md["HLT_DiPFJetAve100_HFJEC"] = range{125, 180, fwdeta, 5.2};
-md["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
-md["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
-md["HLT_DiPFJetAve300_HFJEC"] = range{350,3000, fwdeta0, 5.2};
-
-// dijet2
-md2["HLT_DiPFJetAve40"]  = range{59,  86,  0, 5.2};
-md2["HLT_DiPFJetAve60"]  = range{86,  110, 0, fwdetad};
-md2["HLT_DiPFJetAve80"]  = range{110, 170, 0, fwdetad};
-md2["HLT_DiPFJetAve140"] = range{170, 236, 0, fwdetad};
-md2["HLT_DiPFJetAve200"] = range{236, 302, 0, fwdetad};
-md2["HLT_DiPFJetAve260"] = range{302, 373, 0, fwdetad};
-md2["HLT_DiPFJetAve320"] = range{373, 460, 0, fwdetad};
-md2["HLT_DiPFJetAve400"] = range{460, 575, 0, fwdetad};
-md2["HLT_DiPFJetAve500"] = range{575,6500, 0, fwdetad};
-
-md2["HLT_DiPFJetAve60_HFJEC"]  = range{86,  110, fwdetad, 5.2};
-md2["HLT_DiPFJetAve80_HFJEC"]  = range{110, 132, fwdetad, 5.2};
-md2["HLT_DiPFJetAve100_HFJEC"] = range{132, 204, fwdetad, 5.2};
-md2["HLT_DiPFJetAve160_HFJEC"] = range{204, 279, fwdetad, 5.2};
-md2["HLT_DiPFJetAve220_HFJEC"] = range{279, 373, fwdetad, 5.2};
-md2["HLT_DiPFJetAve300_HFJEC"] = range{373,3000, fwdetad, 5.2};
-
-// dijet2 -> probe binning
-md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-
-md2pf["HLT_PFJetFwd40"]  = range{49,  84,  fwdetad, 5.2};   //Added to check HLT PFJetFwd. Nestor. April 25, 2024.
-md2pf["HLT_PFJetFwd60"]  = range{84,  114, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd80"]  = range{114, 196, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd140"] = range{196, 272, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd200"] = range{272, 330, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd260"] = range{330, 395, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd320"] = range{395, 468, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd400"] = range{468, 548, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd450"] = range{548, 686, fwdetad, 5.2};
-md2pf["HLT_PFJetFwd500"] = range{686,6500, fwdetad, 5.2};   //
-
-// dijet2 -> tag binning
-md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
-md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
-md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-
-// multijet, jetveto, incjet
-mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0};
-mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};
-mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta};
-mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
-mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0};
-mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0};
-mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0};
-mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0};
-mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0};
-mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0};
-//mi["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
-
-mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2};
-mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2};
-mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2};
-mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2};
-mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2};
-mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2};
-mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2};
-mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2};
-mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2};
-mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
-
-
-
-
-////
-//
-//
-
-
-if (debug)
-	cout << "Setting up JEC corrector" << endl
-	<< flush;
-
-	// Redo JEC
-	// NB: could implement time dependence as in jetphys/IOV.h
-	FactorizedJetCorrector *jec(0), *jecl1rc(0), *jersfvspt(0);
-	string jerpath(""), jerpathsf("");
-	// jec = getFJC("","Winter22Run3_V1_MC_L2Relative","","");
-	// if (isRun2==0) {
-	// jec = getFJC("","Winter22Run3_V1_MC_L2Relative",
-	//		  isMC ? "":"Winter22Run3_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-	// }
-	//  2016APV (BCD, EF)
-
-	TH1D *pileupRatio = new TH1D("puRatio", "PURatio;;Ratio", 99, 0, 100);
-
-	if (dataset == "UL2016APVMG")
-{
-	jec = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
-			"Summer19UL16APV_V7_MC_L2Relative_AK4PFchs", "");
-	jecl1rc = getFJC("Summer19UL16APV_V7_MC_L1RC_AK4PFchs", "", "");
-	jerpath = "JRDatabase/textFiles/Summer20UL16APV_JRV3_MC/Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs.txt";
-	jerpathsf = "JRDatabase/textFiles/Summer20UL16APV_JRV3_MC/Summer20UL16APV_JRV3_MC_SF_AK4PFchs.txt";
-	jersfvspt = getFJC("", "Summer20UL2016APV_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
-}
-if (dataset == "UL2016BCD" || dataset == "UL2016BCD_ZB")
-{
-	jec = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL16APV_RunBCD_V7_DATA_L2Relative_AK4PFchs",
-			"Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2016EF" || dataset == "UL2016EF_ZB")
-{
-	jec = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL16APV_RunEF_V7_DATA_L2Relative_AK4PFchs",
-			"Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1RC_AK4PFchs", "", "");
-}
-// 2016 non-APV (GH)
-if (dataset == "UL2016MG" || dataset == "UL2016Flat")
-{
-	jec = getFJC("Summer19UL16_V7_MC_L1FastJet_AK4PFchs",
-			"Summer19UL16_V7_MC_L2Relative_AK4PFchs", "");
-	jecl1rc = getFJC("Summer19UL16_V7_MC_L1RC_AK4PFchs", "", "");
-	// jec = getFJC("Summer20UL16_V1_MC_L1FastJet_AK4PFchs",
-	//		  "Summer20UL16_V1_MC_L2Relative_AK4PFchs","");
-	// jecl1rc = getFJC("Summer20UL16_V1_MC_L1RC_AK4PFchs","","");
-	jerpath = "JRDatabase/textFiles/Summer20UL16_JRV3_MC/Summer20UL16_JRV3_MC_PtResolution_AK4PFchs.txt";
-	jerpathsf = "JRDatabase/textFiles/Summer20UL16_JRV3_MC/Summer20UL16_JRV3_MC_SF_AK4PFchs.txt";
-	jersfvspt = getFJC("", "Summer20UL2016GH_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
-}
-if (dataset == "UL2016GH" || dataset == "UL2016GH_ZB")
-{
-	jec = getFJC("Summer19UL16_RunFGH_V7_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL16_RunFGH_V7_DATA_L2Relative_AK4PFchs",
-			"Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL16_RunFGH_V7_DATA_L1RC_AK4PFchs", "", "");
-	// jec = getFJC("Summer20UL16_RunGH_V1_DATA_L1FastJet_AK4PFchs",
-	//"Summer20UL16_RunGH_V1_DATA_L2Relative_AK4PFchs",
-	//"Summer20UL16_RunGH_V1_DATA_L2L3Residual_AK4PFchs");
-	//"Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
-	// jecl1rc = getFJC("Summer20UL16_RunGH_V1_DATA_L1RC_AK4PFchs","","");
-}
-// 2017
-if (dataset == "UL2017MG")
-{
-	jec = getFJC("Summer19UL17_V6_MC_L1FastJet_AK4PFchs",
-			"Summer19UL17_V6_MC_L2Relative_AK4PFchs", "");
-	jecl1rc = getFJC("Summer19UL17_V6_MC_L1RC_AK4PFchs", "", "");
-	jerpath = "JRDatabase/textFiles/Summer19UL17_JRV3_MC/Summer19UL17_JRV3_MC_PtResolution_AK4PFchs.txt";
-	jerpathsf = "JRDatabase/textFiles/Summer19UL17_JRV3_MC/Summer19UL17_JRV3_MC_SF_AK4PFchs.txt";
-	jersfvspt = getFJC("", "Summer20UL2017_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
-}
-if (dataset == "UL2017B" || dataset == "UL2017B_ZB")
-{
-	jec = getFJC("Summer19UL17_RunB_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunB_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunB_V6_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL17_RunB_V6_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2017C" || dataset == "UL2017C_ZB")
-{
-	jec = getFJC("Summer19UL17_RunC_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunC_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunC_V6_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL17_RunC_V6_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2017D" || dataset == "UL2017D_ZB")
-{
-	jec = getFJC("Summer19UL17_RunD_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunD_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunD_V6_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL17_RunD_V6_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2017E" || dataset == "UL2017E_ZB")
-{
-	jec = getFJC("Summer19UL17_RunE_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunE_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunE_V6_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL17_RunE_V6_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2017F" || dataset == "UL2017F_ZB")
-{
-	jec = getFJC("Summer19UL17_RunF_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunF_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunF_V6_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL17_RunF_V6_DATA_L1RC_AK4PFchs", "", "");
-}
-// 2018
-if (dataset == "UL2018MG" || TString(dataset.c_str()).Contains("UL2018MG") || TString(dataset.c_str()).Contains("UL2018MC"))
-{
-	jec = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
-			"Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
-	jecl1rc = getFJC("Summer19UL18_V5_MC_L1RC_AK4PFchs", "", "");
-	//jerpath = "JRDatabase/textFiles/Summer19UL18_JRV2_MC/Summer19UL18_JRV2_MC_PtResolution_AK4PFchs.txt";
-	//jerpathsf = "JRDatabase/textFiles/Summer19UL18_JRV2_MC/Summer19UL18_JRV2_MC_SF_AK4PFchs.txt";
-	//jersfvspt = getFJC("", "Summer20UL2018_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
-	jerpath = "";
-	jerpathsf = "";
-	//jersfvspt = "";
-}
-if (dataset == "UL2018A" || dataset == "UL2018A_ZB")
-{
-	jec = getFJC("Summer19UL18_RunA_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunA_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL18_RunA_V5_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2018B" || dataset == "UL2018B_ZB")
-{
-	jec = getFJC("Summer19UL18_RunB_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunB_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL18_RunB_V5_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2018C" || dataset == "UL2018C_ZB")
-{
-	jec = getFJC("Summer19UL18_RunC_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunC_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL18_RunC_V5_DATA_L1RC_AK4PFchs", "", "");
-}
-if (dataset == "UL2018D" || dataset == "UL2018D_ZB" ||
-		dataset == "UL2018D1" || dataset == "UL2018D2")
-{
-	jec = getFJC("Summer19UL18_RunD_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunD_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL18_RunD_V5_DATA_L1RC_AK4PFchs", "", "");
-}
-
-// 2022
-//  Align JECs with
-//  https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
-if (dataset == "2022C" || dataset == "2022C_ZB" || dataset == "2022C_prompt" || dataset == "2022C_ZB_prompt")
-{
-	jec = getFJC("",                                       // Winter22Run3_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
-			//"Winter22Run3_RunC_V2_DATA_L2Relative_AK4PFPuppi",
-			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
-			// v33 and prev "Summer22_RunCD_V2_MPF_L2Residual_AK4PFPuppi");
-			// "Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
-	    "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
-	//"");//"Winter22Run3_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-}
-if (dataset == "2022D" || dataset == "2022D_ZB" || dataset == "2022D_prompt" || dataset == "2022D_ZB_prompt")
-{
-	jec = getFJC("",                                       // Winter22Run3_RunD_V2_DATA_L1FastJet_AK4PFPuppi",
-			//"Winter22Run3_RunD_V2_DATA_L2Relative_AK4PFPuppi",
-			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
-			// v33 and prev "Summer22_RunCD_V2_MPF_L2Residual_AK4PFPuppi");
-			//"Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
-	    "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
-	//"");//"Winter22Run3_RunD_V2_DATA_L2L3Residual_AK4PFPuppi");
-}
-if (dataset == "2022E" || dataset == "2022E_ZB")
-{
-	jec = getFJC("",                                             // Summer22EEPrompt22_RunF_V1_DATA_L1FastJet_AK4PFPuppi",
-			//"Summer22EEPrompt22_RunF_V1_DATA_L2Relative_AK4PFPuppi",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
-			// v33 and prev "Summer22EE_RunE_V2_MPF_L2Residual_AK4PFPuppi");
-			// "Run22E-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
-	    "Summer22EE-22Sep2023_Run2022E_V3_DATA_L2L3Residual_AK4PFPuppi");
-	//"Summer22EEPrompt22_RunE_V2_L2Residual_AK4PFPuppi");
-	//"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
-}
-// if (dataset=="2022F" || dataset=="2022F_ZB") {
-if (TString(dataset.c_str()).Contains("2022F"))
-{
-	jec = getFJC("",                                             // Summer22EEPrompt22_RunF_V1_DATA_L1FastJet_AK4PFPuppi",
-			//"Summer22EEPrompt22_RunF_V1_DATA_L2Relative_AK4PFPuppi",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
-			//"Summer22EEPrompt22_RunF_V2_L2Residual_AK4PFPuppi"
-			// "Run22F-Prompt_DATA_L2L3Residual_AK4PFPuppi"
-			"Summer22EEPrompt22_Run2022F_V3_DATA_L2L3Residual_AK4PFPuppi");
-	//"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
-}
-if (dataset == "2022G" || dataset == "2022G_ZB")
-{
-	jec = getFJC("",                                             // Summer22EEPrompt22_RunG_V1_DATA_L1FastJet_AK4PFPuppi",
-			//"Summer22EEPrompt22_RunG_V1_DATA_L2Relative_AK4PFPuppi",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
-			// "Summer22EEPrompt22_RunG_V2_L2Residual_AK4PFPuppi"
-			// "Run22G-Prompt_DATA_L2L3Residual_AK4PFPuppi"
-			"Summer22EEPrompt22_Run2022G_V3_DATA_L2L3Residual_AK4PFPuppi");
-	//"");//"Summer22EEPrompt22_RunG_V1_DATA_L2L3Residual_AK4PFPuppi");
-}
-
-// 22/23 MC
-if (dataset == "Summer22" ||
-		dataset == "Summer22Flat" ||
-		TString(dataset.c_str()).Contains("Summer22MC") ||
-		TString(dataset.c_str()).Contains("Summer22MG"))
-{
-	jec = getFJC("",                                       // Winter22Run3_V2_MC_L1FastJet_AK4PFPuppi",
-			//"Winter22Run3_V2_MC_L2Relative_AK4PFPuppi",
-			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
-			"");                                      // Winter22Run3_V2_MC_L2L3Residual_AK4PFPuppi");
-	//jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
-	//jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
-	jerpath = "";
-	jerpathsf = "";
-	useJERSFvsPt = false;
-}
-if (dataset == "Summer22EE" ||
-		dataset == "Summer22EEFlat" ||
-		TString(dataset.c_str()).Contains("Summer22EEMG"))
-{
-	jec = getFJC("",                                             // Summer22EEPrompt22_V1_MC_L1FastJet_AK4PFPuppi",
-			//"Summer22EEPrompt22_V1_MC_L2Relative_AK4PFPuppi",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
-			"");                                            // Summer22EEPrompt22_V1_MC_L2L3Residual_AK4PFPuppi");
-	jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt";
-	jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt";
-	//jerpath = "";
-	//jerpathsf = "";
-	useJERSFvsPt = false;
-}
-if (dataset == "Summer23" ||
-		dataset == "Summer23MCFlat" || dataset == "Summer23MG" || TString(dataset.c_str()).Contains("Summer23MC") ||
-		dataset == "Summer23MCBPixFlat" || dataset == "Summer23BPIXMG" || TString(dataset.c_str()).Contains("Summer23"))
-{
-	if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPixFlat") || TString(dataset.c_str()).Contains("Summer23MCBPix")) {
-		jec = getFJC("",
-				"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
-				"");
-		//jerpathsf = "";
-		jersfvspt = getFJC("", "", "");
-		jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
-		//jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
-		//jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
-	} else {
-		jec = getFJC("", 
-				"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
-				"");
-		//jerpathsf = "";
-		jersfvspt = getFJC("", "", "");
-		jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
-		//jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
-		//jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
-		// Resolution SF version 2: https://indico.cern.ch/event/1399194/
-		// April 3, 2024
-		//jersfvspt = getFJC("", "Summer23_2023Cv123_JRV2_MC_SF_AK4PFPuppi", "");
-		//jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
-	}
-	//jec = getFJC("", // Winter23Prompt23_V2_MC_L1FastJet_AK4PFPuppi",
-	//             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
-	//             "");                                                                                   // Winter23Prompt23_V2_MC_L2L3Residual_AK4PFPuppi");
-	//jerpath = "";
-	//jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
-	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	useJERSFvsPt = false; //Nestor, 24 July, 2024.
-
-	if (reweightPU)
-	{
-		if (TString(dataset.c_str()).Contains("Summer23MGBPix")) {
-			TFile f("luminosityscripts/PUWeights/Summer23BPix_PUWeight.root");
-			pileupRatio = (TH1D *)f.Get("pileup");
-			pileupRatio->SetDirectory(0);
-			// Print mean, min weight, max weight
-			cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-			cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-			cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
-
-		} else {
-			TFile f("luminosityscripts/PUWeights/Summer23_PUWeight.root");
-			pileupRatio = (TH1D *)f.Get("pileup");
-			pileupRatio->SetDirectory(0);
-			// Print mean, min weight, max weight
-			cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-			cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-			cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
-
-		}
-	}
-}
-
-// 2023
-// if (dataset=="2023B" || dataset=="2023B_ZB") {
-// jec = getFJC("Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
-//		  "Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
-//		  "Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-// }
-
-if (dataset == "2023B" || dataset == "2023B_ZB" || dataset == "2023BCv123" || 
-		dataset == "2023BCv123_ZB" || dataset == "2023Cv123" || dataset == "2023Cv123_ZB" ||
-		dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt")
-{
-	jec = getFJC("",                                                               // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
-			//"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
-			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                         // Mikel
-			// "Run23C123-Prompt_DATA_L2L3Residual_AK4PFPuppi"
-			"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-}
-
-if (dataset == "2023Cv4" || dataset == "2023Cv4_ZB" || 
-		dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt")
-{
-	jec = getFJC("",                                                             // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
-			//"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
-			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                       // Mikel
-			//"Run23C4-Prompt_DATA_L2L3Residual_AK4PFPuppi"
-			"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-}
-
-if (dataset == "2023D" || dataset == "2023D_ZB" ||
-		dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt")
-{
-	jec = getFJC("",                                                           // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
-			//"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
-			"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",                     // Mikel
-			//"Run23D-Prompt_DATA_L2L3Residual_AK4PFPuppi"
-			//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-	    "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-}
-
-if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
-{
-	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI"
-			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
-			//"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
-			"");
-	jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
-	//jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
-	jerpathsf = "";
-	//jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
-	//jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "", "");;
-
-	useJERSFvsPt = true;
-}
-
-if (TString(dataset.c_str()).Contains("Winter24MG"))
-{
-	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			"");
-	//jerpathsf = "";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
-	jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
-	//jersfvspt = getFJC("", "", "");
-	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	//jerpath = "";
-	useJERSFvsPt = true; //Nestor, Aug16, 2024.
-
-	/*
-	   if (reweightPU)
-	   {
-	   if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-	   TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
-	   pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F");
-	   pileupRatio->SetDirectory(0);
-	// Print mean, min weight, max weight
-	cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-	cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-	cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
-
-	} else {
-	TFile f("luminosityscripts/PUWeights/Winter24MG_PUWeight.root");
-	pileupRatio = (TH1D *)f.Get("pileup");
-	pileupRatio->SetDirectory(0);
-	// Print mean, min weight, max weight
-	cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-	cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-	cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
-
-	}
-	}
-	*/
-
-
-
-	//////
-	// Pileupreweighting per trigger
-	// Nestor, Sep 9, 2024. 
-	//////
-	if (reweightPU)
-	{
-		TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
-		pileupRatio = (TH1D *)f.Get("pileup");
-		pileupRatio->SetDirectory(0);
-		// Print mean, min weight, max weight
-		cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-		cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-		cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
-	}
-	/////
-}
-
-
-
-if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
-{
-	if (TString(dataset.c_str()).Contains("2024BR"))
-	{
-		jec = getFJC(""
-				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
-		    "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	}
-	else {
-		jec = getFJC("",
-				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-				//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-				//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-				//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-				//"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
-				//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-				//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
-		    "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
-	}
-}
-
-if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
-{ 
-	if (TString(dataset.c_str()).Contains("2024CR"))
-	{
-		jec = getFJC(""
-				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
-		    "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	}
-	else if (dataset == "2024CS" || dataset == "2024CT")
-	{
-		jec = getFJC(""
-				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
-		    "Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	}
-
-	else {
-		jec = getFJC("",
-				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-				//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-				//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-				//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-				//"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
-				//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-				//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
-		    "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
-	}
-}
-
-if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
-{
-	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-			//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-			//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-			//"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	    "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
-}
-
-if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
-{
-	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-			//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-			//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-			//"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	    "Prompt24_Run2024E_V5M_DATA_L2L3Residual_AK4PFPuppi");
-
-}
-
-if (TString(dataset.c_str()).Contains("2024F")  || dataset == "2024F_ZB")
-{
-	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-			//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-			//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-			//"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	    "Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
-
-}
-
-if (dataset == "2024G"  || dataset == "2024G_ZB")
-{
-	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
-
-}
-
-if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
-	cout << "Missing files for " << dataset << endl
-	<< flush;
-	assert(jec);
-	// assert(jecl1rc);
-
-if (debug)
-	cout << "Setting up JER smearing" << endl
-	<< flush;
-
-	// Smear JER
-	// NB: could implement time dependence as in jetphys/IOV.h
-	JME::JetResolution *jer(0);
-	JME::JetResolutionScaleFactor *jersf(0);
-if (isMC && smearJets)
-{
-	cout << jerpath << endl
-		<< flush;
-	if (!useJERSFvsPt)
-		cout << jerpathsf << endl
-			<< flush;
-	if (jerpath == "" || (jerpathsf == "" && !useJERSFvsPt))
-		cout << "Missing JER file paths for " << dataset << endl
-			<< flush;
-	assert(jerpath != "");
-	assert(jerpathsf != "" || useJERSFvsPt);
-	assert(jersfvspt || !useJERSFvsPt);
-	jer = new JME::JetResolution(jerpath.c_str());
-	if (!useJERSFvsPt)
-		jersf = new JME::JetResolutionScaleFactor(jerpathsf.c_str());
-	//cout << "jersf from the SF file" << endl
-	//   << flush;
-	if (!jer || (!jersf && !useJERSFvsPt) || (!jersfvspt && useJERSFvsPt))
-		cout << "Missing JER files for " << dataset << endl
-			<< flush;
-}
-
-TLorentzVector p4rawmet, p4t1met, p4mht, p4l1rc, p4dj;
-// TLorentzVector p4, p4s, p4mht, p4mht2, p4mhtc, p4mhtc3, p4t, p4p;
-TLorentzVector p4, /*p4raw,*/ p4g, p4s, p4t, p4p;
-TLorentzVector p4lead, p4recoil; //, p4other;
-TLorentzVector p4leadRES, p4recoilRES;
-TLorentzVector p4b3, p4b3r, p4b3l, p4m;
-TLorentzVector p4b, p4bt, p4bp, p4bx, p4d, p4dx;
-TLorentzVector p4c, p4cx, p4f, p4fx, p4l, p4r;
-TLorentzVector p4m0, p4m2, p4mn, p4mu; //, p4mo;
-TLorentzVector p4m3, p4mn3, p4mu3;
-TLorentzVector p4corrjets, p4rcjets, p4rawjets;
-TFile *fout = new TFile(Form("rootfiles/%s/jmenano_%s_out_%s_%s.root",
-			version.c_str(),
-			isMC ? "mc" : "data",
-			dataset.c_str(), version.c_str()),
-		"RECREATE");
-
-// Monitor trigger rates
-TH1D *htrg = new TH1D("htrg", "Triggers;Trigger;N_{events}",
-		vtrg.size(), 0, vtrg.size());
-//cout << "AAAA :"  <<htrg->GetNbinsX() << endl;
-for (int i = 1; i != htrg->GetNbinsX() + 1; ++i)
-{
-	htrg->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
-}
-//cout << "BBB :"  <<htrg->GetNbinsX() << endl;
-
-// trigger vs lumi
-TH2D *h_trgvslumi = new TH2D("h_trgvslumi", "Triggers;Trigger;Lumi",
-		vtrg.size(), 0, vtrg.size(), 100, 0, 1);
-for (int i = 1; i != h_trgvslumi->GetNbinsX() + 1; ++i)
-{
-	h_trgvslumi->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
-}
-
-// trigger vs pu
-TH2D *h_trgvspu = new TH2D("h_trgvspu", "Triggers;Trigger;PU",
-		vtrg.size(), 0, vtrg.size(), 100, 0, 100);
-for (int i = 1; i != h_trgvspu->GetNbinsX() + 1; ++i)
-{
-	h_trgvspu->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
-}
-
-if (debug)
-	cout << "Setting up histograms" << endl
-	<< flush;
-
-	// Setup HT bin weighting and monitoring
-	TH1D *hxsec(0), *hnevt(0), *hnwgt(0), *hLHE_HT(0), *hLHE_HTw(0), *hHT(0), *hHT_Now(0), *hHT_MCw(0), *hHT_w(0);
-	double vht2[] = {0, 25, 50, 100, 200, 300, 500, 700, 1000, 1500, 2000, 13800};
-const int nht2 = sizeof(vht2) / sizeof(vht2[0]) - 1;
-double vht3[] = {0, 40, 70, 100, 200, 400, 600, 800, 1000, 1200, 1500, 2000,
-	13800};
-const int nht3 = sizeof(vht3) / sizeof(vht3[0]) - 1;
-const double *vht = (isRun3 ? &vht3[0] : &vht2[0]);
-const int nht = (isRun3 ? nht3 : nht2);
-int nMG(0), sumwMG(0);
-if (isMG)
-{
-
-	hxsec = new TH1D("hxsec", ";H_{T} (GeV);pb", nht, vht);
-	hnevt = new TH1D("hnevt", ";H_{T} (GeV);N_{evt}", nht, vht);
-	hnwgt = new TH1D("hnwgt", ";H_{T} (GeV);Sum of weights", nht, vht);
-	hLHE_HT = new TH1D("hLHE_HT", ";H_{T} (GeV);N_{evt} (unweighted)", nht, vht);
-	hLHE_HTw = new TH1D("hLHE_HTw", ";H_{T} (GeV);N_{evt} (weighted)", nht, vht);
+  //   In a ROOT session, you can do:
+  //      root> .L DijetHistosFill.C
+  //      root> DijetHistosFill t
+  //      root> t.GetEntry(12); // Fill t data members with entry number 12
+  //      root> t.Show();       // Show values of entry 12
+  //      root> t.Show(16);     // Read and show values of entry 16
+  //      root> t.Loop();       // Loop on all entries
+  //
+
+  //     This is the loop skeleton where:
+  //    jentry is the global entry number in the chain
+  //    ientry is the entry number in the current Tree
+  //  Note that the argument to GetEntry must be:
+  //    jentry for TChain::GetEntry
+  //    ientry for TTree::GetEntry and TBranch::GetEntry
+  //
+  //       To read only selected branches, Insert statements like:
+  // METHOD1:
+  //    fChain->SetBranchStatus("*",0);  // disable all branches
+  //    fChain->SetBranchStatus("branchname",1);  // activate branchname
+  // METHOD2: replace line
+  //    fChain->GetEntry(jentry);       //read all branches
+  // by  b_branchname->GetEntry(ientry); //read only this branch
+  if (fChain == 0)
+    return;
+
+  // ROOT.EnableImplicitMT(); // From Nico on Skype, to parallelize processing
+
+  TStopwatch fulltime, laptime;
+  fulltime.Start();
+  TDatime bgn;
+  TDatime start_time;
+  start_time.Set();
+  int nlap(0);
+
+  fChain->SetBranchStatus("*", 0);
+
+  // if (debug)
+  cout << "Setting branch status for "
+       << (isMC ? (isMG ? "MC (MG)" : "MC (Flat)") : (isZB ? "DATA (ZB)" : "DATA"))
+       << " and " << (isRun2 ? "Run2" : "Run3")
+       << " (isRun2=" << isRun2 << ", isRun3=" << isRun3 << ")"
+       << endl
+       << flush;
+
+  if (isMC)
+    fChain->SetBranchStatus("genWeight", 1);
+  if (isMC)
+    fChain->SetBranchStatus("Generator_binvar", 1); // pThat in Pythia8
+  if (isMC && !(isMG && isRun3))
+    fChain->SetBranchStatus("Pileup_pthatmax", 1);
+
+  if (isMC && reweightPU)
+  {
+    fChain->SetBranchStatus("Pileup_nTrueInt", 1);
+    fChain->SetBranchStatus("Pileup_nPU", 1);
+  }
+
+  if (isMC && (smearJets || doMCtruth))
+  {
+    cout << "Adding branches for GenJets ("
+         << (smearJets ? " smearJets" : "")
+         << (doMCtruth ? " doMCtruth" : "") << ")" << endl;
+    fChain->SetBranchStatus("Jet_genJetIdx", 1);
+    fChain->SetBranchStatus("nGenJet", 1);
+    fChain->SetBranchStatus("GenJet_pt", 1);
+    fChain->SetBranchStatus("GenJet_eta", 1);
+    fChain->SetBranchStatus("GenJet_phi", 1);
+    fChain->SetBranchStatus("GenJet_mass", 1);
+
+    if (doMCtruth)
+    {
+      fChain->SetBranchStatus("GenVtx_z", 1);
+      fChain->SetBranchStatus("PV_z", 1);
+    }
+
+    // At the value of _seed: the old question - should the seed of a rng be random itself?
+    // Here we prefer stability, but the user can vary the seed if necessary. Moreover, https://xkcd.com/221/
+    _seed = 4;
+    _mersennetwister = std::mt19937(_seed);
+  }
+
+  if (isMG)
+    fChain->SetBranchStatus("LHE_HT", 1); // HT in MadGraph
+
+  fChain->SetBranchStatus("run", 1);
+  fChain->SetBranchStatus("luminosityBlock", 1);
+  fChain->SetBranchStatus("event", 1);
+  // fChain->SetBranchStatus("Rho_fixedGridRhoAll",1);
+  if (isRun2)
+    fChain->SetBranchStatus("fixedGridRhoFastjetAll", 1);
+  if (isRun3)
+  //if (isRun3 || isMG )
+    fChain->SetBranchStatus("Rho_fixedGridRhoFastjetAll", 1);
+  //if (!TString(dataset.c_str()).Contains("2024") || !TString(dataset.c_str()).Contains("Winter24MGV14"))
+    //fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
+  //fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
+
+  // Listing of available triggers
+  vector<string> vtrg = {
+      "HLT_PFJet40",
+      "HLT_PFJet60",
+      "HLT_PFJet80",
+      "HLT_PFJet140",
+      "HLT_PFJet200",
+      "HLT_PFJet260",
+      "HLT_PFJet320",
+      "HLT_PFJet400",
+      "HLT_PFJet450",
+      "HLT_PFJet500",
+      "HLT_PFJetFwd40", //
+      "HLT_PFJetFwd60",
+      "HLT_PFJetFwd80",
+      "HLT_PFJetFwd140",
+      "HLT_PFJetFwd200",
+      "HLT_PFJetFwd260",
+      "HLT_PFJetFwd320",
+      "HLT_PFJetFwd400",
+      "HLT_PFJetFwd450",
+      "HLT_PFJetFwd500", //
+      "HLT_DiPFJetAve40",
+      "HLT_DiPFJetAve60",
+      "HLT_DiPFJetAve80",
+      "HLT_DiPFJetAve140",
+      "HLT_DiPFJetAve200",
+      "HLT_DiPFJetAve260",
+      "HLT_DiPFJetAve320",
+      "HLT_DiPFJetAve400",
+      "HLT_DiPFJetAve500",
+      "HLT_DiPFJetAve60_HFJEC",
+      "HLT_DiPFJetAve80_HFJEC",
+      "HLT_DiPFJetAve100_HFJEC",
+      "HLT_DiPFJetAve160_HFJEC",
+      "HLT_DiPFJetAve220_HFJEC",
+      "HLT_DiPFJetAve300_HFJEC"};
+
+  if (isZB)
+    vtrg.insert(vtrg.begin(), "HLT_ZeroBias");
+
+  if (isRun2 > 2)
+    vtrg.push_back("HLT_PFJet550");
+  //}
+
+  // vtrg.push_back("HLT_PFJetFwd15");
+  // vtrg.push_back("HLT_PFJetFwd25");
+  if (isRun2 > 2)
+  { // && dataset!="UL2017B") {
+    vtrg.push_back("HLT_PFJetFwd40");
+    vtrg.push_back("HLT_PFJetFwd60");
+    vtrg.push_back("HLT_PFJetFwd80");
+    vtrg.push_back("HLT_PFJetFwd140");
+    vtrg.push_back("HLT_PFJetFwd200");
+    vtrg.push_back("HLT_PFJetFwd260");
+    vtrg.push_back("HLT_PFJetFwd320");
+    vtrg.push_back("HLT_PFJetFwd400");
+    vtrg.push_back("HLT_PFJetFwd450");
+    vtrg.push_back("HLT_PFJetFwd500");
+  }
+
+  if (doMCtrigOnly && isMC) //Set doMCtrigOnly = true and comment vtrg.clear(); to see the list of triggers
+  {
+    vtrg.clear();
+    vtrg.push_back("HLT_MC");
+  }
+
+  if (isZB && !isMC)
+  {
+    vtrg.clear(); // no jet triggers from ZeroBias PD
+    vtrg.push_back("HLT_ZeroBias");
+  }
+
+  int ntrg = vtrg.size();
+
+  for (int i = 0; i != ntrg; ++i)
+  {
+    if (vtrg[i] != "HLT_MC")
+      fChain->SetBranchStatus(vtrg[i].c_str(), 1); 
+    if (mtrg[vtrg[i]] == 0)
+    {
+      cout << "Missing branch info for " << vtrg[i] << endl
+           << flush;
+    }
+    assert(mtrg[vtrg[i]] != 0);
+  }
+
+  fChain->SetBranchStatus("nJet", 1);
+  fChain->SetBranchStatus("Jet_btagPNetQvG", 1);
+  fChain->SetBranchStatus("Jet_btagUParTAK4QvG", 1);
+  fChain->SetBranchStatus("Jet_pt", 1);
+  fChain->SetBranchStatus("Jet_eta", 1);
+  fChain->SetBranchStatus("Jet_phi", 1);
+  fChain->SetBranchStatus("Jet_mass", 1);
+  fChain->SetBranchStatus("Jet_jetId", 1);
+
+  fChain->SetBranchStatus("Jet_rawFactor", 1);
+  if (isRun2)
+    fChain->SetBranchStatus("Jet_area", 1);
+
+  // bool doPFComposition = true;
+  if (doPFComposition)
+  {
+    fChain->SetBranchStatus("Jet_chHEF", 1);  // h+
+    fChain->SetBranchStatus("Jet_neHEF", 1);  // h0
+    fChain->SetBranchStatus("Jet_neEmEF", 1); // gamma
+    fChain->SetBranchStatus("Jet_chEmEF", 1); // e
+    fChain->SetBranchStatus("Jet_muEF", 1);   // mu
+    // fChain->SetBranchStatus("Jet_hfEmEF",1); // HFe
+    // fChain->SetBranchStatus("Jet_hfHEF",1);  // HFh
+  }
+
+  double Jet_l1rcFactor[nJetMax]; // For L1L2L3-RC type-I MET
+  if (isRun2)
+  {
+    // raw chs PF MET
+    fChain->SetBranchStatus("ChsMET_pt", 1);
+    fChain->SetBranchStatus("ChsMET_phi", 1);
+  }
+  else
+  {
+    // fChain->SetBranchStatus("PuppiMET_pt",1);
+    // fChain->SetBranchStatus("PuppiMET_phi",1);
+    fChain->SetBranchStatus("RawPuppiMET_pt", 1);
+    fChain->SetBranchStatus("RawPuppiMET_sumEt", 1);
+    fChain->SetBranchStatus("RawPuppiMET_phi", 1);
+    //fChain->SetBranchStatus("MET_pt", 1);
+    //fChain->SetBranchStatus("MET_sumEt", 1);
+  }
+
+  fChain->SetBranchStatus("Flag_METFilters", 1);
+  if (isRun2 || isRun3) //April 2, 2024: Same filters for UL Run2 and Run3
+  {
+    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Run_3_recommendations
+    fChain->SetBranchStatus("Flag_goodVertices", 1);
+    fChain->SetBranchStatus("Flag_globalSuperTightHalo2016Filter", 1);
+    fChain->SetBranchStatus("Flag_EcalDeadCellTriggerPrimitiveFilter", 1);
+    fChain->SetBranchStatus("Flag_BadPFMuonFilter", 1);
+    fChain->SetBranchStatus("Flag_BadPFMuonDzFilter", 1);
+    fChain->SetBranchStatus("Flag_hfNoisyHitsFilter", 1);
+    fChain->SetBranchStatus("Flag_eeBadScFilter", 1);
+    fChain->SetBranchStatus("Flag_ecalBadCalibFilter", 1);
+  }
+
+  // Trigger studies => TrigObjAK4 later (fixed now)
+  bool doTriggerMatch = false;
+  nTrigObjJMEAK4 = 0; // turn off
+  if (doTriggerMatch)
+  {
+    // https://github.com/cms-sw/cmssw/blob/CMSSW_12_4_8/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L136-L180
+    fChain->SetBranchStatus("nTrigObjJMEAK4", 1);
+    fChain->SetBranchStatus("TrigObjJMEAK4_pt", 1);
+    fChain->SetBranchStatus("TrigObjJMEAK4_eta", 1);
+    fChain->SetBranchStatus("TrigObjJMEAK4_phi", 1);
+  }
+
+  // List reference pT and abseta thresholds for triggers
+  mt["HLT_MC"] = range{10, 3000, 0, 5.2};
+  mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
+
+  mt["HLT_DiPFJetAve40"] = range{40, 85, 0, 5.2};
+  mt["HLT_DiPFJetAve60"] = range{85, 100, 0, 5.2};
+  mt["HLT_DiPFJetAve80"] = range{100, 155, 0, 5.2};
+  mt["HLT_DiPFJetAve140"] = range{155, 210, 0, 5.2};
+  mt["HLT_DiPFJetAve200"] = range{210, 300, 0, 5.2};
+  mt["HLT_DiPFJetAve260"] = range{300, 400, 0, 5.2};
+  mt["HLT_DiPFJetAve320"] = range{400, 500, 0, 5.2};
+  mt["HLT_DiPFJetAve400"] = range{500, 600, 0, 5.2};
+  mt["HLT_DiPFJetAve500"] = range{600, 6500, 0, 5.2};
+
+  // 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
+  double fwdeta = 3.139;  // was 2.853. 80% (100%) on negative (positive) side
+  double fwdeta0 = 2.964; // 2.853; // 40 and 260 up
+  mt["HLT_DiPFJetAve60_HFJEC"] = range{85, 100, fwdeta, 5.2};
+  mt["HLT_DiPFJetAve80_HFJEC"] = range{100, 125, fwdeta, 5.2};
+  mt["HLT_DiPFJetAve100_HFJEC"] = range{125, 180, fwdeta, 5.2};
+  mt["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
+  mt["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
+  mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
+
+  mt["HLT_PFJet40"] = range{40, 85, 0, 5.2};
+  mt["HLT_PFJet60"] = range{85, 100, 0, 5.2};
+  mt["HLT_PFJet80"] = range{100, 155, 0, 5.2};
+  mt["HLT_PFJet140"] = range{155, 210, 0, 5.2};
+  mt["HLT_PFJet200"] = range{210, 300, 0, 5.2};
+  mt["HLT_PFJet260"] = range{300, 400, 0, 5.2};
+  mt["HLT_PFJet320"] = range{400, 500, 0, 5.2};
+  mt["HLT_PFJet400"] = range{500, 600, 0, 5.2};
+  mt["HLT_PFJet450"] = range{500, 600, 0, 5.2};
+  mt["HLT_PFJet500"] = range{600, 6500, 0, 5.2};
+  mt["HLT_PFJet550"] = range{700, 6500, 0, 5.2};
+
+  mt["HLT_PFJetFwd40"] = range{40, 85, fwdeta0, 5.2};
+  mt["HLT_PFJetFwd60"] = range{85, 100, fwdeta, 5.2};
+  mt["HLT_PFJetFwd80"] = range{100, 155, fwdeta, 5.2};
+  mt["HLT_PFJetFwd140"] = range{155, 210, fwdeta, 5.2};
+  mt["HLT_PFJetFwd200"] = range{210, 300, fwdeta0, 5.2};
+  mt["HLT_PFJetFwd260"] = range{300, 400, fwdeta0, 5.2};
+  mt["HLT_PFJetFwd320"] = range{400, 500, fwdeta0, 5.2};
+  mt["HLT_PFJetFwd400"] = range{500, 600, fwdeta0, 5.2};
+  mt["HLT_PFJetFwd450"] = range{500, 600, fwdeta0, 5.2}; // x
+  mt["HLT_PFJetFwd500"] = range{600, 6500, fwdeta0, 5.2};
+
+  // For jetrate vs runs
+  mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
+  mi["HLT_MC"]       = range{15,6500,  0, 5.2};
+  mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
+  mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
+  mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
+  mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
+  mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0}; // 4
+  mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0}; // 5
+  mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0}; // 6
+  mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0}; // 7
+  mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0}; // 8
+  mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0}; // 9
+  //mi["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
+    
+  mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2}; //  10
+  mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2}; // 11
+  mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2}; // 12
+  mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2}; // 13
+  mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2}; // 14
+  mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2}; // 15
+  mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2}; // 16
+  mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2}; // 16
+  mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2}; // 17
+  mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2}; // 18
+  ///
+
+  if (debug)
+    cout << "Setting up JEC corrector" << endl
+         << flush;
+
+  // Redo JEC
+  // NB: could implement time dependence as in jetphys/IOV.h
+  FactorizedJetCorrector *jec(0), *jecl1rc(0), *jersfvspt(0);
+  string jerpath(""), jerpathsf("");
+  // jec = getFJC("","Winter22Run3_V1_MC_L2Relative","","");
+  // if (isRun2==0) {
+  // jec = getFJC("","Winter22Run3_V1_MC_L2Relative",
+  //		  isMC ? "":"Winter22Run3_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+  // }
+  //  2016APV (BCD, EF)
+
+  TH1D *pileupRatio = new TH1D("puRatio", "PURatio;;Ratio", 99, 0, 100);
+
+  if (dataset == "UL2016APVMG")
+  {
+    jec = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
+                 "Summer19UL16APV_V7_MC_L2Relative_AK4PFchs", "");
+    jecl1rc = getFJC("Summer19UL16APV_V7_MC_L1RC_AK4PFchs", "", "");
+    jerpath = "JRDatabase/textFiles/Summer20UL16APV_JRV3_MC/Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs.txt";
+    jerpathsf = "JRDatabase/textFiles/Summer20UL16APV_JRV3_MC/Summer20UL16APV_JRV3_MC_SF_AK4PFchs.txt";
+    jersfvspt = getFJC("", "Summer20UL2016APV_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
+  }
+  if (dataset == "UL2016BCD" || dataset == "UL2016BCD_ZB")
+  {
+    jec = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL16APV_RunBCD_V7_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2016EF" || dataset == "UL2016EF_ZB")
+  {
+    jec = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL16APV_RunEF_V7_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1RC_AK4PFchs", "", "");
+  }
+  // 2016 non-APV (GH)
+  if (dataset == "UL2016MG" || dataset == "UL2016Flat")
+  {
+    jec = getFJC("Summer19UL16_V7_MC_L1FastJet_AK4PFchs",
+                 "Summer19UL16_V7_MC_L2Relative_AK4PFchs", "");
+    jecl1rc = getFJC("Summer19UL16_V7_MC_L1RC_AK4PFchs", "", "");
+    // jec = getFJC("Summer20UL16_V1_MC_L1FastJet_AK4PFchs",
+    //		  "Summer20UL16_V1_MC_L2Relative_AK4PFchs","");
+    // jecl1rc = getFJC("Summer20UL16_V1_MC_L1RC_AK4PFchs","","");
+    jerpath = "JRDatabase/textFiles/Summer20UL16_JRV3_MC/Summer20UL16_JRV3_MC_PtResolution_AK4PFchs.txt";
+    jerpathsf = "JRDatabase/textFiles/Summer20UL16_JRV3_MC/Summer20UL16_JRV3_MC_SF_AK4PFchs.txt";
+    jersfvspt = getFJC("", "Summer20UL2016GH_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
+  }
+  if (dataset == "UL2016GH" || dataset == "UL2016GH_ZB")
+  {
+    jec = getFJC("Summer19UL16_RunFGH_V7_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL16_RunFGH_V7_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL16_RunFGH_V7_DATA_L1RC_AK4PFchs", "", "");
+    // jec = getFJC("Summer20UL16_RunGH_V1_DATA_L1FastJet_AK4PFchs",
+    //"Summer20UL16_RunGH_V1_DATA_L2Relative_AK4PFchs",
+    //"Summer20UL16_RunGH_V1_DATA_L2L3Residual_AK4PFchs");
+    //"Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
+    // jecl1rc = getFJC("Summer20UL16_RunGH_V1_DATA_L1RC_AK4PFchs","","");
+  }
+  // 2017
+  if (dataset == "UL2017MG")
+  {
+    jec = getFJC("Summer19UL17_V6_MC_L1FastJet_AK4PFchs",
+                 "Summer19UL17_V6_MC_L2Relative_AK4PFchs", "");
+    jecl1rc = getFJC("Summer19UL17_V6_MC_L1RC_AK4PFchs", "", "");
+    jerpath = "JRDatabase/textFiles/Summer19UL17_JRV3_MC/Summer19UL17_JRV3_MC_PtResolution_AK4PFchs.txt";
+    jerpathsf = "JRDatabase/textFiles/Summer19UL17_JRV3_MC/Summer19UL17_JRV3_MC_SF_AK4PFchs.txt";
+    jersfvspt = getFJC("", "Summer20UL2017_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
+  }
+  if (dataset == "UL2017B" || dataset == "UL2017B_ZB")
+  {
+    jec = getFJC("Summer19UL17_RunB_V6_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL17_RunB_V6_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL17_RunB_V6_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL17_RunB_V6_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2017C" || dataset == "UL2017C_ZB")
+  {
+    jec = getFJC("Summer19UL17_RunC_V6_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL17_RunC_V6_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL17_RunC_V6_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL17_RunC_V6_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2017D" || dataset == "UL2017D_ZB")
+  {
+    jec = getFJC("Summer19UL17_RunD_V6_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL17_RunD_V6_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL17_RunD_V6_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL17_RunD_V6_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2017E" || dataset == "UL2017E_ZB")
+  {
+    jec = getFJC("Summer19UL17_RunE_V6_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL17_RunE_V6_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL17_RunE_V6_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL17_RunE_V6_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2017F" || dataset == "UL2017F_ZB")
+  {
+    jec = getFJC("Summer19UL17_RunF_V6_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL17_RunF_V6_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL17_RunF_V6_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL17_RunF_V6_DATA_L1RC_AK4PFchs", "", "");
+  }
+  // 2018
+  if (dataset == "UL2018MG" || TString(dataset.c_str()).Contains("UL2018MG") || TString(dataset.c_str()).Contains("UL2018MC"))
+  {
+    jec = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
+                 "Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
+    jecl1rc = getFJC("Summer19UL18_V5_MC_L1RC_AK4PFchs", "", "");
+    //jerpath = "JRDatabase/textFiles/Summer19UL18_JRV2_MC/Summer19UL18_JRV2_MC_PtResolution_AK4PFchs.txt";
+    //jerpathsf = "JRDatabase/textFiles/Summer19UL18_JRV2_MC/Summer19UL18_JRV2_MC_SF_AK4PFchs.txt";
+    //jersfvspt = getFJC("", "Summer20UL2018_ZB_v26c_JRV3_MC_SF_AK4PFchs", "");
+    jerpath = "";
+    jerpathsf = "";
+    //jersfvspt = "";
+  }
+  if (dataset == "UL2018A" || dataset == "UL2018A_ZB")
+  {
+    jec = getFJC("Summer19UL18_RunA_V5_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL18_RunA_V5_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL18_RunA_V5_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2018B" || dataset == "UL2018B_ZB")
+  {
+    jec = getFJC("Summer19UL18_RunB_V5_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL18_RunB_V5_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL18_RunB_V5_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2018C" || dataset == "UL2018C_ZB")
+  {
+    jec = getFJC("Summer19UL18_RunC_V5_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL18_RunC_V5_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL18_RunC_V5_DATA_L1RC_AK4PFchs", "", "");
+  }
+  if (dataset == "UL2018D" || dataset == "UL2018D_ZB" ||
+      dataset == "UL2018D1" || dataset == "UL2018D2")
+  {
+    jec = getFJC("Summer19UL18_RunD_V5_DATA_L1FastJet_AK4PFchs",
+                 "Summer19UL18_RunD_V5_DATA_L2Relative_AK4PFchs",
+                 "Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
+    jecl1rc = getFJC("Summer19UL18_RunD_V5_DATA_L1RC_AK4PFchs", "", "");
+  }
+
+  // 2022
+  //  Align JECs with
+  //  https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
+  if (dataset == "2022C" || dataset == "2022C_ZB" || dataset == "2022C_prompt" || dataset == "2022C_ZB_prompt")
+  {
+    jec = getFJC("",                                       // Winter22Run3_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
+                                                           //"Winter22Run3_RunC_V2_DATA_L2Relative_AK4PFPuppi",
+                 "Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
+                                                           // v33 and prev "Summer22_RunCD_V2_MPF_L2Residual_AK4PFPuppi");
+                 // "Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
+                 "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
+    //"");//"Winter22Run3_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+  }
+  if (dataset == "2022D" || dataset == "2022D_ZB" || dataset == "2022D_prompt" || dataset == "2022D_ZB_prompt")
+  {
+    jec = getFJC("",                                       // Winter22Run3_RunD_V2_DATA_L1FastJet_AK4PFPuppi",
+                                                           //"Winter22Run3_RunD_V2_DATA_L2Relative_AK4PFPuppi",
+                 "Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
+                                                           // v33 and prev "Summer22_RunCD_V2_MPF_L2Residual_AK4PFPuppi");
+                 //"Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
+                 "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
+    //"");//"Winter22Run3_RunD_V2_DATA_L2L3Residual_AK4PFPuppi");
+  }
+  if (dataset == "2022E" || dataset == "2022E_ZB")
+  {
+    jec = getFJC("",                                             // Summer22EEPrompt22_RunF_V1_DATA_L1FastJet_AK4PFPuppi",
+                                                                 //"Summer22EEPrompt22_RunF_V1_DATA_L2Relative_AK4PFPuppi",
+                 "Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
+                                                                 // v33 and prev "Summer22EE_RunE_V2_MPF_L2Residual_AK4PFPuppi");
+                 // "Run22E-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
+                 "Summer22EE-22Sep2023_Run2022E_V3_DATA_L2L3Residual_AK4PFPuppi");
+    //"Summer22EEPrompt22_RunE_V2_L2Residual_AK4PFPuppi");
+    //"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
+  }
+  // if (dataset=="2022F" || dataset=="2022F_ZB") {
+  if (TString(dataset.c_str()).Contains("2022F"))
+  {
+    jec = getFJC("",                                             // Summer22EEPrompt22_RunF_V1_DATA_L1FastJet_AK4PFPuppi",
+                                                                 //"Summer22EEPrompt22_RunF_V1_DATA_L2Relative_AK4PFPuppi",
+                 "Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
+                                                                 //"Summer22EEPrompt22_RunF_V2_L2Residual_AK4PFPuppi"
+                 // "Run22F-Prompt_DATA_L2L3Residual_AK4PFPuppi"
+                 "Summer22EEPrompt22_Run2022F_V3_DATA_L2L3Residual_AK4PFPuppi");
+    //"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
+  }
+  if (dataset == "2022G" || dataset == "2022G_ZB")
+  {
+    jec = getFJC("",                                             // Summer22EEPrompt22_RunG_V1_DATA_L1FastJet_AK4PFPuppi",
+                                                                 //"Summer22EEPrompt22_RunG_V1_DATA_L2Relative_AK4PFPuppi",
+                 "Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
+                                                                 // "Summer22EEPrompt22_RunG_V2_L2Residual_AK4PFPuppi"
+                 // "Run22G-Prompt_DATA_L2L3Residual_AK4PFPuppi"
+                 "Summer22EEPrompt22_Run2022G_V3_DATA_L2L3Residual_AK4PFPuppi");
+    //"");//"Summer22EEPrompt22_RunG_V1_DATA_L2L3Residual_AK4PFPuppi");
+  }
+
+  // 22/23 MC
+  if (dataset == "Summer22" ||
+      dataset == "Summer22Flat" ||
+      TString(dataset.c_str()).Contains("Summer22MC") ||
+      TString(dataset.c_str()).Contains("Summer22MG"))
+  {
+    jec = getFJC("",                                       // Winter22Run3_V2_MC_L1FastJet_AK4PFPuppi",
+                                                           //"Winter22Run3_V2_MC_L2Relative_AK4PFPuppi",
+                 "Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
+                 "");                                      // Winter22Run3_V2_MC_L2L3Residual_AK4PFPuppi");
+    //jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
+    //jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
+    jerpath = "";
+    jerpathsf = "";
+    useJERSFvsPt = false;
+  }
+  if (dataset == "Summer22EE" ||
+      dataset == "Summer22EEFlat" ||
+      TString(dataset.c_str()).Contains("Summer22EEMG"))
+  {
+    jec = getFJC("",                                             // Summer22EEPrompt22_V1_MC_L1FastJet_AK4PFPuppi",
+                                                                 //"Summer22EEPrompt22_V1_MC_L2Relative_AK4PFPuppi",
+                 "Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
+                 "");                                            // Summer22EEPrompt22_V1_MC_L2L3Residual_AK4PFPuppi");
+    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt";
+    jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt";
+    //jerpath = "";
+    //jerpathsf = "";
+    useJERSFvsPt = false;
+  }
+  if (dataset == "Summer23" ||
+      dataset == "Summer23MCFlat" || dataset == "Summer23MG" || TString(dataset.c_str()).Contains("Summer23MC") ||
+      dataset == "Summer23MCBPixFlat" || dataset == "Summer23BPIXMG" || TString(dataset.c_str()).Contains("Summer23"))
+  {
+    if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPixFlat") || TString(dataset.c_str()).Contains("Summer23MCBPix")) {
+      jec = getFJC("",
+                  "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
+                  "");
+      //jerpathsf = "";
+      jersfvspt = getFJC("", "", "");
+      jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
+      //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
+    } else {
+      jec = getFJC("", 
+                  "Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
+                  "");
+      //jerpathsf = "";
+      jersfvspt = getFJC("", "", "");
+      jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
+      //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV1_MC_SF_AK4PFPuppi", "");
+      // Resolution SF version 2: https://indico.cern.ch/event/1399194/
+      // April 3, 2024
+      //jersfvspt = getFJC("", "Summer23_2023Cv123_JRV2_MC_SF_AK4PFPuppi", "");
+      //jersfvspt = getFJC("", "Summer23_2023Cv4_JRV2_MC_SF_AK4PFPuppi", "");
+    }
+    //jec = getFJC("", // Winter23Prompt23_V2_MC_L1FastJet_AK4PFPuppi",
+    //             "Winter23Prompt23_V2_MC_L2Relative_AK4PFPuppi",
+    //             "");                                                                                   // Winter23Prompt23_V2_MC_L2L3Residual_AK4PFPuppi");
+    //jerpath = "";
+    //jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
+    jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+    useJERSFvsPt = false; //Nestor, 24 July, 2024.
+
+    if (reweightPU)
+    {
+      if (TString(dataset.c_str()).Contains("Summer23MGBPix")) {
+        TFile f("luminosityscripts/PUWeights/Summer23BPix_PUWeight.root");
+        pileupRatio = (TH1D *)f.Get("pileup");
+        pileupRatio->SetDirectory(0);
+        // Print mean, min weight, max weight
+        cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+        cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+        cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+  
+      } else {
+        TFile f("luminosityscripts/PUWeights/Summer23_PUWeight.root");
+        pileupRatio = (TH1D *)f.Get("pileup");
+        pileupRatio->SetDirectory(0);
+        // Print mean, min weight, max weight
+        cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+        cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+        cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+  
+      }
+    }
+  }
+
+  // 2023
+  // if (dataset=="2023B" || dataset=="2023B_ZB") {
+  // jec = getFJC("Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
+  //		  "Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
+  //		  "Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+  // }
+
+  if (dataset == "2023B" || dataset == "2023B_ZB" || dataset == "2023BCv123" || 
+      dataset == "2023BCv123_ZB" || dataset == "2023Cv123" || dataset == "2023Cv123_ZB" ||
+      dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt")
+  {
+    jec = getFJC("",                                                               // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
+                                                                                   //"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
+                 "Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                         // Mikel
+                                                                                   // "Run23C123-Prompt_DATA_L2L3Residual_AK4PFPuppi"
+                 "Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+  }
+
+  if (dataset == "2023Cv4" || dataset == "2023Cv4_ZB" || 
+      dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt")
+  {
+    jec = getFJC("",                                                             // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
+                                                                                 //"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
+                 "Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                       // Mikel
+                                                                                 //"Run23C4-Prompt_DATA_L2L3Residual_AK4PFPuppi"
+                 "Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+  }
+
+  if (dataset == "2023D" || dataset == "2023D_ZB" ||
+      dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt")
+  {
+    jec = getFJC("",                                                           // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
+                                                                               //"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
+                 "Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",                     // Mikel
+                                                                               //"Run23D-Prompt_DATA_L2L3Residual_AK4PFPuppi"
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+		 "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+  }
+
+  if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
+  {
+    jec = getFJC("",
+		 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI"
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
+                 //"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
+                 "");
+    jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
+    //jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
+    jerpathsf = "";
+    //jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
+    //jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
+    jersfvspt = getFJC("", "", "");;
+
+    useJERSFvsPt = true;
+  }
+
+  if (TString(dataset.c_str()).Contains("Winter24MG"))
+  {
+    jec = getFJC("",
+                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                "");
+    //jerpathsf = "";
+    jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
+    jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
+    //jersfvspt = getFJC("", "", "");
+    jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+    //jerpath = "";
+    useJERSFvsPt = true; //Nestor, Aug16, 2024.
+
+    if (reweightPU)
+    {
+      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
+        TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
+        pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F");
+        pileupRatio->SetDirectory(0);
+        // Print mean, min weight, max weight
+        cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+        cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+        cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+
+      } else {
+        TFile f("luminosityscripts/PUWeights/Winter24MG_PUWeight.root");
+        pileupRatio = (TH1D *)f.Get("pileup");
+        pileupRatio->SetDirectory(0);
+        // Print mean, min weight, max weight
+        cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+        cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+        cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+
+      }
+    }
+  }
+
+
+
+  if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
+  {
+    if (TString(dataset.c_str()).Contains("2024BR"))
+    {
+      jec = getFJC(""
+                   "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                   //"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
+    }
+    else {
+      jec = getFJC("",
+                   "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                   //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                   //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                   //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+    }
+  }
+
+  if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
+  { 
+    if (TString(dataset.c_str()).Contains("2024CR"))
+    {
+      jec = getFJC(""
+                   "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+		   //"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
+    }
+    else if (dataset == "2024CS" || dataset == "2024CT")
+    {
+      jec = getFJC(""
+                   "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                   //"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
+    }
+
+    else {
+      jec = getFJC("",
+                   "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                   //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                   //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                   //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                   //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                   "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+    }
+  }
+
+  if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+  }
+
+  if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024E_V5M_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (TString(dataset.c_str()).Contains("2024F")  || dataset == "2024F_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                 //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                 //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 //"Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                 "Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if (dataset == "2024G"  || dataset == "2024G_ZB")
+  {
+    jec = getFJC("",
+                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                 "Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
+
+  }
+
+  if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
+    cout << "Missing files for " << dataset << endl
+         << flush;
+  assert(jec);
+  // assert(jecl1rc);
+
+  if (debug)
+    cout << "Setting up JER smearing" << endl
+         << flush;
+
+  // Smear JER
+  // NB: could implement time dependence as in jetphys/IOV.h
+  JME::JetResolution *jer(0);
+  JME::JetResolutionScaleFactor *jersf(0);
+  if (isMC && smearJets)
+  {
+    cout << jerpath << endl
+         << flush;
+    if (!useJERSFvsPt)
+      cout << jerpathsf << endl
+           << flush;
+    if (jerpath == "" || (jerpathsf == "" && !useJERSFvsPt))
+      cout << "Missing JER file paths for " << dataset << endl
+           << flush;
+    assert(jerpath != "");
+    assert(jerpathsf != "" || useJERSFvsPt);
+    assert(jersfvspt || !useJERSFvsPt);
+    jer = new JME::JetResolution(jerpath.c_str());
+    if (!useJERSFvsPt)
+      jersf = new JME::JetResolutionScaleFactor(jerpathsf.c_str());
+      //cout << "jersf from the SF file" << endl
+        //   << flush;
+    if (!jer || (!jersf && !useJERSFvsPt) || (!jersfvspt && useJERSFvsPt))
+      cout << "Missing JER files for " << dataset << endl
+           << flush;
+  }
+
+  TLorentzVector p4rawmet, p4t1met, p4mht, p4l1rc, p4dj;
+  // TLorentzVector p4, p4s, p4mht, p4mht2, p4mhtc, p4mhtc3, p4t, p4p;
+  TLorentzVector p4, /*p4raw,*/ p4g, p4s, p4t, p4p;
+  TLorentzVector p4lead, p4recoil; //, p4other;
+  TLorentzVector p4leadRES, p4recoilRES;
+  TLorentzVector p4b3, p4b3r, p4b3l, p4m;
+  TLorentzVector p4b, p4bt, p4bp, p4bx, p4d, p4dx;
+  TLorentzVector p4c, p4cx, p4f, p4fx, p4l, p4r;
+  TLorentzVector p4m0, p4m2, p4mn, p4mu; //, p4mo;
+  TLorentzVector p4m3, p4mn3, p4mu3;
+  TLorentzVector p4corrjets, p4rcjets, p4rawjets;
+  TFile *fout = new TFile(Form("rootfiles/%s/jmenano_%s_out_%s_%s.root",
+                               version.c_str(),
+                               isMC ? "mc" : "data",
+                               dataset.c_str(), version.c_str()),
+                          "RECREATE");
+
+  // Monitor trigger rates
+  TH1D *htrg = new TH1D("htrg", "Triggers;Trigger;N_{events}",
+                        vtrg.size(), 0, vtrg.size());
+  //cout << "AAAA :"  <<htrg->GetNbinsX() << endl;
+  for (int i = 1; i != htrg->GetNbinsX() + 1; ++i)
+  {
+    htrg->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
+  }
+  //cout << "BBB :"  <<htrg->GetNbinsX() << endl;
+
+  // trigger vs lumi
+  TH2D *h_trgvslumi = new TH2D("h_trgvslumi", "Triggers;Trigger;Lumi",
+                        vtrg.size(), 0, vtrg.size(), 100, 0, 1);
+  for (int i = 1; i != h_trgvslumi->GetNbinsX() + 1; ++i)
+  {
+    h_trgvslumi->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
+  }
+
+  // trigger vs pu
+  TH2D *h_trgvspu = new TH2D("h_trgvspu", "Triggers;Trigger;PU",
+                        vtrg.size(), 0, vtrg.size(), 100, 0, 100);
+  for (int i = 1; i != h_trgvspu->GetNbinsX() + 1; ++i)
+  {
+    h_trgvspu->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
+  }
+              
+  if (debug)
+    cout << "Setting up histograms" << endl
+         << flush;
+
+  // Setup HT bin weighting and monitoring
+  TH1D *hxsec(0), *hnevt(0), *hnwgt(0), *hLHE_HT(0), *hLHE_HTw(0), *hHT(0), *hHT_Now(0), *hHT_MCw(0), *hHT_w(0);
+  double vht2[] = {0, 25, 50, 100, 200, 300, 500, 700, 1000, 1500, 2000, 13800};
+  const int nht2 = sizeof(vht2) / sizeof(vht2[0]) - 1;
+  double vht3[] = {0, 40, 70, 100, 200, 400, 600, 800, 1000, 1200, 1500, 2000,
+                   13800};
+  const int nht3 = sizeof(vht3) / sizeof(vht3[0]) - 1;
+  const double *vht = (isRun3 ? &vht3[0] : &vht2[0]);
+  const int nht = (isRun3 ? nht3 : nht2);
+  int nMG(0), sumwMG(0);
+  if (isMG)
+  {
+
+    hxsec = new TH1D("hxsec", ";H_{T} (GeV);pb", nht, vht);
+    hnevt = new TH1D("hnevt", ";H_{T} (GeV);N_{evt}", nht, vht);
+    hnwgt = new TH1D("hnwgt", ";H_{T} (GeV);Sum of weights", nht, vht);
+    hLHE_HT = new TH1D("hLHE_HT", ";H_{T} (GeV);N_{evt} (unweighted)", nht, vht);
+    hLHE_HTw = new TH1D("hLHE_HTw", ";H_{T} (GeV);N_{evt} (weighted)", nht, vht);
     hHT = new TH1D("hHT", ";H_{T} (GeV);N_{evt} (weighted)", 2490, 10, 2500);
     hHT_Now = new TH1D("hHT_Now", ";H_{T} (GeV);N_{evt} (unweighted)", 2490, 10, 2500);
     hHT_MCw = new TH1D("hHT_MCw", ";H_{T} (GeV);N_{evt} (MC weight event)", 2490, 10, 2500);
@@ -2883,7 +2456,6 @@ if (isMG)
     } // incjet
 
     // Dijet per trigger
-    //LoadLumi()
     if (doDijet)
     {
       if (debug)
@@ -4183,31 +3755,6 @@ if (isMG)
       Jet_CF[i] = 1.;
     } // reset Jet_CF
 
-
-/*
-    std::string triggerString(double pt, double eta) {
-        std::map<std::string, range> *triggers;
-        if (analysis == "ismultijet") triggers = &mi;
-        else if (analysis == "isdijet") triggers = &md;
-        else if (analysis == "isdijet2") triggers = &md2;
-        else {
-            std::cerr << "Unknown analysis type: " << analysis << std::endl;
-            return "HLT_ZeroBias";
-        }
-
-        for (const auto &entry : *triggers) {
-            const std::string &trigger = entry.first;
-            const range &r = entry.second;
-            if (pt > r.pt_min && pt <= r.pt_max && eta >= r.eta_min && eta <= r.eta_max) {
-                return trigger;
-            }
-        }
-
-    return "HLT_ZeroBias"; // Default
-    } 
-
-
-*/
     if (isMC && reweightPU)
     {
       assert(pileupRatio);
@@ -4983,25 +4530,6 @@ if (isMG)
 
             dijetHistos *h = mhdj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
-
-            bool doPU_per_trigger = true;
-            if (doPU_per_trigger){
-               get_PU_hist("PUWeight2024F");
-               //get_weight(md, ptavp2, eta, w, "ptavp2");
-	       get_weight("HLT_PFJet500", ptavp2, eta, w, "ptavp2");
-               //std::cout << "weight" << w_ptavp2 << std::endl;
-            }
-  	    /*
-            if (doPU_per_trigger) {
-            // Access histograms stored in pu_hist_map
-               for (const auto& entry : pu_hist_map) {
-                   std::cout << "Trigger: " << entry.first << std::endl;
-                   //std::cout << "Trigger: " << entry.first << ", Histogram: " << entry.second->GetName() << std::endl;
-               }
-            } else {
-                std::cerr << "Failed to retrieve histograms." << std::endl;
-            }
-            */
 
             h->h2pteta_aball->Fill(eta, ptavp2, w);
             h->h2pteta_adall->Fill(eta, ptave, w);
