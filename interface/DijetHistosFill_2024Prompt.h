@@ -49,13 +49,14 @@ public :
    double          w_ptave;
    double          w_pttag;
    double          w_ptprobe;
+   double          w_PUReweight;
+   double          PU_weight;
    map<string, map<int, double>> mlumi;
    map<string, map<int, int> > _prescales;
    map<int, map<int, int> > _json;
    //map<int, map<int, float> > _lums;
    map<int, float> _lums;
    double _lumsum;
-   double w_PUReweight;
    std::vector<double> _runNumberBin;
    map<int, map<int, float> > _lums2;
    map<int, map<int, float> > _avgpu;
@@ -3556,7 +3557,8 @@ public :
    // PU Reweighting
    void get_PU_hist(const std::string& dataset);
    //void get_weight(const std::map<std::string, struct range>& trg_map, float pt, float eta, double weight, string pt_analysis);
-   void get_weight(string trg_name, float pt, float eta, double weight, string pt_analysis);
+   //void get_weight(string trg_name, float pt, float eta, double weight, string pt_analysis);
+   void get_weight(float pt, float eta, string pt_analysis, string analysis);
    //
    bool LoadJSON(string json);
    bool LoadLumi();
