@@ -72,6 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v101. Process Winter24MGV14 without smearing. Winter24PU applied for 2024F.
+// v100.Process Winter24MGV14 without smearing to compare the processing time. Winter24MGv14 PU.
+// v99. Process 2024G with the new JSON file: Cert_Collisions2024_378981_385194_Golden.json, Collisions24_13p6TeV_378981_385568_DCSOnly_TkPx.json. 
+// v98. PU reweighting applied for PFJet500 trigger for Winter24MGV14 for all eras.
 // v97. Function to implement PU reweighting per trigger. (For now is just a test, not completed yet)
 // v96. Test for PFJet500 trigger for PU reweighting applied as a single file, no pt either eta treshold. Winter24MGV14. 
 // v95. Adding pttag noveto histograms.

@@ -41,7 +41,7 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = true;
+bool smearJets = false;
 bool useJERSFvsPt = true; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
@@ -49,6 +49,7 @@ std::mt19937 _mersennetwister;
 
 // Do PU reweighting
 bool reweightPU = true;
+bool doPU_per_trigger = true;
 
 // Activate modules
 bool doJetveto = true; // eta-phi maps
@@ -208,6 +209,11 @@ std::map<std::string, struct range> mt;
 // Hardcoded pT, eta thresholds for each trigger
 // used in e.g. jetrate
 std::map<std::string, struct range> mi;
+std::map<std::string, struct range> md;
+std::map<std::string, struct range> md2;
+std::map<std::string, struct range> md2tc;
+std::map<std::string, struct range> md2pf;
+std::map<std::string, struct range> mj;
 
 // CLASS DEFINITIONS
 class mctruthHistos
@@ -263,7 +269,7 @@ public:
   TH2D *h2jtvht, *h2jtoht;
 
   // (Optional) composition plots
-  TProfile2D *p2pt, *p2rho, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;
+  TProfile2D *p2pt, *p2rho, *p2rho_PURW, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13;
   // Related to the tails issue. May 17, 2024. Nestor
   TH2D *h2chf13;
@@ -460,9 +466,10 @@ FactorizedJetCorrector *getFJC(string l1 = "", string l2 = "", string res = "",
 /////////////////////////
 //Get the PU from the root files
 /////////////////////////
-void DijetHistosFill::get_PU_hist(const std::string& dataset) {
+void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
     // Open the ROOT file
-    std::string file_path = "luminosityscripts/PUWeights/PU_weights_2024_trgs.root";
+    //std::string file_path = "luminosityscripts/PUWeights/PU_weights_2024_trgs.root";
+    std::string file_path = "luminosityscripts/PUWeights/PU_weights_2024_trgs_v2.root";
     TFile* root_file = TFile::Open(file_path.c_str(), "READ");
 
     // Check if the file opened successfully
@@ -472,15 +479,20 @@ void DijetHistosFill::get_PU_hist(const std::string& dataset) {
     }
 
     // Get the directory corresponding to the dataset
-    TDirectory* dir = (TDirectory*)root_file->Get(dataset.c_str());
+    //TDirectory* dir = (TDirectory*)root_file->Get(PUdataset);
+    TDirectory* dir = (TDirectory*)root_file->Get(PUdataset.c_str());
     if (!dir) {
-        std::cerr << "Directory " << dataset << " not found in file." << std::endl;
+        std::cerr << "Directory " << PUdataset << " not found in file." << std::endl;
         root_file->Close();
         return;
+    } else{
+        std::cerr << "Directory " << PUdataset << " found in file." << std::endl;
     }
+
 
     // List of triggers
     std::vector<std::string> vtrg = {
+	"HLT_ZeroBias",
         "HLT_PFJet40", "HLT_PFJet60", "HLT_PFJet80", "HLT_PFJet140", "HLT_PFJet200",
         "HLT_PFJet260", "HLT_PFJet320", "HLT_PFJet400", "HLT_PFJet450", "HLT_PFJet500",
         "HLT_PFJetFwd40", "HLT_PFJetFwd60", "HLT_PFJetFwd80", "HLT_PFJetFwd140", "HLT_PFJetFwd200",
@@ -500,138 +512,53 @@ void DijetHistosFill::get_PU_hist(const std::string& dataset) {
         TH1D* hist = (TH1D*)dir->Get(hist_name.c_str());
 	//std::cerr << "hist name string " << hist_name.c_str() << std::endl;
 
-        if (hist) {
-            pu_hist_map[trg] = hist;
-        } //else {
-            //std::cerr << "Histogram " << hist_name << " not found in directory " << dataset << std::endl;
-        //}
+        if (hist && !hist->IsZombie() && hist->InheritsFrom(TH1::Class())) {
+            //std::cout << "Found histogram " << hist_name << " in directory." << std::endl;
+            TH1D* cloned_hist = (TH1D*)hist->Clone();
+            if (cloned_hist) {
+		cloned_hist->SetDirectory(0);
+                pu_hist_map[trg] = cloned_hist;
+                // Verification step: Print histogram name and number of bins
+                //std::cout << "Histogram " << hist_name << " added to pu_hist_map with " 
+                  //        << cloned_hist->GetNbinsX() << " bins." << std::endl;
+            } else {
+                std::cerr << "Failed to clone histogram " << hist_name << std::endl;
+            }
+        } else {
+            std::cerr << "Histogram " << hist_name << " not found in directory " << PUdataset << std::endl;
+        }
     }
 
     // Close the ROOT file
     root_file->Close();
 }
+
+
+////
+// Function to verify the mapping is correct
+////
+void DijetHistosFill::print_PU_hist_map() const {
+    for (const auto& pair : pu_hist_map) {
+        if (pair.second && pair.second->InheritsFrom(TH1::Class())) {
+            std::cout << "Trigger: " << pair.first
+                      << ", Histogram: " << pair.second->GetName()
+                      << std::endl;
+        } else {
+            std::cerr << "Trigger: " << pair.first << " has a null or invalid histogram." << std::endl;
+        }
+    }
+}
+
 /////////////////////////
 //End PU from the root files
 /////////////////////////
 //// Function to get the PU_weight
 /////////////////////////
-void DijetHistosFill::get_weight(float pt, float eta, string pt_analysis, string analysis) {
-    
+void DijetHistosFill::get_weight(float pt, float eta, string analysis) {
+
     eta = std::abs(eta);
-    //define the map
-    struct range {
-      int ptmin;
-      int ptmax;
-      double absetamin;
-      double absetamax;
-    };
-    std::map<std::string, struct range> md;
-    std::map<std::string, struct range> md2;
-    std::map<std::string, struct range> md2tc;
-    std::map<std::string, struct range> md2pf;
-    std::map<std::string, struct range> mj;
-    std::map<std::string, struct range> mi;
-    double fwdeta = 3.139; // was 2.853. 80% (100%) on negative (positive) side
-    double fwdeta0 = 2.964;//2.853; // 40 and 260 up
-    double fwdetad = 2.853;
-    //doDijet
-    md["HLT_DiPFJetAve40"]  = range{40,  85,  0, 5.2};
-    md["HLT_DiPFJetAve60"]  = range{85,  100, 0, fwdeta};
-    md["HLT_DiPFJetAve80"]  = range{100, 155, 0, fwdeta};
-    md["HLT_DiPFJetAve140"] = range{155, 250, 0, fwdeta};
-    md["HLT_DiPFJetAve200"] = range{250, 300, 0, fwdeta0}; // 210->250
-    md["HLT_DiPFJetAve260"] = range{300, 400, 0, fwdeta0};
-    md["HLT_DiPFJetAve320"] = range{400, 500, 0, fwdeta0};
-    md["HLT_DiPFJetAve400"] = range{500, 600, 0, fwdeta0};
-    md["HLT_DiPFJetAve500"] = range{600,3000, 0, fwdeta0};
-
-    md["HLT_DiPFJetAve60_HFJEC"]  = range{85,  100, fwdeta, 5.2};
-    md["HLT_DiPFJetAve80_HFJEC"]  = range{100, 125, fwdeta, 5.2};
-    md["HLT_DiPFJetAve100_HFJEC"] = range{125, 180, fwdeta, 5.2};
-    md["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
-    md["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
-    md["HLT_DiPFJetAve300_HFJEC"] = range{350,3000, fwdeta0, 5.2};
-
-    //doDijet2
-    md2["HLT_DiPFJetAve40"]  = range{59,  86,  0, 5.2};
-    md2["HLT_DiPFJetAve60"]  = range{86,  110, 0, fwdetad};
-    md2["HLT_DiPFJetAve80"]  = range{110, 170, 0, fwdetad};
-    md2["HLT_DiPFJetAve140"] = range{170, 236, 0, fwdetad};
-    md2["HLT_DiPFJetAve200"] = range{236, 302, 0, fwdetad};
-    md2["HLT_DiPFJetAve260"] = range{302, 373, 0, fwdetad};
-    md2["HLT_DiPFJetAve320"] = range{373, 460, 0, fwdetad};
-    md2["HLT_DiPFJetAve400"] = range{460, 575, 0, fwdetad};
-    md2["HLT_DiPFJetAve500"] = range{575,6500, 0, fwdetad};
-
-    md2["HLT_DiPFJetAve60_HFJEC"]  = range{86,  110, fwdetad, 5.2};
-    md2["HLT_DiPFJetAve80_HFJEC"]  = range{110, 132, fwdetad, 5.2};
-    md2["HLT_DiPFJetAve100_HFJEC"] = range{132, 204, fwdetad, 5.2};
-    md2["HLT_DiPFJetAve160_HFJEC"] = range{204, 279, fwdetad, 5.2};
-    md2["HLT_DiPFJetAve220_HFJEC"] = range{279, 373, fwdetad, 5.2};
-    md2["HLT_DiPFJetAve300_HFJEC"] = range{373,3000, fwdetad, 5.2};
-
-    //doDijet_probe
-    md2pf["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
-    md2pf["HLT_MC"]       = range{15,6500,  0, 5.2};
-    md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-    md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-    md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-    md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
-    md2pf["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
-    md2pf["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
-    md2pf["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
-    md2pf["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
-    md2pf["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-
-    md2pf["HLT_PFJetFwd40"]  = range{49,  84,  fwdetad, 5.2};   //Added to check HLT PFJetFwd. Nestor. April 25, 2024.
-    md2pf["HLT_PFJetFwd60"]  = range{84,  114, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd80"]  = range{114, 196, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd140"] = range{196, 272, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd200"] = range{272, 330, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd260"] = range{330, 395, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd320"] = range{395, 468, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd400"] = range{468, 548, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd450"] = range{548, 686, fwdetad, 5.2};
-    md2pf["HLT_PFJetFwd500"] = range{686,6500, fwdetad, 5.2};   //
-
-    //doDijet2_tag
-    md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
-    md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
-    md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-    md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-    md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-    md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
-    md2tc["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
-    md2tc["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
-    md2tc["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
-    md2tc["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
-    md2tc["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-
-    //doInc, doMultijets, doJetveto
-    mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0};
-    mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};
-    mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta};
-    mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
-    mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0};
-    mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0};
-    mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0};
-    mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0};
-    mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0};
-    mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0};
-
-    mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2};
-    mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2};
-    mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2};
-    mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2};
-    mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2};
-    mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2};
-    mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2};
-    mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2};
-    mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2};
-    mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
-
+    
     std::map<std::string, struct range>* selected_map = nullptr;
-
     if (analysis == "doDijet") {
         selected_map = &md;
     } else if (analysis == "doDijet2") {
@@ -644,6 +571,7 @@ void DijetHistosFill::get_weight(float pt, float eta, string pt_analysis, string
         selected_map = &mi;
     } else {
         std::cerr << "Unknown pt_analysis type: " << analysis << std::endl;
+	double PU_weight = 1;
         return;
     }
 
@@ -655,76 +583,36 @@ void DijetHistosFill::get_weight(float pt, float eta, string pt_analysis, string
         if (pt >= trigger_range.ptmin && pt < trigger_range.ptmax &&
             eta >= trigger_range.absetamin && eta < trigger_range.absetamax) {
             selected_trigger = trigger_name;
+	    //std::cerr << "selected_trigger:  " << selected_trigger << std::endl;
             break;
         }
     }
-    
-    //if (selected_trigger.empty()) {
-      //  std::cerr << "No matching trigger found for pt: " << pt << " and eta: " << eta << std::endl;
-        //return;
-    //}
-    
-    // Find the corresponding histogram from pu_hist_map
-    auto hist_it = pu_hist_map.find(selected_trigger);
-    if (hist_it == pu_hist_map.end()) {
-        //std::cerr << "No histogram found for trigger: " << selected_trigger << std::endl;
+
+    //std::cerr << "selected_trigger after the function selection:  " << selected_trigger << std::endl;
+
+    if (selected_trigger.empty()) {
+        //std::cerr << "No matching trigger found for pt: " << pt << " and eta: " << eta << std::endl;
+        PU_weight = 1;
         return;
     }
-    //std::cerr << "Flag to find the bug " << std::endl;
-    //std::cerr << "Flag after defining the TH1D hist " << std::endl;
-    TH1D *h1_PU_weight = nullptr;
-    std::string hist_HLT_path = "luminosityscripts/PUWeights/PUWeight2024F/PUWeights_" + selected_trigger + "_" + dataset.c_str();
-    TFile f((hist_HLT_path + ".root").c_str());  // Convert std::string to const char*
 
-    //std::string hist_HLT_path = "luminosityscripts/PUWeights/PUWeight2024F/PU_weights_" + selected_trigger;
-    //TFile f(hist_HLT_path + ".root");
-    //TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
-    //std::cerr << "Flag after load the root file " << std::endl;
-    //std::string pileup_hist_path = "pileup_weights_" + selected_trigger + "2024F";
-    //h1_PU_weight = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F");
-    //h1_PU_weight = (TH1D *)f.Get(pileup_hist_path);
-    //std::string pileup_hist_path = "pileup_weights_" + selected_trigger + "_2024F";
-    std::string pileup_hist_path = "pileup_weights_" + selected_trigger + "_" + dataset.c_str();
-    //std::cerr << "pileup_hist_path " << pileup_hist_path  << std::endl;
-    //std::cerr << "pileup_hist_path: " << pileup_hist_path << std::endl;
-    h1_PU_weight = (TH1D *)f.Get(pileup_hist_path.c_str());  // Convert std::string to const char*
+    //auto hist_it = pu_hist_map.find("PU_weights_" + selected_trigger);
+    auto hist_it = pu_hist_map.find(selected_trigger);
+    if (hist_it == pu_hist_map.end()) {
+        std::cerr << "No histogram found for trigger: " << selected_trigger << std::endl;
+        PU_weight = 1;
+        return;
+    } 
 
-    //std::cerr << "Flag after Get the pileup " << std::endl;
-    h1_PU_weight->SetDirectory(0);
-    //std::cerr << "Flag after the pileup file " << std::endl;
-    //TH1D* h1_PU_weight = hist_it->second;
+
+    TH1D* h1_PU_weight = hist_it->second;
     int ibin = h1_PU_weight->FindBin(Pileup_nTrueInt);
-    //std::cerr << "Flag after the bin from the pileup_nTruInt " << std::endl;
-    double PU_weight = h1_PU_weight->GetBinContent(ibin);
-    //std::cerr << "Flag after the GetBinContent " << std::endl;
-    //weight *= PU_weight;
-    //std::cerr << "Flag after multiply the weight " << std::endl;
-    /*
-    if (pt_analysis == "ptavp2"){
-       double w_ptavp2 = PU_weight;
-    }
-    else if (pt_analysis == "ptave"){
-       double w_ptave = PU_weight;
-    }
-    else if (pt_analysis == "pttag"){
-       double w_pttag = PU_weight;
-    }
-    else if (pt_analysis == "ptprobe"){
-       double w_ptprobe = PU_weight;
-    }
-    else {
-       w_PUReweight = PU_weight;
-    }
-    */
-    //std::cerr << "Flag to find the bug at the end of the get_weight" << std::endl;
+    //std::cerr << "h1_PU_weight->GetBinContent(ibin):  " << h1_PU_weight->GetBinContent(ibin) << std::endl;
+    PU_weight = h1_PU_weight->GetBinContent(ibin);
+
 }
-
-
 /////////////////////////
 //// End Function to get the PU_weight
-
-
-
 /////////////////////////
 /////////////////////////
 bool DijetHistosFill::LoadLumi()
@@ -1204,10 +1092,12 @@ void DijetHistosFill::Loop()
 	if (isMC && !(isMG && isRun3))
 		fChain->SetBranchStatus("Pileup_pthatmax", 1);
 
-	if (isMC && reweightPU)
+	if (isMC && (reweightPU || doPU_per_trigger))
 	{
 		fChain->SetBranchStatus("Pileup_nTrueInt", 1);
 		fChain->SetBranchStatus("Pileup_nPU", 1);
+		fChain->SetBranchStatus("PV_npvs", 1);
+		fChain->SetBranchStatus("PV_npvsGood", 1);
 	}
 
 	if (isMC && (smearJets || doMCtruth))
@@ -1423,6 +1313,9 @@ mt["HLT_DiPFJetAve500"] = range{600, 6500, 0, 5.2};
 // 2.65, 2.853, 2.964, 3.139, 3.314, 3.489, 3.664, 3.839, 4.013, 4.191,
 double fwdeta = 3.139;  // was 2.853. 80% (100%) on negative (positive) side
 double fwdeta0 = 2.964; // 2.853; // 40 and 260 up
+
+double fwdetad = 2.853;
+
 mt["HLT_DiPFJetAve60_HFJEC"] = range{85, 100, fwdeta, 5.2};
 mt["HLT_DiPFJetAve80_HFJEC"] = range{100, 125, fwdeta, 5.2};
 mt["HLT_DiPFJetAve100_HFJEC"] = range{125, 180, fwdeta, 5.2};
@@ -1455,7 +1348,7 @@ mt["HLT_PFJetFwd500"] = range{600, 6500, fwdeta0, 5.2};
 
 // For jetrate vs runs
 mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
-mi["HLT_MC"]       = range{15,6500,  0, 5.2};
+//mi["HLT_MC"]       = range{15,6500,  0, 5.2};
 mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
 mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
 mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
@@ -1481,31 +1374,9 @@ mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2}; // 18
 ///
 
 
-
-////
-//
-//
-/*
-   struct range {
-   int ptmin;
-   int ptmax;
-   double absetamin;
-   double absetamax;
-   };
-*/
-   std::map<std::string, struct range> md;
-   std::map<std::string, struct range> md2;
-   std::map<std::string, struct range> md2tc;
-   std::map<std::string, struct range> md2pf;
-   std::map<std::string, struct range> mj;
-   std::map<std::string, struct range> mi;
-   double fwdetad = 2.853;
-/*
-   double fwdeta = 3.139; // was 2.853. 80% (100%) on negative (positive) side
-   double fwdeta0 = 2.964;//2.853; // 40 and 260 up
-   double fwdetad = 2.853;
-*/
+// Triggers from the DijetHistosCombine.C 
 // dijet 
+md["HLT_ZeroBias"]      = range{15,  40,  0, 5.2};
 md["HLT_DiPFJetAve40"]  = range{40,  85,  0, 5.2};
 md["HLT_DiPFJetAve60"]  = range{85,  100, 0, fwdeta};
 md["HLT_DiPFJetAve80"]  = range{100, 155, 0, fwdeta};
@@ -1524,6 +1395,7 @@ md["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
 md["HLT_DiPFJetAve300_HFJEC"] = range{350,3000, fwdeta0, 5.2};
 
 // dijet2
+md2["HLT_ZeroBias"]      = range{15,  59,  0, 5.2};
 md2["HLT_DiPFJetAve40"]  = range{59,  86,  0, 5.2};
 md2["HLT_DiPFJetAve60"]  = range{86,  110, 0, fwdetad};
 md2["HLT_DiPFJetAve80"]  = range{110, 170, 0, fwdetad};
@@ -1542,6 +1414,7 @@ md2["HLT_DiPFJetAve220_HFJEC"] = range{279, 373, fwdetad, 5.2};
 md2["HLT_DiPFJetAve300_HFJEC"] = range{373,3000, fwdetad, 5.2};
 
 // dijet2 -> probe binning
+md2pf["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
 md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
@@ -1576,39 +1449,13 @@ md2tc["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
 md2tc["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
 md2tc["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
 
-// multijet, jetveto, incjet
-mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0};
-mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};
-mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta};
-mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
-mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0};
-mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0};
-mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0};
-mi["HLT_PFJet400"] = range{468, 548, 0, fwdeta0};
-mi["HLT_PFJet450"] = range{548, 686, 0, fwdeta0};
-mi["HLT_PFJet500"] = range{686,6500, 0, fwdeta0};
-//mi["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
-
-mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdeta0, 5.2};
-mi["HLT_PFJetFwd60"]  = range{84,  114, fwdeta, 5.2};
-mi["HLT_PFJetFwd80"]  = range{114, 196, fwdeta, 5.2};
-mi["HLT_PFJetFwd140"] = range{196, 272, fwdeta, 5.2};
-mi["HLT_PFJetFwd200"] = range{272, 330, fwdeta0, 5.2};
-mi["HLT_PFJetFwd260"] = range{330, 395, fwdeta0, 5.2};
-mi["HLT_PFJetFwd320"] = range{395, 468, fwdeta0, 5.2};
-mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2};
-mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2};
-mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
-
-
-
 
 ////
 //
 //
-bool doPU_per_trigger = true;
 if (doPU_per_trigger){
-   get_PU_hist(dataset.c_str());
+  get_PU_hist("PUWeight2024F");
+  //print_PU_hist_map();
 }
 
 if (debug)
@@ -1978,48 +1825,29 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	//jerpath = "";
 	useJERSFvsPt = true; //Nestor, Aug16, 2024.
 
-	/*
-	   if (reweightPU)
+           	
+	   if (reweightPU && !doPU_per_trigger)
 	   {
-	   if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-	   TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
-	   pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F");
-	   pileupRatio->SetDirectory(0);
-	// Print mean, min weight, max weight
-	cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-	cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-	cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
+	         TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F");
+	         pileupRatio->SetDirectory(0);
+	         // Print mean, min weight, max weight
+	         cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+	         cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+	         cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
 
-	} else {
-	TFile f("luminosityscripts/PUWeights/Winter24MG_PUWeight.root");
-	pileupRatio = (TH1D *)f.Get("pileup");
-	pileupRatio->SetDirectory(0);
-	// Print mean, min weight, max weight
-	cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-	cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-	cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+	      } else {
+	         TFile f("luminosityscripts/PUWeights/Winter24MG_PUWeight.root");
+	         pileupRatio = (TH1D *)f.Get("pileup");
+	         pileupRatio->SetDirectory(0);
+	         // Print mean, min weight, max weight
+	         cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+	         cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+	         cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
 
-	}
-	}
-	*/
-
-
-
-	//////
-	// Pileupreweighting per trigger
-	// Nestor, Sep 9, 2024. 
-	//////
-	if (reweightPU)
-	{
-		TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
-		pileupRatio = (TH1D *)f.Get("pileup");
-		pileupRatio->SetDirectory(0);
-		// Print mean, min weight, max weight
-		cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
-		cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
-		cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
-	}
-	/////
+	      }
+	   }
 }
 
 
@@ -2668,6 +2496,19 @@ if (isMG)
       h->p2pur = new TProfile2D("p2pur", ";|#eta_{jet}|;p_{T,jet} (GeV);"
                                          "Purity",
                                 nxd, vxd, nptd, vptd);
+
+      /*
+      if (reweightPU || doPU_per_trigger){
+         h->h1_PURho = new TH1D("h1_PURW", ";p_{T,jet} (GeV);" "#rho",
+                                        npt, vpt);
+	 h->h1_PUMu = new TH1D("h1_PUMu", "#mu", 119, 0, 120);
+
+	 h->h1_PUNPV = new TH1D("h1_PUNPV", "NPV", 119, 0, 120);
+
+	 h->h1_PUNPVGood = new TH1D("h1_PUNPVGood", "NPV_good", 119, 0, 120);
+      }
+      */
+
     } // isMC && doMCtruth
 
     // Jet veto per trigger
@@ -2833,6 +2674,9 @@ if (isMG)
         h->p2pt = new TProfile2D("p2pt", ";#eta;p_{T,jet} (GeV);"
                                          "p_{T,jet}",
                                  nx, vx, npt, vpt);
+        h->p2rho_PURW = new TProfile2D("p2rho_PURW", ";#eta;p_{T,jet} (GeV);"
+                                           "#rho",
+                                  nx, vx, npt, vpt);
         h->p2rho = new TProfile2D("p2rho", ";#eta;p_{T,jet} (GeV);"
                                            "#rho",
                                   nx, vx, npt, vpt);
@@ -3810,6 +3654,10 @@ if (isMG)
       b_LHE_HT->GetEntry(ientry);    // read only this branch
       b_genWeight->GetEntry(ientry); // also this if MG
       double w = genWeight;
+      double w_ptlead = genWeight;
+      double w_ptavp3 = genWeight;
+      double w_ptave = genWeight;
+      double w_ptrecoil = genWeight;
       hnevt->Fill(LHE_HT);
       hnwgt->Fill(LHE_HT, w);
       if (jentry % 1000000 == 0)
@@ -3986,6 +3834,10 @@ if (isMG)
     // if (Cut(ientry) < 0) continue;
 
     double w = (isMC ? genWeight : 1.);
+    double w_ptlead = (isMC ? genWeight : 1.); // = w;
+    double w_ptavp3 = (isMC ? genWeight : 1.);; // = w;
+    double w_ptave = (isMC ? genWeight : 1.);; // = w;
+    double w_ptrecoil = (isMC ? genWeight : 1.); // = w;
     //double w = (isMC ? genWeight : (genWeight/lumsum));
     if (isMG)
     {
@@ -4003,7 +3855,11 @@ if (isMG)
       double nevt = (isRun3 ? hnwgt->GetBinContent(iht) : hnevt->GetBinContent(iht));
       double wht = (nevt ? xsec / nevt : 1);
       w *= wht;
-      if (w > 10000){
+      w_ptlead *= wht;
+      w_ptavp3 *= wht;
+      w_ptave *= wht;
+      w_ptrecoil *= wht;
+      if (w > 10000 || w_ptlead > 10000 || w_ptavp3 > 10000 || w_ptrecoil > 10000 ){
         cout << "WARNING: w = " << w << " for " << _filename << endl << flush;
       }
       hLHE_HT->Fill(LHE_HT);     // cross-check hnevt afterwards
@@ -4205,14 +4061,22 @@ if (isMG)
 
 
 */
-    if (isMC && reweightPU)
+    // reweightPU
+    
+    
+    if (isMC && reweightPU && !doPU_per_trigger)
     {
       assert(pileupRatio);
       // Get the bin
       int ibin = pileupRatio->FindBin(Pileup_nTrueInt);
       double pileup_weight = pileupRatio->GetBinContent(ibin);
       w *= pileup_weight;
+
+      //std::cerr << "pileup_weight original: " << pileup_weight << std::endl;
+      //get_weight(700., 2., "doMultijets");
+      //std::cerr << "PU_weight using the function: " << PU_weight <<std::endl;
     }
+    
 
     if (isMC && smearJets)
     {
@@ -4545,7 +4409,11 @@ if (isMG)
               double eta = p4.Eta();
               double pt = p4.Pt();
               h->p2pt->Fill(eta, pt, Jet_pt[i], w);
-              h->p2rho->Fill(eta, pt, rho, w);
+	      //
+	      get_weight(pt, eta, "doInc");
+              h->p2rho_PURW->Fill(eta, pt, rho, w * PU_weight);
+	      //
+	      h->p2rho->Fill(eta, pt, rho, w);
               h->p2chf->Fill(eta, pt, Jet_chHEF[i], w);
               h->p2nhf->Fill(eta, pt, Jet_neHEF[i], w);
               h->p2nef->Fill(eta, pt, Jet_neEmEF[i], w);
@@ -4981,35 +4849,7 @@ if (isMG)
             dijetHistos *h = mhdj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
 
-            //bool doPU_per_trigger = true;
-            if (doPU_per_trigger){
-               //get_PU_hist("PUWeight2024F");
-	       get_weight(ptavp2, eta, "ptavp2", "doDijet");
-	       w_ptavp2 = w * PU_weight;
-	       get_weight(ptave, eta, "ptave", "doDijet");
-	       w_ptave = w * PU_weight;
-	       get_weight(pttag, eta, "pttag", "doDijet");
-	       w_pttag = w * PU_weight;
-	       get_weight(ptprobe, eta, "ptprobe", "doDijet");
-	       w_ptprobe = w * PU_weight;
-            }
-	    else {
-	       w_ptavp2 = w;
-	       w_ptave = w;
-	       w_pttag = w;
-	       w_ptprobe = w;
-	    }
-  	    /*
-            if (doPU_per_trigger) {
-            // Access histograms stored in pu_hist_map
-               for (const auto& entry : pu_hist_map) {
-                   std::cout << "Trigger: " << entry.first << std::endl;
-                   //std::cout << "Trigger: " << entry.first << ", Histogram: " << entry.second->GetName() << std::endl;
-               }
-            } else {
-                std::cerr << "Failed to retrieve histograms." << std::endl;
-            }
-            */
+
 
 	    h->h2pteta_aball->Fill(eta, ptavp2, w);
             h->h2pteta_adall->Fill(eta, ptave, w);
@@ -5296,6 +5136,55 @@ if (isMG)
       double ptrecoil = p4recoil.Pt();
       double ptave = 0.5 * (ptlead + ptrecoil);
       // double ptavp3 defined earlier, as is p4b3
+      //
+      get_weight(ptlead, 0, "doMultijets");
+      
+      //get_weight(ptavp3, 0, "doMultijets");
+
+      //get_weight(ptrecoil, 0, "doMultijets");
+
+      //get_weight(ptave, 0, "doMultijets");
+        //std::cerr << "w weight before the func: " << w << std::endl;  
+        //std::cerr << "w_ptlead before the func: " << w_ptlead << std::endl;
+        //std::cerr << "w_ptavp3 before the func: " << w_ptavp3 << std::endl;
+	//std::cerr << "w_ptave before the func: " << w_ptave << std::endl;
+        //std::cerr << "w_ptrecoil before the func: " << w_ptrecoil << std::endl;
+
+
+        if (doPU_per_trigger){
+           //get_weight(ptlead, p4l.Eta(), "doMultijets");
+           //get_weight(700., 2., "doMultijets");
+           //std::cerr << "ptlead: " << ptlead << " and eta are " << p4l.Eta() <<std::endl;
+           //std::cerr << "PU_weight: " << PU_weight <<std::endl;
+           if (PU_weight > 0){
+              w_ptlead = w * PU_weight;
+              w_ptavp3 = w * PU_weight;
+	      w_ptave = w * PU_weight;
+              w_ptrecoil = w * PU_weight;
+           }
+           else { // if cero, should be = 1? or = w? 
+              w_ptlead = w;
+              w_ptavp3 = w;
+	      w_ptave = w;
+              w_ptrecoil = w;
+           }
+        }
+        else {
+           w_ptlead = w;
+           w_ptavp3 = w;
+	   w_ptave = w;
+           w_ptrecoil = w;
+        }
+        //std::cerr << "w weight after the func: " << w << std::endl;
+        //std::cerr << "w_ptlead: " << w_ptlead << std::endl;
+        //std::cerr << "w_ptavp3: " << w_ptavp3 << std::endl;
+	//std::cerr << "w_ptave: " << w_ptave << std::endl;
+        //std::cerr << "w_ptrecoil: " << w_ptrecoil << std::endl;
+	
+
+
+      //std::cerr << "PU_weight: " << PU_weight <<std::endl;
+      //
 
       // Projection to transverse plane (is this necessary?)
       p4m0.SetPtEtaPhiM(p4m0.Pt(), 0., p4m0.Phi(), 0.);
@@ -5349,6 +5238,18 @@ if (isMG)
 
         multijetHistos *h = mhmj[trg];
 
+
+	// PU reweighintg histograms
+	// Histograms from multijet analysis
+	// Nestor. Sep 12, 2024.
+        h->pm0l->Fill(ptlead, m0l, w_ptlead);
+        h->pm0a->Fill(ptavp3, m0b, w_ptavp3);
+	h->pm0r->Fill(ptrecoil, m0r, w_ptrecoil);
+        h->pm2l->Fill(ptlead, m3l, w_ptlead);
+        h->pm2a->Fill(ptavp3, m3b, w_ptavp3);
+        h->pm2r->Fill(ptrecoil, m3r, w_ptrecoil);
+        //
+
         h->hpta_all->Fill(ptavp3, w);
         h->hptm_all->Fill(ptave, w);
         h->hptl_all->Fill(ptlead, w);
@@ -5365,6 +5266,8 @@ if (isMG)
 
         double res = (p4leadRES.Pt() / p4recoilRES.Pt()) /
                      (p4lead.Pt() / p4recoil.Pt());
+
+
         h->presa->Fill(ptavp3, res, w);
         h->presm->Fill(ptave, res, w);
         h->presl->Fill(ptlead, res, w);
@@ -5380,8 +5283,8 @@ if (isMG)
         h->pcrecoill->Fill(ptlead, Crecoil, w);
         h->pcrecoilr->Fill(ptrecoil, Crecoil, w);
 
-        h->pm0a->Fill(ptavp3, m0b, w);
-        h->pm2a->Fill(ptavp3, m3b, w);
+        //h->pm0a->Fill(ptavp3, m0b, w);
+        //h->pm2a->Fill(ptavp3, m3b, w);
         h->pmna->Fill(ptavp3, mnb, w);
         h->pmua->Fill(ptavp3, mub, w);
 
@@ -5390,13 +5293,13 @@ if (isMG)
         h->pmnm->Fill(ptave, mnm, w);
         h->pmum->Fill(ptave, mum, w);
 
-        h->pm0l->Fill(ptlead, m0l, w);
-        h->pm2l->Fill(ptlead, m3l, w);
+        //h->pm0l->Fill(ptlead, m0l, w);
+        //h->pm2l->Fill(ptlead, m3l, w);
         h->pmnl->Fill(ptlead, mnl, w);
         h->pmul->Fill(ptlead, mul, w);
 
-        h->pm0r->Fill(ptrecoil, m0r, w);
-        h->pm2r->Fill(ptrecoil, m3r, w);
+        //h->pm0r->Fill(ptrecoil, m0r, w);
+        //h->pm2r->Fill(ptrecoil, m3r, w);
         h->pmnr->Fill(ptrecoil, mnr, w);
         h->pmur->Fill(ptrecoil, mur, w);
 

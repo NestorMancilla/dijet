@@ -3555,10 +3555,11 @@ public :
    // Code originally from jetphys/HistosFill.C
    void PrintInfo(string info, bool printcout);
    // PU Reweighting
-   void get_PU_hist(const std::string& dataset);
+   void get_PU_hist(const std::string& PUdataset);
+   void print_PU_hist_map() const;
    //void get_weight(const std::map<std::string, struct range>& trg_map, float pt, float eta, double weight, string pt_analysis);
    //void get_weight(string trg_name, float pt, float eta, double weight, string pt_analysis);
-   void get_weight(float pt, float eta, string pt_analysis, string analysis);
+   void get_weight(float pt, float eta, string analysis);
    //
    bool LoadJSON(string json);
    bool LoadLumi();
