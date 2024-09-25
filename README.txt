@@ -72,6 +72,10 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v104. Adding the histograms per trigger to compare the PFJet500 results. Running 2024F and 2024E.
+// v103. Process Winter24MGV14 PU reweighting for a single trigger 2024F PFJet500.
+// v102. Process Winter24MGV14 without smearing either SF. Rho, nTrueInt, NPV, NPV_Good included.
+//	 The new histograms are included in a separated folder called do_PUProfiles.
 // v101. Process Winter24MGV14 without smearing. Winter24PU applied for 2024F.
 // v100.Process Winter24MGV14 without smearing to compare the processing time. Winter24MGv14 PU.
 // v99. Process 2024G with the new JSON file: Cert_Collisions2024_378981_385194_Golden.json, Collisions24_13p6TeV_378981_385568_DCSOnly_TkPx.json. 

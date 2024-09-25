@@ -42,14 +42,15 @@ bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
 bool smearJets = false;
-bool useJERSFvsPt = true; // new file format
+bool useJERSFvsPt = false; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
-// Do PU reweighting
+// Do PU reweighting and studies
 bool reweightPU = true;
-bool doPU_per_trigger = true;
+bool doPU_per_trigger = false;
+bool do_PUProfiles = true;
 
 // Activate modules
 bool doJetveto = true; // eta-phi maps
@@ -1092,12 +1093,17 @@ void DijetHistosFill::Loop()
 	if (isMC && !(isMG && isRun3))
 		fChain->SetBranchStatus("Pileup_pthatmax", 1);
 
-	if (isMC && (reweightPU || doPU_per_trigger))
+	if (isMC && (reweightPU || doPU_per_trigger || do_PUProfiles))
 	{
 		fChain->SetBranchStatus("Pileup_nTrueInt", 1);
 		fChain->SetBranchStatus("Pileup_nPU", 1);
-		fChain->SetBranchStatus("PV_npvs", 1);
-		fChain->SetBranchStatus("PV_npvsGood", 1);
+		//fChain->SetBranchStatus("PV_npvs", 1);
+		//fChain->SetBranchStatus("PV_npvsGood", 1);
+	}
+
+	if (do_PUProfiles){
+                fChain->SetBranchStatus("PV_npvs", 1);
+                fChain->SetBranchStatus("PV_npvsGood", 1);	
 	}
 
 	if (isMC && (smearJets || doMCtruth))
@@ -1817,13 +1823,13 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			"");
-	//jerpathsf = "";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
-	jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
-	//jersfvspt = getFJC("", "", "");
+	jerpathsf = "";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
+	//jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
+	jersfvspt = getFJC("", "", "");
 	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
 	//jerpath = "";
-	useJERSFvsPt = true; //Nestor, Aug16, 2024.
+	useJERSFvsPt = false; //Nestor, Sep20, 2024.
 
            	
 	   if (reweightPU && !doPU_per_trigger)
@@ -2039,6 +2045,7 @@ for (int i = 1; i != h_trgvspu->GetNbinsX() + 1; ++i)
 	h_trgvspu->GetXaxis()->SetBinLabel(i, vtrg[i - 1].c_str());
 }
 
+
 if (debug)
 	cout << "Setting up histograms" << endl
 	<< flush;
@@ -2238,6 +2245,19 @@ if (isMG)
                               500, 0, 500, 500, 0, 500);
   TH2D *h2dphi = new TH2D("h2dphi", "#Delta#phi vs #eta;#eta;#Delta#phi",
                           nx, vx, 126, -TMath::TwoPi(), +TMath::TwoPi());
+
+TH1D *h_PUProfile(0), *h_RhoAll(0), *h_NPV(0), *h_NPVGood(0);
+if (do_PUProfiles){
+   fout->mkdir("Profiles");
+   fout->cd("Profiles");
+   if (isMC){
+      h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
+   }
+   //h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
+   h_RhoAll = new TH1D("h_RhoAll", "RhoFastjetAll", 119, 0, 120);
+   h_NPV = new TH1D("h_NPV", "NPV", 119, 0, 120);
+   h_NPVGood = new TH1D("h_NPVGood", "NPVGood", 119, 0, 120);
+}
 
   // L2Res profiles for HDM method
   // coding: m0=MPF, m2=DB, mn=n-jet, mu=uncl. (observable)
@@ -3870,6 +3890,9 @@ if (isMG)
       hHT_w->Fill(genWeight); 
     }
     double rho = Rho_fixedGridRhoFastjetAll;
+    double Pileup_nTrue = Pileup_nTrueInt;
+    double NPV = PV_npvs;
+    double NPV_Good = PV_npvsGood;
 
     bool doPtHatFilter = true; // Set to false for MC Nano V09, isMG works fine 
     if (doPtHatFilter && isMC )
@@ -4077,6 +4100,16 @@ if (isMG)
       //std::cerr << "PU_weight using the function: " << PU_weight <<std::endl;
     }
     
+    if (do_PUProfiles){
+       if (isMC){
+          h_PUProfile->Fill(Pileup_nTrue, w);
+       }
+       //h_PUProfile->Fill(Pileup_nTrue, w);
+       h_RhoAll->Fill(rho, w);
+       h_NPV->Fill(NPV, w);
+       h_NPVGood->Fill(NPV_Good, w);
+    }
+
 
     if (isMC && smearJets)
     {
@@ -4410,7 +4443,9 @@ if (isMG)
               double pt = p4.Pt();
               h->p2pt->Fill(eta, pt, Jet_pt[i], w);
 	      //
-	      get_weight(pt, eta, "doInc");
+	      if (doPU_per_trigger){
+	         get_weight(pt, eta, "doInc");
+	      }
               h->p2rho_PURW->Fill(eta, pt, rho, w * PU_weight);
 	      //
 	      h->p2rho->Fill(eta, pt, rho, w);
@@ -5136,9 +5171,9 @@ if (isMG)
       double ptrecoil = p4recoil.Pt();
       double ptave = 0.5 * (ptlead + ptrecoil);
       // double ptavp3 defined earlier, as is p4b3
-      //
-      get_weight(ptlead, 0, "doMultijets");
-      
+      if (doPU_per_trigger){
+         get_weight(ptlead, 0, "doMultijets");
+      }
       //get_weight(ptavp3, 0, "doMultijets");
 
       //get_weight(ptrecoil, 0, "doMultijets");
