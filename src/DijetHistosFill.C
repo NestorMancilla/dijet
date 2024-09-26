@@ -139,7 +139,7 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 42> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 47> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -182,6 +182,11 @@ constexpr std::array<std::pair<const char*, const char*>, 42> lumifiles = {{
     {"2024F_4", lumibyls2024BCDEFG},
     {"2024F_ZB", lumibyls2024BCDEFG},
     {"2024G", lumibyls2024BCDEFG},
+    {"2024G_1", lumibyls2024BCDEFG},
+    {"2024G_2", lumibyls2024BCDEFG},
+    {"2024G_3", lumibyls2024BCDEFG},
+    {"2024G_4", lumibyls2024BCDEFG},
+    {"2024G_5", lumibyls2024BCDEFG},
     {"2024G_ZB", lumibyls2024BCDEFG},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
@@ -215,6 +220,7 @@ std::map<std::string, struct range> md2;
 std::map<std::string, struct range> md2tc;
 std::map<std::string, struct range> md2pf;
 std::map<std::string, struct range> mj;
+
 
 // CLASS DEFINITIONS
 class mctruthHistos
@@ -404,6 +410,15 @@ public:
   TProfile *pMPF_500, *pMPF_500b, *pMPF_600, *pMPF_600b, *pMPF_800, *pMPF_800b, *pMPF_1000, *pMPF_1000b, *pMPF_1200, *pMPF_1200b;
   TProfile *pDB_500, *pDB_500b, *pDB_600, *pDB_600b, *pDB_800, *pDB_800b, *pDB_1000, *pDB_1000b, *pDB_1200, *pDB_1200b;
   TProfile2D *p2MPF, *p2MPF_bar;
+};
+
+class PUHistos
+{
+public:
+  string trg;
+  int trgpt;
+  double ptmin, ptmax, absetamin, absetamax;
+  TH1D *h_PUProfile, *h_RhoAll, *h_NPV, *h_NPVGood;
 };
 
 // Helper function to retrieve FactorizedJetCorrector
@@ -1835,8 +1850,9 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-	         TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F");
+	         //TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
+		 TFile f("luminosityscripts/PUWeights/PUWeight2024G/PUWeights_HLT_PFJet500_2024G.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024G");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 	         cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
@@ -1957,7 +1973,7 @@ if (TString(dataset.c_str()).Contains("2024F")  || dataset == "2024F_ZB")
 
 }
 
-if (dataset == "2024G"  || dataset == "2024G_ZB")
+if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 {
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2246,6 +2262,7 @@ if (isMG)
   TH2D *h2dphi = new TH2D("h2dphi", "#Delta#phi vs #eta;#eta;#Delta#phi",
                           nx, vx, 126, -TMath::TwoPi(), +TMath::TwoPi());
 
+/*
 TH1D *h_PUProfile(0), *h_RhoAll(0), *h_NPV(0), *h_NPVGood(0);
 if (do_PUProfiles){
    fout->mkdir("Profiles");
@@ -2258,6 +2275,7 @@ if (do_PUProfiles){
    h_NPV = new TH1D("h_NPV", "NPV", 119, 0, 120);
    h_NPVGood = new TH1D("h_NPVGood", "NPVGood", 119, 0, 120);
 }
+*/
 
   // L2Res profiles for HDM method
   // coding: m0=MPF, m2=DB, mn=n-jet, mu=uncl. (observable)
@@ -2394,6 +2412,7 @@ if (do_PUProfiles){
   map<string, multijetHistos *> mhmj;
   map<string, lumiHistos *> mhlumi;
   map<string, jetsperRuns *> mjet;
+  map<string, PUHistos *> mhPU;
 
   //bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
   //if (dolumi)
@@ -2530,6 +2549,36 @@ if (do_PUProfiles){
       */
 
     } // isMC && doMCtruth
+
+    if (do_PUProfiles)
+    {
+      if (debug)
+        cout << "Setup do_PUProfiles " << trgpt << endl
+             << flush;
+
+      dout->mkdir("Pileup");
+      dout->cd("Pileup");
+
+      PUHistos *h = new PUHistos();
+
+      string &t = vtrg[itrg];
+      mhPU[t] = h;
+      h->trg = t;
+      h->trgpt = trgpt;
+
+      struct range &r = mt[t];
+      h->ptmin = r.ptmin;
+      h->ptmax = r.ptmax;
+      h->absetamin = r.absetamin;
+      h->absetamax = r.absetamax;
+      if (isMC){
+         h->h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
+      }
+      //h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
+      h->h_RhoAll = new TH1D("h_RhoAll", "RhoFastjetAll", 119, 0, 120);
+      h->h_NPV = new TH1D("h_NPV", "NPV", 119, 0, 120);
+      h->h_NPVGood = new TH1D("h_NPVGood", "NPVGood", 119, 0, 120);
+    }
 
     // Jet veto per trigger
     if (doJetveto)
@@ -3587,7 +3636,7 @@ if (do_PUProfiles){
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
     fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
-  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
+  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB")
     fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
   assert(fjv);
 
@@ -3647,7 +3696,7 @@ if (do_PUProfiles){
       dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
-  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || dataset == "2024G" || dataset == "2024G_ZB")
+  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB")
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
@@ -4099,7 +4148,8 @@ if (do_PUProfiles){
       //get_weight(700., 2., "doMultijets");
       //std::cerr << "PU_weight using the function: " << PU_weight <<std::endl;
     }
-    
+
+/*    
     if (do_PUProfiles){
        if (isMC){
           h_PUProfile->Fill(Pileup_nTrue, w);
@@ -4109,7 +4159,7 @@ if (do_PUProfiles){
        h_NPV->Fill(NPV, w);
        h_NPVGood->Fill(NPV_Good, w);
     }
-
+*/
 
     if (isMC && smearJets)
     {
@@ -4380,6 +4430,23 @@ if (do_PUProfiles){
           }
         }
       } // doJetveto
+
+      if (do_PUProfiles){
+        for (int itrg = 0; itrg != ntrg; ++itrg)
+        {
+          string &trg = vtrg[itrg];
+          if (!(*mtrg[trg]))
+            continue;
+          PUHistos *h = mhPU[trg];
+          assert(h);
+          if (isMC){
+             h->h_PUProfile->Fill(Pileup_nTrue, w);
+          }
+          h->h_RhoAll->Fill(rho, w);
+          h->h_NPV->Fill(NPV, w);
+          h->h_NPVGood->Fill(NPV_Good, w);
+	}
+      }
 
       // Inclusive jets
       if (doIncjet)
