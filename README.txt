@@ -72,6 +72,9 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v108. Run 2024G using new GoldenRuns_378981to385863_DCSRuns_378981to386319. Including abseta<1.3 and new histograms:
+//       fixedGridRhoFastjetCentral and fixedGridRhoFastjetCentralChargedPileUp.
+// v107. Adding pt selection for the trigger (ptmin, ptmax) and eta selection.
 // v106. Process Winter24MGV14 and 2024G to compare PU reweighting.
 // v105. Process Winter24MGV14 and 2024D to compare PU reweighting.
 // v104. Adding the histograms per trigger to compare the PFJet500 results. Running 2024F and 2024E. Winter24MGV14 using PHJet500 for the RW.

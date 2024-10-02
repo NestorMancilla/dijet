@@ -134,7 +134,8 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381417_DCSRuns_381418to381594.csv";
 //constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
 //constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to383163_DCSRuns_383164to383467.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to383724_DCSRuns_383725to384446.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to383724_DCSRuns_383725to384446.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to385863_DCSRuns_378981to386319.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
@@ -418,7 +419,7 @@ public:
   string trg;
   int trgpt;
   double ptmin, ptmax, absetamin, absetamax;
-  TH1D *h_PUProfile, *h_RhoAll, *h_NPV, *h_NPVGood;
+  TH1D *h_PUProfile, *h_RhoAll, *h_Rho_C, *h_Rho_CCPU, *h_NPV, *h_NPVGood;
 };
 
 // Helper function to retrieve FactorizedJetCorrector
@@ -680,7 +681,8 @@ bool DijetHistosFill::LoadLumi()
 	//string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
 	//string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
 	//string JSON_version = "2022_Golden";
-	string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
+	//string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
+	string JSON_version = "GoldenRuns_378985to385863_DCSRuns_385864to386319";
 	// List of filenames
 	vector<string> filenames = {
 		"luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1157,6 +1159,8 @@ void DijetHistosFill::Loop()
 	if (isRun3)
 		//if (isRun3 || isMG )
 		fChain->SetBranchStatus("Rho_fixedGridRhoFastjetAll", 1);
+	        fChain->SetBranchStatus("Rho_fixedGridRhoFastjetCentral", 1);
+		fChain->SetBranchStatus("Rho_fixedGridRhoFastjetCentralChargedPileUp", 1);
 	//if (!TString(dataset.c_str()).Contains("2024") || !TString(dataset.c_str()).Contains("Winter24MGV14"))
 	//fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
 	//fChain->SetBranchStatus("L1_UnprefireableEvent", 1);
@@ -2389,7 +2393,8 @@ if (do_PUProfiles){
       //LoadJSON("rootfiles/CombinedJSONS_GoldenRuns_378985to381417_DCSRuns_381418to381594.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to382329_DCSRuns_382330to382686.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to383163_DCSRuns_383164to383467.json");
-      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to383724_DCSRuns_383725to384446.json");
+      //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to383724_DCSRuns_383725to384446.json");
+      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to385863_DCSRuns_385864to386319.json");
 
   }
   int _nbadevts_json(0);
@@ -2576,6 +2581,8 @@ if (do_PUProfiles){
       }
       //h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
       h->h_RhoAll = new TH1D("h_RhoAll", "RhoFastjetAll", 119, 0, 120);
+      h->h_Rho_C = new TH1D("h_Rho_C", "RhoFastjetCentral", 119, 0, 120);
+      h->h_Rho_CCPU = new TH1D("h_Rho_CCPU", "RhoFastjetCentralChargedPileUp", 119, 0, 120);
       h->h_NPV = new TH1D("h_NPV", "NPV", 119, 0, 120);
       h->h_NPVGood = new TH1D("h_NPVGood", "NPVGood", 119, 0, 120);
     }
@@ -3939,6 +3946,8 @@ if (do_PUProfiles){
       hHT_w->Fill(genWeight); 
     }
     double rho = Rho_fixedGridRhoFastjetAll;
+    double rho_C = Rho_fixedGridRhoFastjetCentral;
+    double rho_CCPU = Rho_fixedGridRhoFastjetCentralChargedPileUp;
     double Pileup_nTrue = Pileup_nTrueInt;
     double NPV = PV_npvs;
     double NPV_Good = PV_npvsGood;
@@ -4439,12 +4448,29 @@ if (do_PUProfiles){
             continue;
           PUHistos *h = mhPU[trg];
           assert(h);
-          if (isMC){
-             h->h_PUProfile->Fill(Pileup_nTrue, w);
-          }
-          h->h_RhoAll->Fill(rho, w);
-          h->h_NPV->Fill(NPV, w);
-          h->h_NPVGood->Fill(NPV_Good, w);
+	  double abseta = fabs(p4.Eta());
+          double pt = p4.Pt();
+          if (pt >= h->ptmin && pt < h->ptmax &&
+              abseta >= h->absetamin && abseta < h->absetamax)
+          {
+	    if (abseta<1.3)
+	    {
+	      if (isMC){
+                h->h_PUProfile->Fill(Pileup_nTrue, w);
+              }
+              h->h_RhoAll->Fill(rho, w);
+	      h->h_Rho_C->Fill(rho_C, w);
+	      h->h_Rho_CCPU->Fill(rho_CCPU, w);
+              h->h_NPV->Fill(NPV, w);
+              h->h_NPVGood->Fill(NPV_Good, w);
+	    }
+            //if (isMC){
+            //   h->h_PUProfile->Fill(Pileup_nTrue, w);
+            //}
+            //h->h_RhoAll->Fill(rho, w);
+            //h->h_NPV->Fill(NPV, w);
+            //h->h_NPVGood->Fill(NPV_Good, w);
+	  }
 	}
       }
 
