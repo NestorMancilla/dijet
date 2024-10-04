@@ -48,19 +48,19 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = true;
+bool reweightPU = false;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
 // Activate modules
 bool doJetveto = true; // eta-phi maps
-bool doMCtruth = false;
+bool doMCtruth = true;
 bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
 bool doGluonJets = false; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
-bool doJetsperRuns = false; // Jets rate per runs normalized by the luminosity
+bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
 
 // Core additions
 bool doPFComposition = true; // jetveto / incjet / dijet / multijet
@@ -805,6 +805,7 @@ bool DijetHistosFill::LoadLumi()
 
 	// Determine expected data tags based on the lumifile year
 	std::string expectedTag;
+	std::string expectedTag_2;
 	std::string expectedHeader;
 	TString lumifile_str(lumifile);
 	// Check the lumifile year and set the expected data tag and header accordingly
@@ -813,7 +814,8 @@ bool DijetHistosFill::LoadLumi()
 		expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source";
 	} else {
 		expectedTag = "#Data tag : 24v1 , Norm tag: None";
-		expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
+	        expectedTag_2 = "#Data tag : 24v2 , Norm tag: None";
+                expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
 	}
 
 	// Read and validate the first line
@@ -825,10 +827,20 @@ bool DijetHistosFill::LoadLumi()
 
 	PrintInfo("First line: " + s + " !", true);
 
-	if (s != expectedTag) {
+	if (s != expectedTag && s != expectedTag_2) {
 		std::cout << "First line does not match expected data tag" << std::endl;
 		return false;
 	}
+	/*
+	if (s == expectedTag) {
+            std::cout << "Matched expectedTag: " << expectedTag << std::endl;
+        } else if (s == expectedTag_2) {
+            std::cout << "Matched expectedTag_2: " << expectedTag_2 << std::endl;
+        } else {
+            std::cout << "First line does not match any expected data tag" << std::endl;
+            return false;
+        }
+        */
 
 	// Read and validate the second line
 	bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
@@ -1854,9 +1866,8 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-	         //TFile f("luminosityscripts/PUWeights/PUWeight2024F/PUWeights_HLT_PFJet500_2024F.root");
-		 TFile f("luminosityscripts/PUWeights/PUWeight2024G/PUWeights_HLT_PFJet500_2024G.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024G");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024C/PUWeights_HLT_PFJet500_2024C.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024C");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 	         cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
