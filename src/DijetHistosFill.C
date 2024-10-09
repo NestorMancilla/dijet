@@ -48,7 +48,7 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = false;
+bool reweightPU = true;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
@@ -1866,8 +1866,8 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024C/PUWeights_HLT_PFJet500_2024C.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024C");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024BCD/PUWeights_HLT_PFJet500_2024BCD.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024BCD");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 	         cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
