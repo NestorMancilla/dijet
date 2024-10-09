@@ -41,7 +41,7 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = false;
+bool smearJets = true;
 bool useJERSFvsPt = false; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
@@ -1856,20 +1856,22 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 			"");
 	jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
-	//jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "", "");
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
+	jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "", "");
 	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
 	//jerpath = "";
-	useJERSFvsPt = false; //Nestor, Sep20, 2024.
+	useJERSFvsPt = true; //Nestor, Sep20, 2024.
 
            	
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024BCD/PUWeights_HLT_PFJet500_2024BCD.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024BCD");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024G/PUWeights_HLT_PFJet500_2024G.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024G");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
+		 cout << "PU weight file: " << f.GetName() << endl;
 	         cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
 	         cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
 	         cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
@@ -1908,7 +1910,8 @@ if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
 				//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
-		    "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+		    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+		    		"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 }
 
@@ -1939,7 +1942,8 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 				//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
-		    "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+		    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+		    		"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 }
 
@@ -1954,7 +1958,8 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
 			//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	    "Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+	    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+	    		"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
@@ -1968,7 +1973,8 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
 			//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	    "Prompt24_Run2024E_V5M_DATA_L2L3Residual_AK4PFPuppi");
+	    		//"Prompt24_Run2024E_V5M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024E_V6M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -1984,7 +1990,8 @@ if (TString(dataset.c_str()).Contains("2024F")  || dataset == "2024F_ZB")
 			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	    "Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
+	    		//"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024F_V6M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -1992,7 +1999,8 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 {
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -3649,13 +3657,15 @@ if (do_PUProfiles){
       dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
       dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
       dataset == "2024CS" || dataset == "2024CT" ||
-      TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
+      TString(dataset.c_str()).Contains("Winter24MCFlat")) //|| TString(dataset.c_str()).Contains("Winter24MG"))
     //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
-    fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
-  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB")
-    fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
+    //fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
+    fjv = new TFile("rootfiles/jetveto2024BCDE_V6M.root", "READ");
+  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB" || TString(dataset.c_str()).Contains("Winter24MG"))
+    //fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
+    fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
