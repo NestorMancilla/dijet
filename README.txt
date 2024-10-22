@@ -72,8 +72,11 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v110. Prompt24_V6M for all eras (L2L3 and jetvetomaps). v110_1_era corresponds to the PU reweigting and the JRSF.
+//	 V110_1_2024 includes the Profile results for MPF and DB avg and rec.
 // v109. Run 2024 including doJetsperRuns and fixed luminosity problem. Winter24MGV14 without pileup reweighting to have the two new variables distributions.
 //       Versions v109_B, v109_C, v109_D, v109_E, v109_F, and v109_G correspond to the pileup reweighting for the correspoding era using PFJet500.
+//	 Versions V109_JRSF_2024BCD, V109_JRSF_2024E, V109_JRSF_2024F, V109_JRSF_2024G included JER SF.
 // v108. Run 2024G using new GoldenRuns_378981to385863_DCSRuns_378981to386319. Including abseta<1.3 and new histograms:
 //       fixedGridRhoFastjetCentral and fixedGridRhoFastjetCentralChargedPileUp. No Lumi included because of a v_2 issue. Fixed. No doJetsperRuns included.  
 // v107. Adding pt selection for the trigger (ptmin, ptmax) and eta selection.

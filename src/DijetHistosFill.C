@@ -356,6 +356,10 @@ public:
 
   // Smearing controls
   TProfile2D *p2jsf, *p2jsftc, *p2jsfpf;
+
+  // (Optional) composition plots
+  TProfile2D *p2pt, *p2rho, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;      // probe,avp
+  TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13; // tag
 };
 
 class multijetHistos
@@ -408,8 +412,8 @@ public:
   // Jet rate per trigger
   TH1D *h1jetxsec, *h1jetrate, *h1pt13, *h1pt13_w;
   TH2D *h2jetpteta;
-  TProfile *pMPF_500, *pMPF_500b, *pMPF_600, *pMPF_600b, *pMPF_800, *pMPF_800b, *pMPF_1000, *pMPF_1000b, *pMPF_1200, *pMPF_1200b;
-  TProfile *pDB_500, *pDB_500b, *pDB_600, *pDB_600b, *pDB_800, *pDB_800b, *pDB_1000, *pDB_1000b, *pDB_1200, *pDB_1200b;
+  TProfile *pMPF_500, *pMPF_500b, *pMPF_600, *pMPF_600b, *pMPF_800, *pMPF_800b, *pMPF_avg_800b, *pMPF_rec_800b, *pMPF_1000, *pMPF_1000b, *pMPF_1200, *pMPF_1200b;
+  TProfile *pDB_500, *pDB_500b, *pDB_600, *pDB_600b, *pDB_800, *pDB_800b, *pDB_avg_800b, *pDB_rec_800b, *pDB_1000, *pDB_1000b, *pDB_1200, *pDB_1200b;
   TProfile2D *p2MPF, *p2MPF_bar;
 };
 
@@ -1856,8 +1860,8 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 			"");
 	jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
-	jersfvspt = getFJC("", "Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi", "");
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024G_JRV6M_MC_SF_AK4PFPuppi.txt";
+	jersfvspt = getFJC("", "Prompt24_2024G_JRV6M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "", "");
 	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
 	//jerpath = "";
@@ -3360,6 +3364,57 @@ if (do_PUProfiles){
         assert(false);
         // separate TProfile2D for NM=1, NM=2, NM=3+ (no JetID if has NM>1)
       }
+
+      if (doPFComposition)
+      {
+
+        dout->mkdir("Dijet2/PFcomposition");
+        dout->cd("Dijet2/PFcomposition");
+
+        h->p2pt = new TProfile2D("p2pt", ";#eta;p_{T,avp} (GeV);"
+                                         "p_{T,probe}",
+                                 nx, vx, npt, vpt);
+        h->p2rho = new TProfile2D("p2rho", ";#eta;p_{T,avp} (GeV);"
+                                           "#rho",
+                                  nx, vx, npt, vpt);
+        h->p2chf = new TProfile2D("p2chf", ";#eta;p_{T,avp} (GeV);"
+                                           "CHF",
+                                  nx, vx, npt, vpt);
+        h->p2nhf = new TProfile2D("p2nhf", ";#eta;p_{T,avp} (GeV);"
+                                           "NHF",
+                                  nx, vx, npt, vpt);
+        h->p2nef = new TProfile2D("p2nef", ";#eta;p_{T,avp} (GeV);"
+                                           "NEF",
+                                  nx, vx, npt, vpt);
+        h->p2cef = new TProfile2D("p2cef", ";#eta;p_{T,avp} (GeV);"
+                                           "CEF",
+                                  nx, vx, npt, vpt);
+        h->p2muf = new TProfile2D("p2muf", ";#eta;p_{T,avp} (GeV);"
+                                           "MUF",
+                                  nx, vx, npt, vpt);
+
+        h->ppt13 = new TProfile("ppt13", ";#eta;p_{T,avp} (GeV);"
+                                         "p_{T,tag}",
+                                npt, vpt);
+        h->prho13 = new TProfile("prho13", ";#eta;p_{T,avp} (GeV);"
+                                           "#rho",
+                                 npt, vpt);
+        h->pchf13 = new TProfile("pchf13", ";#eta;p_{T,avp} (GeV);"
+                                           "CHF",
+                                 npt, vpt);
+        h->pnhf13 = new TProfile("pnhf13", ";#eta;p_{T,avp} (GeV);"
+                                           "NHF",
+                                 npt, vpt);
+        h->pnef13 = new TProfile("pnef13", ";#eta;p_{T,avp} (GeV);"
+                                           "NEF",
+                                 npt, vpt);
+        h->pcef13 = new TProfile("pcef13", ";#eta;p_{T,avp} (GeV);"
+                                           "CEF",
+                                 npt, vpt);
+        h->pmuf13 = new TProfile("pmuf13", ";#eta;p_{T,avp} (GeV);"
+                                           "MUF",
+                                 npt, vpt);
+      }
     } // doDijet2
 
     // Multijet per trigger
@@ -3592,12 +3647,17 @@ if (do_PUProfiles){
         h->pMPF_1200 = new TProfile("pMPF_1200", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pMPF_1200b = new TProfile("pMPF_1200b", "", _runNumberBin.size()-1, _runNumberBin.data());
 
+        h->pMPF_avg_800b = new TProfile("pMPF_avg_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
+	h->pMPF_rec_800b = new TProfile("pMPF_rec_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
+
         h->pDB_500 = new TProfile("pDB_500", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_500b = new TProfile("pDB_500b", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_600 = new TProfile("pDB_600", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_600b = new TProfile("pDB_600b", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_800 = new TProfile("pDB_800", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_800b = new TProfile("pDB_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
+	h->pDB_avg_800b = new TProfile("pDB_avg_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
+	h->pDB_rec_800b = new TProfile("pDB_rec_800b", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_1000 = new TProfile("pDB_1000", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_1000b = new TProfile("pDB_1000b", "", _runNumberBin.size()-1, _runNumberBin.data());
         h->pDB_1200 = new TProfile("pDB_1200", "", _runNumberBin.size()-1, _runNumberBin.data());
@@ -3657,7 +3717,7 @@ if (do_PUProfiles){
       dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
       dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
       dataset == "2024CS" || dataset == "2024CT" ||
-      TString(dataset.c_str()).Contains("Winter24MCFlat")) //|| TString(dataset.c_str()).Contains("Winter24MG"))
+      TString(dataset.c_str()).Contains("Winter24MCFlat"))// || TString(dataset.c_str()).Contains("Winter24MG"))
     //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
@@ -5256,6 +5316,26 @@ if (do_PUProfiles){
             h->p2m2pf->Fill(abseta, ptprobe, m2f, w);
             h->p2mnpf->Fill(abseta, ptprobe, mnf, w);
             h->p2mupf->Fill(abseta, ptprobe, muf, w);
+	    { if (doPFComposition)
+              {
+                h->p2pt->Fill(eta, ptavp2, Jet_pt[iprobe], w);
+                h->p2rho->Fill(eta, ptavp2, rho, w);
+                h->p2chf->Fill(eta, ptavp2, Jet_chHEF[iprobe], w);
+                h->p2nhf->Fill(eta, ptavp2, Jet_neHEF[iprobe], w);
+                h->p2nef->Fill(eta, ptavp2, Jet_neEmEF[iprobe], w);
+                h->p2cef->Fill(eta, ptavp2, Jet_chEmEF[iprobe], w);
+                h->p2muf->Fill(eta, ptavp2, Jet_muEF[iprobe], w);
+
+                h->ppt13->Fill(ptavp2, Jet_pt[itag], w);
+                h->prho13->Fill(ptavp2, rho, w);
+                h->pchf13->Fill(ptavp2, Jet_chHEF[itag], w);
+                h->pnhf13->Fill(ptavp2, Jet_neHEF[itag], w);
+                h->pnef13->Fill(ptavp2, Jet_neEmEF[itag], w);
+                h->pcef13->Fill(ptavp2, Jet_chEmEF[itag], w);
+                h->pmuf13->Fill(ptavp2, Jet_muEF[itag], w);
+              }
+            }
+
           } // doDijet2
 
         } // for itrg
@@ -5479,14 +5559,40 @@ if (do_PUProfiles){
     {
       auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
       double ptlead = p4lead.Pt();
+      double ptrecoil = p4recoil.Pt();
+      double ptave = 0.5 * (ptlead + ptrecoil);
+
       p4l.SetPtEtaPhiM(0, 0, 0, 0);
       p4l -= p4lead;
       p4l.SetPtEtaPhiM(p4l.Pt(), 0., p4l.Phi(), 0.);
       p4m0.SetPtEtaPhiM(p4m0.Pt(), 0., p4m0.Phi(), 0.);
       p4m3.SetPtEtaPhiM(p4m3.Pt(), 0., p4m3.Phi(), 0.);
       p4l *= 1. / p4l.Pt();
+      // MPF and DB leading
       double m0l = 1 + (p4m0.Vect().Dot(p4l.Vect())) / ptlead; // MPF leading
       double m3l = 1 + (p4m3.Vect().Dot(p4l.Vect())) / ptlead; // DB leading
+
+      p4b3.SetPtEtaPhiM(0, 0, 0, 0);
+      p4b3r.SetPtEtaPhiM(1, 0, p4recoil.Phi(), 0);
+      p4b3l.SetPtEtaPhiM(1, 0, p4lead.Phi(), 0);
+      p4b3 += p4b3r;
+      p4b3 -= p4b3l;
+      p4b3.SetPtEtaPhiM(p4b3.Pt(), 0., p4b3.Phi(), 0.);
+      p4b3 *= 1. / p4b3.Pt();
+      
+      // MPF and DB avg
+      double m0b = 1 + (p4m0.Vect().Dot(p4b3.Vect())) / ptave;
+      double m3b = 1 + (p4m3.Vect().Dot(p4b3.Vect())) / ptave;
+
+      p4r.SetPtEtaPhiM(0, 0, 0, 0);
+      p4r += p4recoil;
+      p4r.SetPtEtaPhiM(p4r.Pt(), 0., p4r.Phi(), 0.);
+      p4r *= 1. / p4r.Pt();
+
+      //MPF and DB rec
+      double m0r = 1 + (p4m0.Vect().Dot(p4r.Vect())) / ptrecoil;
+      double m3r = 1 + (p4m3.Vect().Dot(p4r.Vect())) / ptrecoil;
+
       for (int itrg = 0; itrg != ntrg; ++itrg)
       {
         string &trg = vtrg[itrg];
@@ -5534,8 +5640,14 @@ if (do_PUProfiles){
               h->pDB_600b->Fill(run, m3l, 1./mlumi[trg][run]);
             }
             if (ptlead > 800){
-              h->pMPF_800b->Fill(run, m0l, 1./mlumi[trg][run]);
+              //MPF
+	      h->pMPF_800b->Fill(run, m0l, 1./mlumi[trg][run]);
+	      h->pMPF_avg_800b->Fill(run, m0b, 1./mlumi[trg][run]);
+	      h->pMPF_rec_800b->Fill(run, m0r, 1./mlumi[trg][run]);
+	      // DB
               h->pDB_800b->Fill(run, m3l, 1./mlumi[trg][run]);
+              h->pDB_avg_800b->Fill(run, m3b, 1./mlumi[trg][run]);
+              h->pDB_rec_800b->Fill(run, m3r, 1./mlumi[trg][run]);
             }
             if (ptlead > 1000){
               h->pMPF_1000b->Fill(run, m0l, 1./mlumi[trg][run]);
