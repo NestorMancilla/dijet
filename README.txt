@@ -72,6 +72,8 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v111. Test on 2024I Skim. Full 2024 H and I without skim. JSON: CombinedJSON_GoldenRuns_378985to386319_DCSRuns_386320to386951.
+//	 JRSF_2024[H,I] and 2024[H,I] includes PU reweighting and SF.
 // v110. Prompt24_V6M for all eras (L2L3 and jetvetomaps). v110_1_era corresponds to the PU reweigting and the JRSF.
 //	 V110_1_2024 includes the Profile results for MPF and DB avg and rec.
 // v109. Run 2024 including doJetsperRuns and fixed luminosity problem. Winter24MGV14 without pileup reweighting to have the two new variables distributions.

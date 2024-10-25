@@ -135,12 +135,13 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D
 //constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
 //constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to383163_DCSRuns_383164to383467.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to383724_DCSRuns_383725to384446.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to385863_DCSRuns_378981to386319.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to385863_DCSRuns_378981to386319.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to386319_DCSRuns_386320to386951.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 47> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 56> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -189,6 +190,15 @@ constexpr std::array<std::pair<const char*, const char*>, 47> lumifiles = {{
     {"2024G_4", lumibyls2024BCDEFG},
     {"2024G_5", lumibyls2024BCDEFG},
     {"2024G_ZB", lumibyls2024BCDEFG},
+    {"2024H", lumibyls2024BCDEFG},
+    {"2024H_ZB", lumibyls2024BCDEFG},
+    {"2024Iv1", lumibyls2024BCDEFG},
+    {"2024Iv1_ZB", lumibyls2024BCDEFG},
+    {"2024Iv2", lumibyls2024BCDEFG},
+    {"2024Iv2_ZB", lumibyls2024BCDEFG},
+    {"2024F_TeVJet", lumibyls2024BCDEFG},
+    {"2024F_JetHT", lumibyls2024BCDEFG},
+    {"2024I_Skim", lumibyls2024BCDEFG},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -686,7 +696,7 @@ bool DijetHistosFill::LoadLumi()
 	//string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
 	//string JSON_version = "2022_Golden";
 	//string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
-	string JSON_version = "GoldenRuns_378985to385863_DCSRuns_385864to386319";
+	string JSON_version = "GoldenRuns_378985to386319_DCSRuns_386320to386951";
 	// List of filenames
 	vector<string> filenames = {
 		"luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -1858,21 +1868,21 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			"");
-	jerpathsf = "";
+	//jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024G_JRV6M_MC_SF_AK4PFPuppi.txt";
-	jersfvspt = getFJC("", "Prompt24_2024G_JRV6M_MC_SF_AK4PFPuppi", "");
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV6M_MC_SF_AK4PFPuppi.txt";
+	jersfvspt = getFJC("", "Prompt24_2024F_JRV6M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "", "");
 	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
 	//jerpath = "";
-	useJERSFvsPt = true; //Nestor, Sep20, 2024.
+	useJERSFvsPt = false; //Nestor, Sep20, 2024.
 
            	
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024G/PUWeights_HLT_PFJet500_2024G.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024G");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024I/PUWeights_HLT_PFJet500_2024I.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024I");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 		 cout << "PU weight file: " << f.GetName() << endl;
@@ -2005,6 +2015,22 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+
+}
+
+if (dataset == "2024H"  || dataset == "2024H_ZB")
+{
+        jec = getFJC("",
+                        "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+
+}
+
+if (dataset == "2024Iv1" || dataset == "2024Iv2" || dataset == "2024Iv1_ZB" || dataset == "2024Iv2_ZB" || dataset == "2024I_Skim")
+{
+        jec = getFJC("",
+                        "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -2417,7 +2443,8 @@ if (do_PUProfiles){
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to382329_DCSRuns_382330to382686.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to383163_DCSRuns_383164to383467.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to383724_DCSRuns_383725to384446.json");
-      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to385863_DCSRuns_385864to386319.json");
+      //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to385863_DCSRuns_385864to386319.json");
+      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to386319_DCSRuns_386320to386951.json");
 
   }
   int _nbadevts_json(0);
@@ -3717,13 +3744,17 @@ if (do_PUProfiles){
       dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
       dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
       dataset == "2024CS" || dataset == "2024CT" ||
-      TString(dataset.c_str()).Contains("Winter24MCFlat"))// || TString(dataset.c_str()).Contains("Winter24MG"))
+      TString(dataset.c_str()).Contains("Winter24MCFlat")) // || TString(dataset.c_str()).Contains("Winter24MG"))
     //fjv = new TFile("rootfiles/jetveto2024BC_V1M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
     fjv = new TFile("rootfiles/jetveto2024BCDE_V6M.root", "READ");
-  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB" || TString(dataset.c_str()).Contains("Winter24MG"))
+  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || 
+      dataset == "2024G_ZB" || TString(dataset.c_str()).Contains("Winter24MG") ||
+      dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
+      dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
+      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim")
     //fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
     fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
   assert(fjv);
@@ -3784,7 +3815,10 @@ if (do_PUProfiles){
       dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
-  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB")
+  if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB" ||
+      dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
+      dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
+      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim")
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 

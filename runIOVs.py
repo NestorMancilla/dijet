@@ -34,8 +34,9 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2024F', '2024F_ZB', '2024G', '2024G_ZB',
     '2024F_1', '2024F_2', '2024F_3', '2024F_4',
     '2024G_1', '2024G_2', '2024G_3', '2024G_4', '2024G_5',
-    '2024BR', '2024CR', '2024Crs', '2024CS', '2024CT',
-    '2024_skim',
+    '2024H', '2024H_ZB', '2024Iv1', '2024Iv1_ZB', '2024Iv2', '2024Iv2_ZB',
+    '2024BR', '2024CR', '2024Crs', '2024CS', '2024CT', '2024F_TeVJet', '2024F_JetHT', 
+    '2024_skim', '2024I_Skim',
     'Winter24MG_1', 'Winter24MG_2', 'Winter24MG_3', 'Winter24MG_4', 'Winter24MG_5',
     'Winter24MGV14_1', 'Winter24MGV14_2', 'Winter24MGV14_3', 'Winter24MGV14_4', 'Winter24MGV14_5'
 ]
@@ -46,7 +47,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v110_1_2024G'
+version = 'JRSF_v111_2024I'
 
 IOV_input = []
 
