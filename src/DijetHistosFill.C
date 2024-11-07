@@ -9,6 +9,7 @@
 //#include "../interface/DijetHistosFillNanoV9.h"
 //#include "../interface/DijetHistosFill.h"
 #include "../interface/DijetHistosFill_2024Prompt.h"
+//#include "../interface/DijetHistosFill_2024Prompt_2024Skim.h" // Skimm Files. Nestor Oct25, 2024.
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -41,7 +42,7 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = true;
+bool smearJets = false;
 bool useJERSFvsPt = false; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
@@ -141,7 +142,7 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 56> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 61> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -198,7 +199,12 @@ constexpr std::array<std::pair<const char*, const char*>, 56> lumifiles = {{
     {"2024Iv2_ZB", lumibyls2024BCDEFG},
     {"2024F_TeVJet", lumibyls2024BCDEFG},
     {"2024F_JetHT", lumibyls2024BCDEFG},
+    {"2024H_Skim", lumibyls2024BCDEFG},
     {"2024I_Skim", lumibyls2024BCDEFG},
+    {"2024F_ECAL_CC_1", lumibyls2024BCDEFG},
+    {"2024F_ECAL_CC_2", lumibyls2024BCDEFG},
+    {"2024F_ECAL_CC_3", lumibyls2024BCDEFG},
+    {"2024F_ECAL_CC_4", lumibyls2024BCDEFG},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -1868,21 +1874,21 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			"");
-	//jerpathsf = "";
+	jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV6M_MC_SF_AK4PFPuppi.txt";
-	jersfvspt = getFJC("", "Prompt24_2024F_JRV6M_MC_SF_AK4PFPuppi", "");
-	//jersfvspt = getFJC("", "", "");
-	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	//jerpath = "";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV6M_MC_SF_AK4PFPuppi.txt";
+	//jersfvspt = getFJC("", "Prompt24_2024F_JRV6M_MC_SF_AK4PFPuppi", "");
+	jersfvspt = getFJC("", "", "");
+	//jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+	jerpath = "";
 	useJERSFvsPt = false; //Nestor, Sep20, 2024.
 
            	
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024I/PUWeights_HLT_PFJet500_2024I.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024I");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeight2024GH/PUWeights_HLT_PFJet500_2024GH.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024GH");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 		 cout << "PU weight file: " << f.GetName() << endl;
@@ -2018,7 +2024,7 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 
 }
 
-if (dataset == "2024H"  || dataset == "2024H_ZB")
+if (dataset == "2024H"  || dataset == "2024H_ZB" || dataset == "2024H_Skim")
 {
         jec = getFJC("",
                         "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3752,7 +3758,8 @@ if (do_PUProfiles){
     fjv = new TFile("rootfiles/jetveto2024BCDE_V6M.root", "READ");
   if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || 
       dataset == "2024G_ZB" || TString(dataset.c_str()).Contains("Winter24MG") ||
-      dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
+      dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
+      dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
       dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim")
     //fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
@@ -3816,7 +3823,8 @@ if (do_PUProfiles){
       TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || dataset == "2024G_ZB" ||
-      dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
+      dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" || 
+      dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
       dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim")
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");

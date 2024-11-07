@@ -16,6 +16,7 @@
 //#include "../interface/DijetHistosFillNanoV9.h"
 //#include "../interface/DijetHistosFill.h"
 #include "../interface/DijetHistosFill_2024Prompt.h" // For Prompt 2024 and to add the luminosity in the Loop function. Nestor. April 19.
+//#include "../interface/DijetHistosFill_2024Prompt_2024Skim.h" // For Skim Files. Nestor. October25, 2024.
 
 #include "TSystem.h"
 
@@ -108,7 +109,12 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2023Cv123_prompt", "2023Cv123_ZB_prompt", "2023Cv4_prompt", "2023Cv4_ZB_prompt", "2023D_prompt", "2023D_ZB_prompt",
   "2024B", "2024B_JME", "2024B_ZB", "2024C", "2024C_JME", "2024C_ZB", "2024D", "2024D_ZB", "2024Ev1", "2024Ev1_ZB", "2024Ev2_ZB",
   "2024F", "2024F_ZB", "2024G", "2024G_ZB",
+  "2024F_1", "2024F_2", "2024F_3", "2024F_4",
+  "2024G_1", "2024G_2", "2024G_3", "2024G_4", "2024G_5",
+  "2024H", "2024H_ZB", "2024Iv1", "2024Iv1_ZB", "2024Iv2", "2024Iv2_ZB",
+  "2024F_TeVJet", "2024F_JetHT", "2024I_Skim", "2024H_Skim",
   "2024BR", "2024CR", "2024Ev2", "2024Crs", "2024CS", "2024CT",
+  "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
   "2024_skim"
   };
 
