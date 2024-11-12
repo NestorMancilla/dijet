@@ -138,6 +138,7 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to383724_DCSRuns_383725to384446.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to385863_DCSRuns_378981to386319.csv";
 constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to386319_DCSRuns_386320to386951.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumibyls2024_378981_386951_Golden.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
@@ -702,7 +703,8 @@ bool DijetHistosFill::LoadLumi()
 	//string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
 	//string JSON_version = "2022_Golden";
 	//string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
-	string JSON_version = "GoldenRuns_378985to386319_DCSRuns_386320to386951";
+	//string JSON_version = "GoldenRuns_378985to386319_DCSRuns_386320to386951";
+	string JSON_version = "Collisions2024_378981_386951_Golden";
 	// List of filenames
 	vector<string> filenames = {
 		"luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
@@ -2450,7 +2452,8 @@ if (do_PUProfiles){
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to383163_DCSRuns_383164to383467.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378981to383724_DCSRuns_383725to384446.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to385863_DCSRuns_385864to386319.json");
-      LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to386319_DCSRuns_386320to386951.json");
+      //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to386319_DCSRuns_386320to386951.json");
+      LoadJSON("rootfiles/Cert_Collisions2024_378981_386951_Golden.json");
 
   }
   int _nbadevts_json(0);
