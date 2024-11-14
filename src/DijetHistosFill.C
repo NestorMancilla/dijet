@@ -49,7 +49,7 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = true;
+bool reweightPU = false;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
@@ -137,7 +137,7 @@ constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D
 //constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to383163_DCSRuns_383164to383467.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to383724_DCSRuns_383725to384446.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to385863_DCSRuns_378981to386319.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to386319_DCSRuns_386320to386951.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to386319_DCSRuns_386320to386951.csv";
 constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumibyls2024_378981_386951_Golden.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
@@ -834,11 +834,15 @@ bool DijetHistosFill::LoadLumi()
 	if (lumifile_str.Contains("2022") || lumifile_str.Contains("2023")) {
 		expectedTag = "#Data tag : 23v1 , Norm tag: None";
 		expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source";
+	} else if (lumifile_str.Contains("lumibyls2024_378981_386951_Golden")) {
+		expectedTag = "#Data tag : online , Norm tag: None";
+                expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
 	} else {
 		expectedTag = "#Data tag : 24v1 , Norm tag: None";
-	        expectedTag_2 = "#Data tag : 24v2 , Norm tag: None";
+		expectedTag_2 = "#Data tag : 24v2 , Norm tag: None";
                 expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
 	}
+	
 
 	// Read and validate the first line
 	bool getsuccess1 = static_cast<bool>(getline(f, s, '\n'));
@@ -1933,7 +1937,8 @@ if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
 				//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
-		    		"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
+		    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 }
 
@@ -1965,7 +1970,8 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 				//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
-		    		"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
+		    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 }
 
@@ -1981,7 +1987,8 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
 			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
 	    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
-	    		"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
+	    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
@@ -1996,7 +2003,8 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
 			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
 	    		//"Prompt24_Run2024E_V5M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt24_Run2024E_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt24_Run2024E_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024E_V7M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -2013,7 +2021,8 @@ if (TString(dataset.c_str()).Contains("2024F")  || dataset == "2024F_ZB")
 			//"Prompt24_Run2024E_V4M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
 	    		//"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt24_Run2024F_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt24_Run2024F_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024F_V7M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -2022,7 +2031,8 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024G_V7M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -2030,7 +2040,8 @@ if (dataset == "2024H"  || dataset == "2024H_ZB" || dataset == "2024H_Skim")
 {
         jec = getFJC("",
                         "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                        "Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -2038,7 +2049,8 @@ if (dataset == "2024Iv1" || dataset == "2024Iv2" || dataset == "2024Iv1_ZB" || d
 {
         jec = getFJC("",
                         "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                        "Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -3758,7 +3770,8 @@ if (do_PUProfiles){
     //fjv = new TFile("rootfiles/jetveto2024BC_V2M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
-    fjv = new TFile("rootfiles/jetveto2024BCDE_V6M.root", "READ");
+    //fjv = new TFile("rootfiles/jetveto2024BCDE_V6M.root", "READ");
+    fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
   if (TString(dataset.c_str()).Contains("2024F") || dataset == "2024F_ZB" || TString(dataset.c_str()).Contains("2024G") || 
       dataset == "2024G_ZB" || TString(dataset.c_str()).Contains("Winter24MG") ||
       dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
@@ -3766,7 +3779,8 @@ if (do_PUProfiles){
       dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
       dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim")
     //fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
-    fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
+    //fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
+    fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -6101,7 +6115,15 @@ bool DijetHistosFill::LoadJSON(string json)
       continue;
     else if (_dh_debug and s2 != "],")
       PrintInfo(string("s2: ") + s2, true);
-    assert(s2 == "],");
+    else
+    {
+        // Add this check before the assertion
+      if (s2 != "],") {
+          std::cerr << "Unexpected s2 value: '" << s2 << "'" << std::endl;
+      }
+      assert(s2 == "],"); // Assertion remains here
+    }
+    //assert(s2 == "],");
   } // while run
   if (s2 != "]}")
   {

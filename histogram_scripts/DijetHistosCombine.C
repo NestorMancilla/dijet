@@ -10,7 +10,7 @@
 #include <iostream>
 
 int debug = 1; // 1=trg, 2=dir, 3=all
-string version = "v79_2024";
+string version = "v111_2024_GH";
 void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 			 string trg, string folder);
 //void mergeDijet(TDirectory *dir, TDirectory *dout);
@@ -41,13 +41,21 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024BCD_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024E_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev1_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev2_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024I_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024BR_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024CR_JME_"+version+".root");
-  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024CS_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024CS_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024CT_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_TeVJet_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_JetHT_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_Skim_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024BC_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
@@ -72,6 +80,24 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_Sv9_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MCFlat_Sv10_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MG_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+"B.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+"C.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+"D.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+"E.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+"F.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+"G.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+"BCD.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v109_JRSF_2024BCD.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v109_JRSF_2024E.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_JRSF_v110_1_2024BCD.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_JRSF_v110_1_2024E.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_JRSF_v110_1_2024F.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_JRSF_v110_1_2024G.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v111_2024H.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v111_2024I.root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+".root");
 
 
   //DijetHistosCombines("rootfiles/jmenano_mc_out_v23ul16flat.root");
@@ -265,6 +291,14 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	      else {
 		p2o->SetEntries(p2o->GetEntries()+p2->GetEntries());
 		(*p2o)[ibin] = (*p2)[ibin]; // copy bin y values
+		/*
+		if (p2->GetSumw2()->fN > ibin) {
+                   (*p2o->GetSumw2())[ibin] = (*p2->GetSumw2())[ibin];
+                }
+		else{
+                   cout << "GetSumw2 is not greater than ibin " <<  endl << flush;
+		}
+		*/
 		(*p2o->GetSumw2())[ibin] = (*p2->GetSumw2())[ibin]; // copy y*y
 		p2o->SetBinEntries(ibin, p2->GetBinEntries(ibin));  // entries
 		// copy (if needed) bin sum of weight square
@@ -353,6 +387,49 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
       } // TH2D
 
       else if (obj->InheritsFrom("TProfile")) {
+          TProfile *p = (TProfile*)obj;
+
+          TProfile *po = (TProfile*)outdir->FindObject(key->GetName());
+          if (!po) {
+              outdir->cd();
+              po = (TProfile*)p->Clone(key->GetName());
+              po->Reset();
+	      //po->Sumw2(); // Nestor, Oct 24, 2024. Problems with 2024F_TeVJet.
+          }
+
+          // Copy bins for JetsperRuns without checking pt and eta
+          for (int ibin = 1; ibin != p->GetNbinsX()+1; ++ibin) {
+              if (folder == "JetsperRuns") {
+                  // Directly copy for JetsperRuns
+                  (*po)[ibin] = (*p)[ibin];  // copy bin y values
+                  (*po->GetSumw2())[ibin] = (*p->GetSumw2())[ibin];  // copy bin y*y
+                  po->SetBinEntries(ibin, p->GetBinEntries(ibin));  // copy entries
+
+                  if (p->GetBinSumw2()->fN > ibin) {
+                      (*po->GetBinSumw2())[ibin] = (*p->GetBinSumw2())[ibin];  // copy sumw2
+                  }
+              } else {
+                  // For other folders, apply the copyBin condition
+                  if (copyBin(trg, folder, key->GetName(), po->GetBinCenter(ibin), 0.)) {
+                      (*po)[ibin] = (*p)[ibin];  // copy bin y values
+                      (*po->GetSumw2())[ibin] = (*p->GetSumw2())[ibin];  // copy bin y*y
+                      po->SetBinEntries(ibin, p->GetBinEntries(ibin));  // copy entries
+
+                      if (p->GetBinSumw2()->fN > ibin) {
+		      //if (p->GetBinSumw2()->fN > ibin && po->GetBinSumw2()->fN > ibin) {
+                          (*po->GetBinSumw2())[ibin] = (*p->GetBinSumw2())[ibin];  // copy sumw2
+                      }
+		      
+		      //else{
+		      //   cout << "GetBinSumw2 of po is not greater than ibin " <<  endl << flush;
+		      //}
+                  }
+              }
+          } // for ibin
+      } // TProfile
+
+      /*
+      else if (obj->InheritsFrom("TProfile")) {
 	TProfile *p = (TProfile*)obj;
 
 	TProfile *po = (TProfile*)outdir->FindObject(key->GetName());
@@ -378,6 +455,7 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	  }
 	} // for ibin
       } // TProfile
+      */
       else if (obj->InheritsFrom("TH1D")) {
 	TH1D *h = (TH1D*)obj;
 	TH1D *ho = (TH1D*)outdir->FindObject(key->GetName());
@@ -600,7 +678,11 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
   
   if (folder=="Jetveto" && (hist=="p2chf" || hist=="p2nhf" || hist=="p2nef" ||
 			    hist=="p2asymm" || hist=="h2phieta" ||
-			    hist=="h2phieta_ave" || hist=="p2asymm_noveto"))
+			    hist=="h2phieta_ave" || hist=="p2asymm_noveto" ||
+			    hist=="p2asymm_pttag" || hist=="p2asymm_noveto_pttag" ||
+			    hist=="p2chf_pttag" || hist=="p2nhf_pttag" || hist=="p2nef_pttag" ||
+			    hist=="h2phieta_pttag" || hist=="h2pteta_all_pttag" || hist=="h2pteta_sel_pttag" ||
+			    hist=="p2chf_noveto_pttag" || hist=="p2nef_noveto_pttag" || hist=="p2nhf_noveto_pttag"))
     return true;
   if (folder=="Jetveto") {
     if (h3asymm) {
@@ -623,6 +705,12 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
       fabs(eta) >= mi[trg].absetamin && fabs(eta) < mi[trg].absetamax)
     return true;
   if (folder=="Dijet" &&
+      md.find(trg)!=md.end() &&
+      pt >= md[trg].ptmin && pt < md[trg].ptmax &&
+      fabs(eta) >= md[trg].absetamin && fabs(eta) < md[trg].absetamax)
+    return true;
+
+  if (folder=="Pileup" &&
       md.find(trg)!=md.end() &&
       pt >= md[trg].ptmin && pt < md[trg].ptmax &&
       fabs(eta) >= md[trg].absetamin && fabs(eta) < md[trg].absetamax)
