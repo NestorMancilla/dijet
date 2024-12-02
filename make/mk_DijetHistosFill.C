@@ -15,8 +15,8 @@
 
 //#include "../interface/DijetHistosFillNanoV9.h"
 //#include "../interface/DijetHistosFill.h"
-#include "../interface/DijetHistosFill_2024Prompt.h" // For Prompt 2024 and to add the luminosity in the Loop function. Nestor. April 19.
-//#include "../interface/DijetHistosFill_2024Prompt_2024Skim.h" // For Skim Files. Nestor. October25, 2024.
+//#include "../interface/DijetHistosFill_2024Prompt.h" // For Prompt 2024 and to add the luminosity in the Loop function. Nestor. April 19.
+#include "../interface/DijetHistosFill_2024Prompt_2024Skim.h" // For Skim Files. Nestor. October25, 2024.
 
 #include "TSystem.h"
 
@@ -80,6 +80,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer22MC_Flat2018",
      "Summer22Flat", "Summer22MG",
      "Summer22MG1", "Summer22MG2",
+     "Summer22MG_1", "Summer22MG_2", "Summer22MG_3", "Summer22MG_4", "Summer22MG_5",
+     "Summer22EEMG_1", "Summer22EEMG_2", "Summer22EEMG_3", "Summer22EEMG_4", "Summer22EEMG_5",
      "Summer22EEFlat", "Summer22EEMG",
      "Summer22EEMG1", "Summer22EEMG2",
      "Summer22EEMG3", "Summer22EEMG4",
@@ -102,14 +104,23 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "UL2016GH_ZB", "UL2017B_ZB", "UL2017C_ZB", "UL2017D_ZB", 
   "UL2017E_ZB", "UL2017F_ZB", "UL2018A_ZB", "UL2018B_ZB", 
   "UL2018C_ZB", "UL2018D_ZB", "2022C", "2022D", "2022E", 
+  "2022C_nib1", "2022D_nib1", "2022E_nib1", "2022F_nib1", "2022G_nib1",
+  "2022C_nib1_ZB", "2022D_nib1_ZB", "2022E_nib1_ZB", "2022F_nib1_ZB", "2022G_nib1_ZB",
   "2022F", "2022G", "2022F1", "2022F2", "2022D_prompt", "2022D_ZB_prompt", "2022C_prompt", "2022C_ZB_prompt",
-  "2023BCv123", "2023B", "2023Cv123", "2023Cv123_ZB","2023Cv4", 
+  "2023BCv123", "2023B", "2023Cv123", "2023Cv123_ZB","2023Cv4",
+  "2023Bv1_nib1", "2023Cv1_nib1", "2023Cv2_nib1", "2023Cv3_nib1", "2023Cv4_nib1", "2023Cv4_nib2", "2023Dv1_nib1", "2023Dv2_nib1",
+  "2023Bv1_nib1_ZB", "2023Cv1_nib1_ZB", "2023Cv2_nib1_ZB", "2023Cv3_nib1_ZB", "2023Cv4_nib1_ZB", "2023Cv4_nib2_ZB", "2023Dv1_nib1_ZB", "2023Dv2_nib1_ZB",
   "2023D", "2022C_ZB", "2022D_ZB", "2022E_ZB", "2022F_ZB", "2022G_ZB", 
   "2023BCv123_ZB", "2023Cv4_ZB", "2023D_ZB",
   "2023Cv123_prompt", "2023Cv123_ZB_prompt", "2023Cv4_prompt", "2023Cv4_ZB_prompt", "2023D_prompt", "2023D_ZB_prompt",
   "2024B", "2024B_JME", "2024B_ZB", "2024C", "2024C_JME", "2024C_ZB", "2024D", "2024D_ZB", "2024Ev1", "2024Ev1_ZB", "2024Ev2_ZB",
   "2024F", "2024F_ZB", "2024G", "2024G_ZB",
   "2024F_1", "2024F_2", "2024F_3", "2024F_4",
+  "2024B_nib1", "2024C_nib1", "2024D_nib1", "2024Ev1_nib1", "2024Ev2_nib1", "2024H_nib1", "2024Iv1_nib1", "2024Iv2_nib1",
+  "2024F_nib1", "2024F_nib2", "2024F_nib3", "2024G_nib1", "2024G_nib2",
+  "2024B_nib1_ZB", "2024C_nib1_ZB", "2024D_nib1_ZB", "2024Ev1_nib1_ZB", "2024Ev2_nib1_ZB", "2024H_nib1_ZB", "2024Iv1_nib1_ZB", "2024Iv2_nib1_ZB",
+  "2024F_nib1_ZB", "2024F_nib2_ZB", "2024F_nib3_ZB", "2024G_nib1_ZB", "2024G_nib2_ZB",
+  "2024F_nib1_ZeroBias", "2024F_nib2_ZeroBias", "2024F_nib3_ZeroBias",
   "2024G_1", "2024G_2", "2024G_3", "2024G_4", "2024G_5",
   "2024H", "2024H_ZB", "2024Iv1", "2024Iv1_ZB", "2024Iv2", "2024Iv2_ZB",
   "2024F_TeVJet", "2024F_JetHT", "2024I_Skim", "2024H_Skim",

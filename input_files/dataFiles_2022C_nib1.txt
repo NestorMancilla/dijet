@@ -1,0 +1,5 @@
+/media/DATA3/Skims/2022/Data_2022C_DiJet_JetMET_2022C-nib1-fib1-355862-356576.root
+/media/DATA3/Skims/2022/Data_2022C_DiJet_JetMET_2022C-nib1-fib2-356578-356947.root
+/media/DATA3/Skims/2022/Data_2022C_DiJet_JetMET_2022C-nib1-fib3-356948-357268.root
+/media/DATA3/Skims/2022/Data_2022C_DiJet_JetMET_2022C-nib1-fib4-357271-357401.root
+/media/DATA3/Skims/2022/Data_2022C_DiJet_JetMET_2022C-nib1-fib5-357406-357482.root

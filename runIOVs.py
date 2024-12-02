@@ -15,13 +15,19 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2022C','2022D','2022E', '2022F', '2022G', # '2022F1','2022F2',
     '2022C_ZB','2022D_ZB','2022E_ZB','2022F_ZB','2022G_ZB',
     '2022D_prompt', '2022D_ZB_prompt', '2022C_prompt', '2022C_ZB_prompt',
+    '2022C_nib1', '2022D_nib1', '2022E_nib1', '2022F_nib1', '2022G_nib1',
+    '2022C_nib1_ZB', '2022D_nib1_ZB', '2022E_nib1_ZB', '2022F_nib1_ZB', '2022G_nib1_ZB',
     '2023Cv4', '2023D', '2023BCv123', '2023Cv123', '2023Cv123_ZB',
     '2023BCv123_ZB','2023Cv4_ZB','2023D_ZB',
+    '2023Bv1_nib1', '2023Cv1_nib1', '2023Cv2_nib1', '2023Cv3_nib1', '2023Cv4_nib1', '2023Cv4_nib2', '2023Dv1_nib1', '2023Dv2_nib1',
+    '2023Bv1_nib1_ZB', '2023Cv1_nib1_ZB', '2023Cv2_nib1_ZB', '2023Cv3_nib1_ZB', '2023Cv4_nib1_ZB', '2023Cv4_nib2_ZB', '2023Dv1_nib1_ZB', '2023Dv2_nib1_ZB',
     '2023Cv123_prompt', '2023Cv123_ZB_prompt', '2023Cv4_prompt', '2023Cv4_ZB_prompt', '2023D_prompt', '2023D_ZB_prompt',
     'UL2018MG_1', 'UL2018MG_2', 'UL2018MG_3', 'UL2018MG_4', 'UL2018MG_5',
     'Summer22MC_Flat2018',
     'Summer22MG1','Summer22MG2',
+    'Summer22MG_1', 'Summer22MG_2', 'Summer22MG_3', 'Summer22MG_4', 'Summer22MG_5',
     'Summer22EEMG1','Summer22EEMG2','Summer22EEMG3','Summer22EEMG4',
+    'Summer22EEMG_1', 'Summer22EEMG_2', 'Summer22EEMG_3', 'Summer22EEMG_4', 'Summer22EEMG_5',
     'Summer22EEMG_full', 'Summer22MG_full',
     'Summer23MG_1', 'Summer23MG_2', 'Summer23MG_3', 'Summer23MG_4', 'Summer23MG',
     'Summer23MGBPix_1', 'Summer23MGBPix_2', 'Summer23MGBPix_3', 'Summer23MGBPix_4', 'Summer23MGBPix',
@@ -33,6 +39,11 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2024B', '2024B_JME', '2024B_ZB', '2024C', '2024C_JME', '2024C_ZB', '2024D', '2024D_ZB', '2024Ev1', '2024Ev1_ZB', '2024Ev2', '2024Ev2_ZB',
     '2024F', '2024F_ZB', '2024G', '2024G_ZB',
     '2024F_1', '2024F_2', '2024F_3', '2024F_4',
+    '2024B_nib1', '2024C_nib1', '2024D_nib1', '2024Ev1_nib1', '2024Ev2_nib1', '2024H_nib1', '2024Iv1_nib1', '2024Iv2_nib1',
+    '2024F_nib1', '2024F_nib2', '2024F_nib3', '2024G_nib1', '2024G_nib2',
+    '2024B_nib1_ZB', '2024C_nib1_ZB', '2024D_nib1_ZB', '2024Ev1_nib1_ZB', '2024Ev2_nib1_ZB', '2024H_nib1_ZB', '2024Iv1_nib1_ZB', '2024Iv2_nib1_ZB',
+    '2024F_nib1_ZB', '2024F_nib2_ZB', '2024F_nib3_ZB', '2024G_nib1_ZB', '2024G_nib2_ZB',
+    '2024F_nib1_ZeroBias', '2024F_nib2_ZeroBias', '2024F_nib3_ZeroBias',
     '2024G_1', '2024G_2', '2024G_3', '2024G_4', '2024G_5',
     '2024H', '2024H_ZB', '2024Iv1', '2024Iv1_ZB', '2024Iv2', '2024Iv2_ZB',
     '2024BR', '2024CR', '2024Crs', '2024CS', '2024CT', '2024F_TeVJet', '2024F_JetHT', 
@@ -48,7 +59,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v112_2024'
+version = 'v113_2024'
 
 IOV_input = []
 

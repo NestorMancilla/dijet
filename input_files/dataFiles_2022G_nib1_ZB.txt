@@ -1,0 +1,3 @@
+/media/DATA3/Skims/2022/Data_2022G_DiJet_ZeroBias_2022G-nib1-fib1-362437-362616.root
+/media/DATA3/Skims/2022/Data_2022G_DiJet_ZeroBias_2022G-nib1-fib2-362617-362696.root
+/media/DATA3/Skims/2022/Data_2022G_DiJet_ZeroBias_2022G-nib1-fib3-362698-362760.root

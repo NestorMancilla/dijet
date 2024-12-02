@@ -1,0 +1,10 @@
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib1-369927-370144.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib10-370753-370790.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib2-370169-370175.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib3-370293-370293.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib4-370294-370321.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib5-370332-370332.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib6-370340-370472.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib7-370497-370579.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib8-370580-370580.root
+/media/DATA3/Skims/2023/Data_2023Dv1_DiJet_ZeroBias_2023D-nib1-fib9-370667-370749.root
