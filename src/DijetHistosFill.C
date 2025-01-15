@@ -4283,7 +4283,7 @@ if (do_PUProfiles){
 
     // Check that MET filters are all true
     bool pass_METfilter = ((isRun3 || isRun2) &&
-		           //MET_pt / MET_sumEt > 0.3 && // To (maybe) remove noise spoiling the RMS. Nestor April24, 2024.
+		           //MET_pt / MET_sumEt > 0.3 && // To  remove noise spoiling the RMS. Nestor April24, 2024.
 		           !(RawPuppiMET_pt / RawPuppiMET_sumEt > 0.3) && // To (maybe) remove noise spoiling the RMS. Nestor April24, 2024.
                            Flag_goodVertices &&
                            Flag_globalSuperTightHalo2016Filter &&
