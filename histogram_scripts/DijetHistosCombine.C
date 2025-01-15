@@ -10,7 +10,7 @@
 #include <iostream>
 
 int debug = 1; // 1=trg, 2=dir, 3=all
-string version = "v111_2024_GH";
+string version = "v113_2024";
 void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 			 string trg, string folder);
 //void mergeDijet(TDirectory *dir, TDirectory *dout);
@@ -24,6 +24,11 @@ void DijetHistosCombine() {
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2022D_JME_"+version+".root");
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2022CD_JME_"+version+".root");
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2022E_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2022C_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2022D_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2022E_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2022F_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2022G_nib1_JME_"+version+".root");
   // Nestor run
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2022E_"+version+"_22Sep2023.root");
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2022F_JME_"+version+".root");
@@ -32,6 +37,14 @@ void DijetHistosCombine() {
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2023BCv123_JME_"+version+".root");
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2023Cv4_JME_"+version+".root");
   //DijetHistosCombines("../rootfiles/jmenano_data_out_2023D_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Bv1_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv1_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv2_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv3_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv4_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv4_nib2_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Dv1_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Dv2_nib1_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022C_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022D_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2022CD_JME_"+version+".root");
@@ -47,6 +60,7 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev2_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024GH_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024I_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024BR_JME_"+version+".root");
@@ -56,6 +70,20 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_TeVJet_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_JetHT_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_Skim_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev1_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev2_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_nib2_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_nib3_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_nib2_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Iv1_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Iv2_nib1_JME_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024I_nib1_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024BC_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
@@ -70,6 +98,8 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_ECALv1_"+version+".root");
 
   // Really slow on this after all the others, rerun separately (then sec)
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22MG_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22EEMG_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22MG_full_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22EEMG_full_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer23MGBPix_"+version+".root");
@@ -95,9 +125,16 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_JRSF_v110_1_2024E.root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_JRSF_v110_1_2024F.root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_JRSF_v110_1_2024G.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v111_2024H.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v111_2024I.root");
-  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024BCD_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024E_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024F_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024G_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024GH_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024GHv2_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024H_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024Hv2_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024I_JRSF.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+".root");
 
 
   //DijetHistosCombines("rootfiles/jmenano_mc_out_v23ul16flat.root");
@@ -512,7 +549,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
   // Setup triggers only once
   if (md.find("HLT_ZeroBias")==md.end()) {
 
-    double fwdeta = 3.139; // was 2.853. 80% (100%) on negative (positive) side
+    double fwdeta = 3.0; // was 3.139; // was 2.853. 80% (100%) on negative (positive) side
     double fwdeta0 = 2.964;//2.853; // 40 and 260 up
     double fwdetad = 2.853;
 

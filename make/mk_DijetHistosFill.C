@@ -94,7 +94,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer23MCBPix_Cas", "Summer23MC_Cas",
      "Winter24MCFlat", "Winter24MCFlat_Sv10", "Winter24MCFlat_Sv9",
      "Winter24MG_1", "Winter24MG_2", "Winter24MG_3", "Winter24MG_4", "Winter24MG_5",
-     "Winter24MGV14_1", "Winter24MGV14_2", "Winter24MGV14_3", "Winter24MGV14_4", "Winter24MGV14_5"
+     "Winter24MGV14_1", "Winter24MGV14_2", "Winter24MGV14_3", "Winter24MGV14_4", "Winter24MGV14_5", "Winter24MGV14_OneHTFile"
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 

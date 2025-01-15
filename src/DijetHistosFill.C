@@ -49,7 +49,7 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = true;
+bool reweightPU = false;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
@@ -67,6 +67,7 @@ bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
 bool doPFComposition = true; // jetveto / incjet / dijet / multijet
 bool doDijetJER = true;
 
+bool dohpt05 = true;
 
 // Additional variants and controls
 bool doJetvetoVariants = true;
@@ -298,7 +299,7 @@ std::map<std::string, struct range> mj;
 class mctruthHistos
 {
 public:
-  TH1D *ptreco_ptgen; //, *h1res_bar;
+  TH1D *ptreco_ptgen, *hpt_gen, *hpt_reco; //, *h1res_bar;
   TH2D *h2pteta, *h2pteta_gen, *h2pteta_rec, *h2res_ptgen, *h2res_etagen, *h2_btagUpar;//, *h2res_bar;
   TH3D *h3res, *h3res_Match, *h3res_raw;
   TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff, *p2pur;
@@ -341,7 +342,7 @@ public:
   TH2D *h2pteta_all;
   TH2D *h2pteta_sel;
   TH2D *h2pteta, *h2pteta_lumi;
-  TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50;
+  TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50, *hpt05_reco, *hpt05_gen, *hpt05_gentest;
   TH1D *vpt[ny];
 
   // Control plots for pileup
@@ -2003,8 +2004,8 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/PUWeight2024H/PUWeights_HLT_PFJet500_2024H.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024H");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/PUWeight2024F_n1/PUWeights_HLT_PFJet500_2024F_n1.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F_n1");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 		 cout << "PU weight file: " << f.GetName() << endl;
@@ -2698,6 +2699,12 @@ if (do_PUProfiles){
       h->h2pteta_rec = new TH2D("h2pteta_rec", ";|#eta_{jet}|;p_{T,jet} (GeV);"
                                                "N_{events}",
                                 nxd, vxd, nptd, vptd);
+      h->hpt_gen = new TH1D("hpt_gen",";p_{T,gen} (GeV);N_{events};"
+                                       "N_{events}",
+                            npti, vpti);
+      h->hpt_reco = new TH1D("hpt_reco",";p_{T,reco} (GeV);N_{events};"
+                                       "N_{events}",
+                            npti, vpti);
       h->p2jes = new TProfile2D("p2jes", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                          "JES(jet)",
                                 nxd, vxd, nptd, vptd);
@@ -2923,6 +2930,7 @@ if (do_PUProfiles){
                               npti, vpti);
       } // for iy
 
+
       if (doPFComposition)
       {
 
@@ -2979,6 +2987,24 @@ if (do_PUProfiles){
                                            "MUF",
                                  npt, vpt);
       }
+
+      if (dohpt05)
+      {
+	
+        dout->mkdir("Incjet/Unfolding");
+        dout->cd("Incjet/Unfolding");
+
+        h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
+                                     "N_{jet}",
+                              npti, vpti);
+        h->hpt05_gen = new TH1D("hpt05_gen", ";p_{T} (GeV);"
+                                     "N_{jet}",
+                              npti, vpti);
+        h->hpt05_gentest = new TH1D("hpt05_gentest", ";p_{T} (GeV);"
+                                     "N_{jet}",
+                              npti, vpti);
+      }
+
     } // incjet
 
     // Dijet per trigger
@@ -4598,6 +4624,8 @@ if (do_PUProfiles){
 	  //  h->h1res_bar->Fill(p4.Pt()/p4g.Pt(), w);
 	  //}
         }
+	h->hpt_gen->Fill(p4g.Pt(), w);
+	h->hpt_reco->Fill(p4.Pt(), w);
         h->h2pteta_gen->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
         bool hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
         bool hasMatchJet = (dR < 0.2 && p4g.Pt() > 0 && p4.Pt() > 0);
@@ -4809,7 +4837,6 @@ if (do_PUProfiles){
             int iy = int(fabs(p4.Rapidity()) / 0.5);
             if (iy < h->ny)
               h->vpt[iy]->Fill(p4.Pt(), w);
-
             if (doPFComposition)
             {
               double eta = p4.Eta();
@@ -4840,6 +4867,51 @@ if (do_PUProfiles){
                 h->pmuf13->Fill(pt, Jet_muEF[i], w);
               }
             } // doPFcomposition
+            if (dohpt05)
+            {
+              if (iy == 0)
+	      {
+	        if (isMC)
+	        {
+		  h->hpt05_reco->Fill(p4.Pt(), w);
+		  h->hpt05_gen->Fill(p4g.Pt(), w);
+		  
+	          map<int, int> genToReco;
+                  for (int i = 0; i != njet; ++i)
+                  {
+                    if (Jet_genJetIdx[i] >= 0)
+                    {
+                      genToReco[Jet_genJetIdx[i]] = i;
+                    }
+                    Jet_genDR[i] = 999.;
+                  } // for i
+
+                  // Then loop over genjets and also update dr
+                  for (Int_t j = 0; j != nGenJet; ++j)
+                  {
+
+                  p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
+                                   GenJet_mass[j]);
+                  double dR(999);
+                  int i(-1);
+                  if (genToReco.find(j) != genToReco.end())
+                  {
+                    i = genToReco[j];
+                    p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
+                    dR = p4g.DeltaR(p4);
+                    Jet_genDR[i] = dR;
+                  }
+                  else
+                    p4.SetPtEtaPhiM(0, 0, 0, 0);
+		  }
+		  h->hpt05_gentest->Fill(p4g.Pt(), w);
+	        } // isMC
+		else
+		{
+	          h->hpt05_reco->Fill(p4.Pt(), w);
+		}
+	      } // iy=0
+            } // dohtp05
           }   // JetID+METfilter
         }     // for itrg
       }       // doIncJet
