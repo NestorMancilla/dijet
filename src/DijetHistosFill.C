@@ -35,6 +35,12 @@
 #include <string_view>
 #include <algorithm>
 
+
+// Unfolding, Nestor Jan20,2025.
+#include <TUnfoldBinning.h>
+#include <TFile.h>
+#include <TF2.h>
+
 // Recalculate JECs
 bool redoJEC = true;
 
@@ -2376,6 +2382,13 @@ if (isMG)
 
   const int nxd = sizeof(vxd) / sizeof(vxd[0]) - 1;
 
+  //Unfolding binning
+  //https://dasanalysissystem.docs.cern.ch/namespaceDAS_1_1Unfolding_1_1InclusiveJet.html#aec1e8e21b2f3158729572af0ee0d1cb3
+  const double nptdU[] = {97,114,133,153,174,196,220,245,272,300,330,362,395,430,468,507,548,592,638,686,737,790,846,905,967,1032,
+	            1101,1172,1248,1327,1410,1497,1588,1684,1784,1890,2000,2116,2238,2366,2500,2640,2787,2941,3103,3273,3450,
+		    3637,3832};
+  const int nptU = sizeof(nptdU) / sizeof(nptdU[0]) - 1;
+
   // p_reco/p_gen binning
   int reco_nedges = 101;
   double minValue = 0.0;
@@ -2993,6 +3006,11 @@ if (do_PUProfiles){
 	
         dout->mkdir("Incjet/Unfolding");
         dout->cd("Incjet/Unfolding");
+
+	//Bi -> nptdU Edges -> nptU
+	TUnfoldBinning *rec = new TUnfoldBinning("recIncl"); 
+	rec->AddAxis("p_{T}",nptU,nptdU, false, false);
+	TH1 *hRec = rec->CreateHistogram("rec", false, 0, "detector level");
 
         h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
                                      "N_{jet}",
@@ -4875,42 +4893,36 @@ if (do_PUProfiles){
 	        {
 		  h->hpt05_reco->Fill(p4.Pt(), w);
 		  h->hpt05_gen->Fill(p4g.Pt(), w);
-		  
-	          map<int, int> genToReco;
-                  for (int i = 0; i != njet; ++i)
-                  {
-                    if (Jet_genJetIdx[i] >= 0)
-                    {
-                      genToReco[Jet_genJetIdx[i]] = i;
-                    }
-                    Jet_genDR[i] = 999.;
-                  } // for i
 
-                  // Then loop over genjets and also update dr
+		  /*
+		  p4g.SetPtEtaPhiM(0, 0, 0, 0); 
                   for (Int_t j = 0; j != nGenJet; ++j)
                   {
-
-                  p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
-                                   GenJet_mass[j]);
-                  double dR(999);
-                  int i(-1);
-                  if (genToReco.find(j) != genToReco.end())
-                  {
-                    i = genToReco[j];
-                    p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
-                    dR = p4g.DeltaR(p4);
-                    Jet_genDR[i] = dR;
-                  }
-                  else
-                    p4.SetPtEtaPhiM(0, 0, 0, 0);
+                    p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
+                                     GenJet_mass[j]);
+                    h->hpt05_gentest->Fill(p4g.Pt(), w);
 		  }
-		  h->hpt05_gentest->Fill(p4g.Pt(), w);
+		  */
 	        } // isMC
 		else
 		{
 	          h->hpt05_reco->Fill(p4.Pt(), w);
+		  // Unfolding
+
+		  // End Unfolding
 		}
 	      } // iy=0
+              p4g.SetPtEtaPhiM(0, 0, 0, 0);
+              for (Int_t j = 0; j != nGenJet; ++j)
+              {
+                p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
+                                 GenJet_mass[j]);
+		int iyg = int(fabs(p4g.Rapidity()) / 0.5);
+		if (iyg < 0.5)
+		{
+                  h->hpt05_gentest->Fill(p4g.Pt(), w);
+		}
+              }
             } // dohtp05
           }   // JetID+METfilter
         }     // for itrg
