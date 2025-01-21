@@ -62,6 +62,7 @@ bool do_PUProfiles = true;
 // Activate modules
 bool doJetveto = true; // eta-phi maps
 bool doMCtruth = true;
+bool doUnfolding = true;
 bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
 bool doGluonJets = false; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
@@ -336,6 +337,13 @@ public:
   TProfile2D *p2chf_pttag, *p2nhf_pttag, *p2nef_pttag, *p2chf_noveto_pttag, *p2nhf_noveto_pttag, *p2nef_noveto_pttag;
 };
 
+struct unfHistos
+{
+  TUnfoldBinning *TUrec;
+  TH2 *h2Cov;
+  TH1 *hRec, *htmp;
+};
+
 class incjetHistos
 {
 public:
@@ -350,11 +358,6 @@ public:
   TH2D *h2pteta, *h2pteta_lumi;
   TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50, *hpt05_reco, *hpt05_gen, *hpt05_gentest;
   TH1D *vpt[ny];
-
-  // Unfolding
-  TUnfoldBinning *TUrec;
-  TH2 *h2Cov;
-  TH1 *hRec;
 
   // Control plots for pileup
   TH2D *h2jtvht, *h2jtoht;
@@ -2624,6 +2627,13 @@ if (do_PUProfiles){
   //if (dolumi)
   //  LoadLumi();
 
+  auto unf = new unfHistos;
+  unf->TUrec = new TUnfoldBinning("recIncl");
+  unf->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false); //To increase the dimension
+  unf->hRec = unf->TUrec->CreateHistogram("rec", false, 0, "detector level");
+  unf->htmp = unf->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
+  unf->h2Cov = unf->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
+
   for (int itrg = 0; itrg != ntrg; ++itrg)
   {
 
@@ -3011,11 +3021,6 @@ if (do_PUProfiles){
 	
         dout->mkdir("Incjet/Unfolding");
         dout->cd("Incjet/Unfolding");
-
-	h->TUrec = new TUnfoldBinning("recIncl");
-	h->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false);
-        h->hRec = h->TUrec->CreateHistogram("rec", false, 0, "detector level");
-	h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
 
         h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
                                      "N_{jet}",
@@ -4723,6 +4728,13 @@ if (do_PUProfiles){
     bool multijet_vetonear(false);
     bool multijet_vetofwd(false);
 
+
+    if (doUnfolding)
+    {
+	    unf->htmp->Reset();
+    }
+    vector<int> binIDs;
+
     for (int i = 0; i != njet; ++i)
     {
 
@@ -4736,6 +4748,26 @@ if (do_PUProfiles){
       p4l1rc.SetPtEtaPhiM(Jet_pt[i] / (smearJets && Jet_CF[i] ? Jet_CF[i] : 1) * (1.0 - Jet_l1rcFactor[i]),
                           Jet_eta[i], Jet_phi[i],
                           Jet_mass[i] / (smearJets && Jet_CF[i] ? Jet_CF[i] : 1) * (1.0 - Jet_l1rcFactor[i]));
+
+      // Unfolding
+      if (doUnfolding) {
+	      //vector<int> binIDs;
+	      auto iRec = unf->TUrec->GetGlobalBinNumber(p4.Pt());
+
+	      if (find(binIDs.begin(), binIDs.end(), iRec) == binIDs.end()) 
+		      binIDs.push_back(iRec);
+
+	      unf->hRec->Fill(iRec, w);
+	      unf->htmp->Fill(iRec, w);
+
+	      for (auto x : binIDs) {
+		      for (auto y : binIDs) {
+			      double cCov = unf->h2Cov->GetBinContent(x, y);
+			      double cTmp = unf->htmp->GetBinContent(x) * unf->htmp->GetBinContent(y);
+			      unf->h2Cov->SetBinContent(x, y, cCov + cTmp);
+		      }
+	      }
+      }
 
       // Jet veto maps
       if (doJetveto)
@@ -4912,11 +4944,8 @@ if (do_PUProfiles){
 		else
 		{
 	          h->hpt05_reco->Fill(p4.Pt(), w);
-		  // Unfolding
-		  //h->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false);
-                  auto iRec = h->TUrec->GetGlobalBinNumber(p4.Pt());
-		  h->hRec->Fill(iRec);
-		  h->h2Cov->Fill(iRec,iRec);
+
+		  //h->h2Cov->Fill(iRec,iRec);
 		  //TH2 *h2rec = (TH2*) rec->ExtractHistogram("hRecIncjet",hRec);
 		  // End Unfolding
 		}
