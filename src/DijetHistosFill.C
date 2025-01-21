@@ -351,6 +351,11 @@ public:
   TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50, *hpt05_reco, *hpt05_gen, *hpt05_gentest;
   TH1D *vpt[ny];
 
+  // Unfolding
+  TUnfoldBinning *TUrec;
+  TH2 *h2Cov;
+  TH1 *hRec;
+
   // Control plots for pileup
   TH2D *h2jtvht, *h2jtoht;
 
@@ -3007,10 +3012,10 @@ if (do_PUProfiles){
         dout->mkdir("Incjet/Unfolding");
         dout->cd("Incjet/Unfolding");
 
-	//Bi -> nptdU Edges -> nptU
-	TUnfoldBinning *rec = new TUnfoldBinning("recIncl"); 
-	rec->AddAxis("p_{T}",nptU,nptdU, false, false);
-	TH1 *hRec = rec->CreateHistogram("rec", false, 0, "detector level");
+	h->TUrec = new TUnfoldBinning("recIncl");
+	h->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false);
+        h->hRec = h->TUrec->CreateHistogram("rec", false, 0, "detector level");
+	h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
 
         h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
                                      "N_{jet}",
@@ -4908,11 +4913,18 @@ if (do_PUProfiles){
 		{
 	          h->hpt05_reco->Fill(p4.Pt(), w);
 		  // Unfolding
-
+		  //h->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false);
+                  auto iRec = h->TUrec->GetGlobalBinNumber(p4.Pt());
+		  h->hRec->Fill(iRec);
+		  h->h2Cov->Fill(iRec,iRec);
+		  //TH2 *h2rec = (TH2*) rec->ExtractHistogram("hRecIncjet",hRec);
 		  // End Unfolding
 		}
 	      } // iy=0
-              p4g.SetPtEtaPhiM(0, 0, 0, 0);
+
+              /*
+	      p4g.SetPtEtaPhiM(0, 0, 0, 0);
+
               for (Int_t j = 0; j != nGenJet; ++j)
               {
                 p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
@@ -4922,7 +4934,7 @@ if (do_PUProfiles){
 		{
                   h->hpt05_gentest->Fill(p4g.Pt(), w);
 		}
-              }
+              }*/
             } // dohtp05
           }   // JetID+METfilter
         }     // for itrg
