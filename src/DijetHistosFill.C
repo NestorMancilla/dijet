@@ -4751,7 +4751,8 @@ if (do_PUProfiles){
 
       // Unfolding
       if (doUnfolding) {
-	      //vector<int> binIDs;
+	    if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0)
+            {
 	      auto iRec = unf->TUrec->GetGlobalBinNumber(p4.Pt());
 
 	      if (find(binIDs.begin(), binIDs.end(), iRec) == binIDs.end()) 
@@ -4767,6 +4768,7 @@ if (do_PUProfiles){
 			      unf->h2Cov->SetBinContent(x, y, cCov + cTmp);
 		      }
 	      }
+	    }
       }
 
       // Jet veto maps
