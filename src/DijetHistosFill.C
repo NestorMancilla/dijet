@@ -301,6 +301,7 @@ std::map<std::string, struct range> md2tc;
 std::map<std::string, struct range> md2pf;
 std::map<std::string, struct range> mj;
 
+std::map<int, std::vector<int>> binIDsMap;
 
 // CLASS DEFINITIONS
 class mctruthHistos
@@ -337,12 +338,6 @@ public:
   TProfile2D *p2chf_pttag, *p2nhf_pttag, *p2nef_pttag, *p2chf_noveto_pttag, *p2nhf_noveto_pttag, *p2nef_noveto_pttag;
 };
 
-struct unfHistos
-{
-  TUnfoldBinning *TUrec;
-  TH2 *h2Cov;
-  TH1 *hRec, *htmp;
-};
 
 class incjetHistos
 {
@@ -367,6 +362,11 @@ public:
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13;
   // Related to the tails issue. May 17, 2024. Nestor
   TH2D *h2chf13;
+
+  //Unfolding
+  TUnfoldBinning *TUrec;
+  TH2 *h2Cov;
+  TH1 *hRec, *htmp;
 };
 
 class dijetHistos
@@ -1475,6 +1475,7 @@ mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
 
 mt["HLT_PFJet40"] = range{40, 85, 0, 5.2};
 mt["HLT_PFJet60"] = range{85, 100, 0, 5.2};
+/*
 mt["HLT_PFJet80"] = range{100, 155, 0, 5.2};
 mt["HLT_PFJet140"] = range{155, 210, 0, 5.2};
 mt["HLT_PFJet200"] = range{210, 300, 0, 5.2};
@@ -1484,6 +1485,34 @@ mt["HLT_PFJet400"] = range{500, 600, 0, 5.2};
 mt["HLT_PFJet450"] = range{500, 600, 0, 5.2};
 mt["HLT_PFJet500"] = range{600, 6500, 0, 5.2};
 mt["HLT_PFJet550"] = range{700, 6500, 0, 5.2};
+*/
+
+// Unfolding thresholds to avoid overlaping
+// Nestor thresholds
+/*
+mt["HLT_PFJet80"]  = range{100, 153, 0, 5.2};
+mt["HLT_PFJet140"] = range{153, 196, 0, 5.2};
+mt["HLT_PFJet200"] = range{196, 300, 0, 5.2};
+mt["HLT_PFJet260"] = range{300, 395, 0, 5.2};
+mt["HLT_PFJet320"] = range{395, 468, 0, 5.2};
+mt["HLT_PFJet400"] = range{468, 600, 0, 5.2};
+mt["HLT_PFJet450"] = range{548, 600, 0, 5.2};
+mt["HLT_PFJet500"] = range{600, 6500, 0, 5.2};
+mt["HLT_PFJet550"] = range{737, 6500, 0, 5.2};
+*/
+
+//Mikko's thresholds
+//https://github.com/miquork/jecsys3/blob/main/minitools/DijetHistosCombine.C#L264-L370
+mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
+mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
+mt["HLT_PFJet200"] = range{272, 330, 0, 3.0};
+mt["HLT_PFJet260"] = range{330, 395, 0, 3.0};
+mt["HLT_PFJet320"] = range{395, 468, 0, 3.0};
+mt["HLT_PFJet400"] = range{468, 548, 0, 3.0};
+mt["HLT_PFJet450"] = range{548, 686, 0, 3.0};
+mt["HLT_PFJet500"] = range{686, 7000, 0, 3.0};
+mt["HLT_PFJet550"] = range{737, 6500, 0, 3.0};
+
 
 mt["HLT_PFJetFwd40"] = range{40, 85, fwdeta0, 5.2};
 mt["HLT_PFJetFwd60"] = range{85, 100, fwdeta, 5.2};
@@ -2392,9 +2421,16 @@ if (isMG)
 
   //Unfolding binning
   //https://dasanalysissystem.docs.cern.ch/namespaceDAS_1_1Unfolding_1_1InclusiveJet.html#aec1e8e21b2f3158729572af0ee0d1cb3
-  const double nptdU[] = {97,114,133,153,174,196,220,245,272,300,330,362,395,430,468,507,548,592,638,686,737,790,846,905,967,1032,
-	            1101,1172,1248,1327,1410,1497,1588,1684,1784,1890,2000,2116,2238,2366,2500,2640,2787,2941,3103,3273,3450,
-		    3637,3832};
+    const double nptdU[] = {97,114,133,153,174,196,220,245,272,300,330,362,395,430,468,507,548,592,638,686,737,790,846,905,967,1032, 
+                            1101,1172,1248,1327,1410,1497,1588,1684,1784,1890,2000,2116,2238,2366,2500,2640,2787,2941,3103,3273,3450,
+                            3637,3832};
+    //const double nptdU[] = {
+    //40, 85, 100, 155, 210, 300, 400, 500, 600, 700, 800, 900, 1000, 
+    //1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100,
+    //2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 
+    //3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000
+    //};
+
   const int nptU = sizeof(nptdU) / sizeof(nptdU[0]) - 1;
 
   // p_reco/p_gen binning
@@ -2627,12 +2663,6 @@ if (do_PUProfiles){
   //if (dolumi)
   //  LoadLumi();
 
-  auto unf = new unfHistos;
-  unf->TUrec = new TUnfoldBinning("recIncl");
-  unf->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false); //To increase the dimension
-  unf->hRec = unf->TUrec->CreateHistogram("rec", false, 0, "detector level");
-  unf->htmp = unf->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
-  unf->h2Cov = unf->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
 
   for (int itrg = 0; itrg != ntrg; ++itrg)
   {
@@ -3021,6 +3051,11 @@ if (do_PUProfiles){
 	
         dout->mkdir("Incjet/Unfolding");
         dout->cd("Incjet/Unfolding");
+	h->TUrec = new TUnfoldBinning("recIncl_1");
+        h->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false); //To increase the dimension
+        h->hRec = h->TUrec->CreateHistogram("rec", false, 0, "detector level");
+        h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
+        h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
 
         h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
                                      "N_{jet}",
@@ -4728,12 +4763,40 @@ if (do_PUProfiles){
     bool multijet_vetonear(false);
     bool multijet_vetofwd(false);
 
-
-    if (doUnfolding)
-    {
-	    unf->htmp->Reset();
-    }
+    // Unfolding
     vector<int> binIDs;
+
+    if (doIncjet)
+    {
+      if (isMC)
+      {
+        for (int itrg = 0; itrg != ntrg; ++itrg)
+	{
+          string &trg = vtrg[itrg];
+          if (!(*mtrg[trg]))
+            continue;
+          incjetHistos *h = mhij[trg];
+	  p4g.SetPtEtaPhiM(0, 0, 0, 0);
+          for (Int_t j = 0; j != nGenJet; ++j)
+          {
+
+            p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
+                             GenJet_mass[j]);
+
+            if (Jet_jetId[j] >= 4 && !Jet_jetveto[j] && pass_METfilter > 0)
+            {
+              if (dohpt05)
+              {
+                if (abs(p4g.Eta()) <0.5)
+                {
+	          h->hpt05_gen->Fill(p4g.Pt(), w);
+	        }
+	      }
+	    } // MET filter
+	  } // ngen
+	} // ntrg
+      } //isMC
+    } // doIncjet
 
     for (int i = 0; i != njet; ++i)
     {
@@ -4749,28 +4812,8 @@ if (do_PUProfiles){
                           Jet_eta[i], Jet_phi[i],
                           Jet_mass[i] / (smearJets && Jet_CF[i] ? Jet_CF[i] : 1) * (1.0 - Jet_l1rcFactor[i]));
 
-      // Unfolding
-      if (doUnfolding) {
-	    if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0)
-            {
-	      auto iRec = unf->TUrec->GetGlobalBinNumber(p4.Pt());
 
-	      if (find(binIDs.begin(), binIDs.end(), iRec) == binIDs.end()) 
-		      binIDs.push_back(iRec);
-
-	      unf->hRec->Fill(iRec, w);
-	      unf->htmp->Fill(iRec, w);
-
-	      for (auto x : binIDs) {
-		      for (auto y : binIDs) {
-			      double cCov = unf->h2Cov->GetBinContent(x, y);
-			      double cTmp = unf->htmp->GetBinContent(x) * unf->htmp->GetBinContent(y);
-			      unf->h2Cov->SetBinContent(x, y, cCov + cTmp);
-		      }
-	      }
-	    }
-      }
-
+      
       // Jet veto maps
       if (doJetveto)
       {
@@ -4931,7 +4974,7 @@ if (do_PUProfiles){
 	        if (isMC)
 	        {
 		  h->hpt05_reco->Fill(p4.Pt(), w);
-		  h->hpt05_gen->Fill(p4g.Pt(), w);
+		  //h->hpt05_gen->Fill(p4g.Pt(), w);
 
 		  /*
 		  p4g.SetPtEtaPhiM(0, 0, 0, 0); 
@@ -4967,6 +5010,36 @@ if (do_PUProfiles){
 		}
               }*/
             } // dohtp05
+	          // Unfolding
+            if (doUnfolding)
+            {
+              if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
+                  fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax && fabs(p4.Eta()) < 2.0)
+              {
+                auto iRec = h->TUrec->GetGlobalBinNumber(p4.Pt());
+
+                // Access binIDs for this trigger
+                auto &binIDs = binIDsMap[itrg];
+
+                if (find(binIDs.begin(), binIDs.end(), iRec) == binIDs.end())
+                {
+                  binIDs.push_back(iRec);
+                }
+
+                h->hRec->Fill(iRec, w);
+                h->htmp->Fill(iRec, w);
+                /*
+                for (auto x : binIDs) {
+                  for (auto y : binIDs) {
+                    double cCov = unf->h2Cov->GetBinContent(x, y);
+                    double cTmp = unf->htmp->GetBinContent(x) * unf->htmp->GetBinContent(y);
+                    unf->h2Cov->SetBinContent(x, y, cCov + cTmp);
+                  }
+                }
+                */
+              } // Event selection
+            } // doUnfolding
+
           }   // JetID+METfilter
         }     // for itrg
       }       // doIncJet
@@ -5067,6 +5140,31 @@ if (do_PUProfiles){
         multijet_vetofwd = true;
 
     } // for i in njet
+
+    //Unfolding 
+    // After njets
+    for(int itrg = 0; itrg != ntrg; ++itrg)
+    {
+      string &trg = vtrg[itrg];
+      incjetHistos *h = mhij[trg];
+
+      // Access binIDs for this trigger
+      auto &binIDs = binIDsMap[itrg];
+
+      // Fill hCov using stored binIDs
+      for (auto x : binIDs) {
+        for (auto y : binIDs) {
+          double cCov = h->h2Cov->GetBinContent(x, y);
+          double cTmp = h->htmp->GetBinContent(x) * h->htmp->GetBinContent(y);
+          h->h2Cov->SetBinContent(x, y, cCov + cTmp);
+        }
+      }
+
+      // Only reset after all binIDs have been processed
+      h->htmp->Reset();
+      binIDs.clear();              
+      
+    } // End Unfolding Cov matrix
 
     // Calculate unclustered MET from the remainders
     // met = -j2 -jn -ju = m2 + mn + mu => mu = met -m2 -mn
