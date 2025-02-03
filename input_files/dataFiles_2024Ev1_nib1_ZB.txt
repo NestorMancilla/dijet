@@ -1,0 +1,14 @@
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv1_2024Ev1-nib1-fib1-380963-381065.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv1_2024Ev1-nib1-fib2-381067-381079.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv1_2024Ev1-nib1-fib3-381080-381115.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv1_2024Ev1-nib1-fib4-381147-381164.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv1_2024Ev1-nib1-fib5-381190-381191.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv1_2024Ev1-nib1-fib6-381199-381364.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv1_2024Ev1-nib1-fib7-381365-381380.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv2_2024Ev1-nib1-fib1-380963-381065.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv2_2024Ev1-nib1-fib2-381067-381079.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv2_2024Ev1-nib1-fib3-381080-381115.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv2_2024Ev1-nib1-fib4-381147-381164.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv2_2024Ev1-nib1-fib5-381190-381191.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv2_2024Ev1-nib1-fib6-381199-381364.root
+/media/DATA3/Skims/2024/Data_2024E_DiJet_ZeroBiasv2_2024Ev1-nib1-fib7-381365-381380.root

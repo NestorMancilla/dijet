@@ -1,6 +1,4 @@
 #define DijetHistosFill_cxx
-//#define NANOV12
-//#define NANOV09
 //#ifdef NANOVO9
 //      #include "../interface/DijetHistosFillV09.h" // Specific for NanoV09
 //#else
@@ -351,8 +349,8 @@ public:
   TH2D *h2pteta_all;
   TH2D *h2pteta_sel;
   TH2D *h2pteta, *h2pteta_lumi;
-  TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50, *hpt05_reco, *hpt05_gen, *hpt05_gentest;
-  TH1D *vpt[ny];
+  TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50, *hpt05_reco, *hpt05_gen;
+  TH1D *vpt[ny], *vpt_RecU[ny], *vpt_GenU[ny];
 
   // Control plots for pileup
   TH2D *h2jtvht, *h2jtoht;
@@ -1487,22 +1485,12 @@ mt["HLT_PFJet500"] = range{600, 6500, 0, 5.2};
 mt["HLT_PFJet550"] = range{700, 6500, 0, 5.2};
 */
 
-// Unfolding thresholds to avoid overlaping
-// Nestor thresholds
-/*
-mt["HLT_PFJet80"]  = range{100, 153, 0, 5.2};
-mt["HLT_PFJet140"] = range{153, 196, 0, 5.2};
-mt["HLT_PFJet200"] = range{196, 300, 0, 5.2};
-mt["HLT_PFJet260"] = range{300, 395, 0, 5.2};
-mt["HLT_PFJet320"] = range{395, 468, 0, 5.2};
-mt["HLT_PFJet400"] = range{468, 600, 0, 5.2};
-mt["HLT_PFJet450"] = range{548, 600, 0, 5.2};
-mt["HLT_PFJet500"] = range{600, 6500, 0, 5.2};
-mt["HLT_PFJet550"] = range{737, 6500, 0, 5.2};
-*/
 
-//Mikko's thresholds
+//Mikko's thresholds for Inclusive jet analysis
 //https://github.com/miquork/jecsys3/blob/main/minitools/DijetHistosCombine.C#L264-L370
+//mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
+//mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
+//mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
 mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
 mt["HLT_PFJet200"] = range{272, 330, 0, 3.0};
@@ -1903,8 +1891,6 @@ if (dataset == "Summer22EE" ||
 }
 if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MG"))
 		//dataset == "Summer23" ||
-		//dataset == "Summer23MCFlat" || dataset == "Summer23MG" || TString(dataset.c_str()).Contains("Summer23MC") ||
-		//dataset == "Summer23MCBPixFlat" || dataset == "Summer23BPIXMG" || TString(dataset.c_str()).Contains("Summer23"))
 {
 	if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPixFlat") || TString(dataset.c_str()).Contains("Summer23MCBPix")) {
 		jec = getFJC("",
@@ -1953,9 +1939,6 @@ if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str
 			cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
 
 		} else {
-			//TFile f("luminosityscripts/PUWeights/Summer23_PUWeight.root");
-			//pileupRatio = (TH1D *)f.Get("pileup");
-			//pileupRatio->SetDirectory(0);
 		        TFile f("luminosityscripts/PUWeights/75mb/PUWeights2023/PUWeight2023Cv1/PUWeights_HLT_PFJet500_2023Cv1.root");
                         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2023Cv1");
                         pileupRatio->SetDirectory(0);
@@ -1969,12 +1952,6 @@ if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str
 	}
 }
 
-// 2023
-// if (dataset=="2023B" || dataset=="2023B_ZB") {
-// jec = getFJC("Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
-//		  "Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
-//		  "Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-// }
 
 if (TString(dataset.c_str()).Contains("2023B") || TString(dataset.c_str()).Contains("2023Cv1") ||
     TString(dataset.c_str()).Contains("2023Cv2") || TString(dataset.c_str()).Contains("2023Cv3"))
@@ -2504,20 +2481,6 @@ if (isMG)
   TH2D *h2dphi = new TH2D("h2dphi", "#Delta#phi vs #eta;#eta;#Delta#phi",
                           nx, vx, 126, -TMath::TwoPi(), +TMath::TwoPi());
 
-/*
-TH1D *h_PUProfile(0), *h_RhoAll(0), *h_NPV(0), *h_NPVGood(0);
-if (do_PUProfiles){
-   fout->mkdir("Profiles");
-   fout->cd("Profiles");
-   if (isMC){
-      h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
-   }
-   //h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
-   h_RhoAll = new TH1D("h_RhoAll", "RhoFastjetAll", 119, 0, 120);
-   h_NPV = new TH1D("h_NPV", "NPV", 119, 0, 120);
-   h_NPVGood = new TH1D("h_NPVGood", "NPVGood", 119, 0, 120);
-}
-*/
 
   // L2Res profiles for HDM method
   // coding: m0=MPF, m2=DB, mn=n-jet, mu=uncl. (observable)
@@ -2713,14 +2676,6 @@ if (do_PUProfiles){
 
       string &t = vtrg[itrg];
       mhmc[t] = h;
-      // h->trg = t;
-      // h->trgpt = trgpt;
-
-      // struct range &r  = mt[t];
-      // h->ptmin = r.ptmin;
-      // h->ptmax = r.ptmax;
-      // h->absetamin = r.absetamin;
-      // h->absetamax = r.absetamax;
 
       h->ptreco_ptgen = new TH1D("ptreco/ptgen",";p_{T,reco}/p_{T,gen} (GeV);N_{events};"
 		                       "N_{events}",
@@ -3057,15 +3012,23 @@ if (do_PUProfiles){
         h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
         h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
 
-        h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
-                                     "N_{jet}",
-                              npti, vpti);
-        h->hpt05_gen = new TH1D("hpt05_gen", ";p_{T} (GeV);"
-                                     "N_{jet}",
-                              npti, vpti);
-        h->hpt05_gentest = new TH1D("hpt05_gentest", ";p_{T} (GeV);"
-                                     "N_{jet}",
-                              npti, vpti);
+	
+        //h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
+          //                           "N_{jet}",
+            //                  npti, vpti);
+        //h->hpt05_gen = new TH1D("hpt05_Gen", ";p_{T} (GeV);"
+          //                           "N_{jet}",
+            //                  npti, vpti);
+	
+        for (int iy = 0; iy != h->ny; ++iy)
+        {
+          h->vpt_RecU[iy] = new TH1D(Form("hpt%02d_rec", 5 * (iy + 1)), ";p_{T} (GeV);"
+                                                             "N_{jet}",
+                                     npti, vpti);
+	  h->vpt_GenU[iy] = new TH1D(Form("hpt%02d_gen", 5 * (iy + 1)), ";p_{T} (GeV);"
+                                                             "N_{jet}",
+                                     npti, vpti);
+        } // for iy                      npti, vpti);
       }
 
     } // incjet
@@ -4766,17 +4729,13 @@ if (do_PUProfiles){
     // Unfolding
     vector<int> binIDs;
 
+    
     if (doIncjet)
     {
       if (isMC)
       {
-        for (int itrg = 0; itrg != ntrg; ++itrg)
-	{
-          string &trg = vtrg[itrg];
-          if (!(*mtrg[trg]))
-            continue;
-          incjetHistos *h = mhij[trg];
-	  p4g.SetPtEtaPhiM(0, 0, 0, 0);
+	incjetHistos *h = mhij["HLT_MC"];
+	  //p4g.SetPtEtaPhiM(0, 0, 0, 0);
           for (Int_t j = 0; j != nGenJet; ++j)
           {
 
@@ -4784,19 +4743,24 @@ if (do_PUProfiles){
                              GenJet_mass[j]);
 
             if (Jet_jetId[j] >= 4 && !Jet_jetveto[j] && pass_METfilter > 0)
-            {
+            { 
+	      int iy = int(fabs(p4g.Rapidity()) / 0.5);
+              //if (iy < h->ny)
+                //h->vpt_GenU[iy]->Fill(p4g.Pt(), w);
               if (dohpt05)
               {
-                if (abs(p4g.Eta()) <0.5)
-                {
-	          h->hpt05_gen->Fill(p4g.Pt(), w);
-	        }
+		  if (iy < h->ny)
+                    h->vpt_GenU[iy]->Fill(p4g.Pt(), w);
+                  //if (abs(p4g.Eta()) <0.5)
+                  //{
+	          //h->hpt05_gen->Fill(p4g.Pt(), w);
+	          //}
 	      }
 	    } // MET filter
 	  } // ngen
-	} // ntrg
       } //isMC
     } // doIncjet
+    
 
     for (int i = 0; i != njet; ++i)
     {
@@ -4969,22 +4933,19 @@ if (do_PUProfiles){
             } // doPFcomposition
             if (dohpt05)
             {
+	      if (iy < h->ny)
+                h->vpt_RecU[iy]->Fill(p4.Pt(), w);
+	      /*
               if (iy == 0)
+	      //if (abs(p4g.Eta()) <0.5)
 	      {
+		h->hpt05_reco->Fill(p4.Pt(), w);
+		
 	        if (isMC)
 	        {
 		  h->hpt05_reco->Fill(p4.Pt(), w);
 		  //h->hpt05_gen->Fill(p4g.Pt(), w);
 
-		  /*
-		  p4g.SetPtEtaPhiM(0, 0, 0, 0); 
-                  for (Int_t j = 0; j != nGenJet; ++j)
-                  {
-                    p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
-                                     GenJet_mass[j]);
-                    h->hpt05_gentest->Fill(p4g.Pt(), w);
-		  }
-		  */
 	        } // isMC
 		else
 		{
@@ -4994,21 +4955,10 @@ if (do_PUProfiles){
 		  //TH2 *h2rec = (TH2*) rec->ExtractHistogram("hRecIncjet",hRec);
 		  // End Unfolding
 		}
+		
 	      } // iy=0
+	      */
 
-              /*
-	      p4g.SetPtEtaPhiM(0, 0, 0, 0);
-
-              for (Int_t j = 0; j != nGenJet; ++j)
-              {
-                p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
-                                 GenJet_mass[j]);
-		int iyg = int(fabs(p4g.Rapidity()) / 0.5);
-		if (iyg < 0.5)
-		{
-                  h->hpt05_gentest->Fill(p4g.Pt(), w);
-		}
-              }*/
             } // dohtp05
 	          // Unfolding
             if (doUnfolding)
