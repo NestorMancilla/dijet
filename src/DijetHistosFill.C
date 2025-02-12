@@ -103,7 +103,7 @@ std::set<std::string> mcIOV = {"Summer22",
                                "Summer22EEMG1", "Summer22EEMG2", "Summer22EEMG3", "Summer22EEMG4",
                                "TestSummer23MGBPix",
 			       "Summer23MC_Cas"
-                               "Winter24MCFlat", "Winter24MG"};
+                               "Winter24MCFlat", "Winter24MG", "Summer24MG"};
 
 // UTILITIES
 double DELTAPHI(double phi1, double phi2)
@@ -1446,7 +1446,13 @@ if (doTriggerMatch)
 
 // List reference pT and abseta thresholds for triggers
 mt["HLT_MC"] = range{10, 3000, 0, 5.2};
-mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
+//mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
+mt["HLT_ZeroBias"] = range{0,   56,  0.0, 0.5};
+mt["HLT_ZeroBias"] = range{0,   56,  0.5, 1.0};
+mt["HLT_ZeroBias"] = range{0,   64,  1.0, 1.5};
+mt["HLT_ZeroBias"] = range{0,   64,  1.5, 2.0};
+mt["HLT_ZeroBias"] = range{0,  114,  2.0, 2.5};
+mt["HLT_ZeroBias"] = range{0,   97,  2.5, 3.0};
 
 mt["HLT_DiPFJetAve40"] = range{40, 85, 0, 5.2};
 mt["HLT_DiPFJetAve60"] = range{85, 100, 0, 5.2};
@@ -1471,9 +1477,9 @@ mt["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
 mt["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
 mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
 
+/*
 mt["HLT_PFJet40"] = range{40, 85, 0, 5.2};
 mt["HLT_PFJet60"] = range{85, 100, 0, 5.2};
-/*
 mt["HLT_PFJet80"] = range{100, 155, 0, 5.2};
 mt["HLT_PFJet140"] = range{155, 210, 0, 5.2};
 mt["HLT_PFJet200"] = range{210, 300, 0, 5.2};
@@ -1491,7 +1497,27 @@ mt["HLT_PFJet550"] = range{700, 6500, 0, 5.2};
 //mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
 //mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
 //mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
-mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
+mt["HLT_PFJet40"] = range{56, 84, 0.0, 0.5},
+mt["HLT_PFJet40"] = range{56, 84, 0.5, 1.0},
+mt["HLT_PFJet40"] = range{64, 84, 1.0, 1.5},
+mt["HLT_PFJet40"] = range{64, 84, 1.5, 2.0},
+mt["HLT_PFJet40"] = range{114, 153, 2.0, 2.5},
+mt["HLT_PFJet40"] = range{97, 114, 2.5, 3.0},
+
+mt["HLT_PFJet60"] = range{84,  114, 0.0, 0.5},
+mt["HLT_PFJet60"] = range{84,  114, 0.5, 1.0},
+mt["HLT_PFJet60"] = range{84,  114, 1.0, 1.5},
+mt["HLT_PFJet60"] = range{84,  114, 1.5, 2.0},
+mt["HLT_PFJet60"] = range{153, 174, 2.0, 2.5},
+mt["HLT_PFJet60"] = range{114, 133, 2.5, 3.0}, 
+//mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
+mt["HLT_PFJet80"] = range{114, 196, 0.0, 0.5},
+mt["HLT_PFJet80"] = range{114, 196, 0.5, 1.0},
+mt["HLT_PFJet80"] = range{114, 196, 1.0, 1.5},
+mt["HLT_PFJet80"] = range{114, 196, 1.5, 2.0},
+mt["HLT_PFJet80"] = range{174, 196, 2.0, 2.5},
+mt["HLT_PFJet80"] = range{133, 196, 2.5, 3.0},
+
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
 mt["HLT_PFJet200"] = range{272, 330, 0, 3.0};
 mt["HLT_PFJet260"] = range{330, 395, 0, 3.0};
@@ -2006,7 +2032,7 @@ if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
 	useJERSFvsPt = true;
 }
 
-if (TString(dataset.c_str()).Contains("Winter24MG"))
+if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG"))
 {
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2024,8 +2050,8 @@ if (TString(dataset.c_str()).Contains("Winter24MG"))
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/PUWeight2024F_n1/PUWeights_HLT_PFJet500_2024F_n1.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024F_n1");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/PUWeight2024Iv2/PUWeights_HLT_ZeroBias_2024Iv2.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_ZeroBias_2024Iv2");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 		 cout << "PU weight file: " << f.GetName() << endl;
@@ -2396,19 +2422,18 @@ if (isMG)
 
   const int nxd = sizeof(vxd) / sizeof(vxd[0]) - 1;
 
-  //Unfolding binning
+  //Unfolding pt binning
   //https://dasanalysissystem.docs.cern.ch/namespaceDAS_1_1Unfolding_1_1InclusiveJet.html#aec1e8e21b2f3158729572af0ee0d1cb3
-    const double nptdU[] = {97,114,133,153,174,196,220,245,272,300,330,362,395,430,468,507,548,592,638,686,737,790,846,905,967,1032, 
+    const double vptdU[] = {74,84,97,114,133,153,174,196,220,245,272,300,330,362,395,430,468,507,548,592,638,686,737,790,846,905,967,1032, 
                             1101,1172,1248,1327,1410,1497,1588,1684,1784,1890,2000,2116,2238,2366,2500,2640,2787,2941,3103,3273,3450,
                             3637,3832};
-    //const double nptdU[] = {
-    //40, 85, 100, 155, 210, 300, 400, 500, 600, 700, 800, 900, 1000, 
-    //1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100,
-    //2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 
-    //3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000
-    //};
+  const int nptdU = sizeof(vptdU) / sizeof(vptdU[0]) - 1;
 
-  const int nptU = sizeof(nptdU) / sizeof(nptdU[0]) - 1;
+  //Unfolding eta binning
+  //https://gitlab.cern.ch/cms-analysis/general/DasAnalysisSystem/Core/-/blob/master/Unfolding/interface/PtY.h?ref_type=heads#L21-23
+  //const double vetadU[] = {0., 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
+  const double vetadU[] = {0., 0.5, 1.0, 1.5, 2.0, 2.5}; // removing 3.0 due to low pt issues
+  const int netadU = sizeof(vetadU) / sizeof(vetadU[0]) - 1;
 
   // p_reco/p_gen binning
   int reco_nedges = 101;
@@ -3006,12 +3031,15 @@ if (isMG)
 	
         dout->mkdir("Incjet/Unfolding");
         dout->cd("Incjet/Unfolding");
-	h->TUrec = new TUnfoldBinning("recIncl_1");
-        h->TUrec->AddAxis("p_{T}",nptU,nptdU, false, false); //To increase the dimension
-        h->hRec = h->TUrec->CreateHistogram("rec", false, 0, "detector level");
-        h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
-        h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
-
+	if (doUnfolding && !isMC)
+        {
+	  h->TUrec = new TUnfoldBinning("recIncl_1");
+          h->TUrec->AddAxis("p_{T}",nptdU,vptdU, false, false); //To increase the dimension
+	  h->TUrec->AddAxis("|#eta|",netadU,vetadU, false, false); //To increase the dimension
+          h->hRec = h->TUrec->CreateHistogram("rec", false, 0, "detector level");
+          h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
+          h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
+        }
 	
         //h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
           //                           "N_{jet}",
@@ -3954,7 +3982,7 @@ if (isMG)
       TString(dataset.c_str()).Contains("2024H") ||
       TString(dataset.c_str()).Contains("2024I") ||
       //dataset == "2024G_ZB" || 
-      TString(dataset.c_str()).Contains("Winter24MG") ||
+      TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") ||
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
@@ -4026,7 +4054,8 @@ if (isMG)
       //dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
       //dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
       //dataset == "2024CS" || dataset == "2024CT" ||
-      TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
+      TString(dataset.c_str()).Contains("Winter24MCFlat") || 
+      TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (TString(dataset.c_str()).Contains("2024F") || //dataset == "2024F_ZB" || 
       TString(dataset.c_str()).Contains("2024G") || //dataset == "2024G_ZB" ||
@@ -4961,12 +4990,12 @@ if (isMG)
 
             } // dohtp05
 	          // Unfolding
-            if (doUnfolding)
+            if (doUnfolding && !isMC)
             {
               if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
-                  fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax && fabs(p4.Eta()) < 2.0)
+                  fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax && p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.5)// 1D matrix ->fabs(p4.Eta()) < 2.0)
               {
-                auto iRec = h->TUrec->GetGlobalBinNumber(p4.Pt());
+                auto iRec = h->TUrec->GetGlobalBinNumber(p4.Pt(), fabs(p4.Eta()));
 
                 // Access binIDs for this trigger
                 auto &binIDs = binIDsMap[itrg];
@@ -4994,52 +5023,6 @@ if (isMG)
         }     // for itrg
       }       // doIncJet
 
-    /*
-    //doJetsperRun
-      if (doJetsperRuns && dolumi)
-      {
-        auto it5 = std::find(_runNumberBin.begin(), _runNumberBin.end(), run);
-        for (int itrg = 0; itrg != ntrg; ++itrg)
-        {
-          string &trg = vtrg[itrg];
-          //std::cout << "Trigger: " << trg << std::endl;
-          if (!(*mtrg[trg]))
-            continue;
-          jetsperRuns *h = mjet[trg];
-          //const range &r = mt[trg];
-
-          p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
-          if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0 ) //&& fabs(p4.Eta()) < 1.3)  
-          {
-
-            w = (isMC ? genWeight : 1.);
-	    h->h1jetrate->Fill(run, w);
-            if (it5 != _runNumberBin.end() && mlumi[trg][run] > 0){
-              //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
-              w = (isMC ? genWeight : 1./mlumi[trg][run]);
-            }
-            else {
-              //w = (isMC ? genWeight : 1.);
-	      //exit(0);
-	      continue;
-            }
-	    if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
-	        fabs(p4.Rapidity()) > h->absetamin &&
-		fabs(p4.Rapidity()) < h->absetamax) {
-                  //std::cout << "The p4.pt is: " << p4.Pt() << " and the pt min is: " << r.ptmin << " from the trg: " << itrg << " weight: " << w << " and the itrg is: " << itrg << std::endl;
-                h->h1jetxsec->Fill(run, w);
-                h->h2jetpteta->Fill(fabs(p4.Eta()), p4.Pt(), w);
-		h->p2MPF->Fill(ptlead, run, m0l, w);
-		if (fabs(p4.Eta()) < 1.3) {
-                  h->h1pt13_w->Fill(p4.Pt(), w);
-		  h->h1pt13->Fill(p4.Pt(), 1.);
-		}
-            }
-          }
-        }
-        w = (isMC ? genWeight : 1.);
-      } // doJetsperRun
-      */
 
       // Calculate type-I MET (L1L2L3-RC) and MHT
       if (p4.Pt() > 15.)
@@ -5093,28 +5076,31 @@ if (isMG)
 
     //Unfolding 
     // After njets
-    for(int itrg = 0; itrg != ntrg; ++itrg)
+    if (doUnfolding && !isMC)
     {
-      string &trg = vtrg[itrg];
-      incjetHistos *h = mhij[trg];
+      for(int itrg = 0; itrg != ntrg; ++itrg)
+      {
+        string &trg = vtrg[itrg];
+        incjetHistos *h = mhij[trg];
 
-      // Access binIDs for this trigger
-      auto &binIDs = binIDsMap[itrg];
+        // Access binIDs for this trigger
+        auto &binIDs = binIDsMap[itrg];
 
-      // Fill hCov using stored binIDs
-      for (auto x : binIDs) {
-        for (auto y : binIDs) {
-          double cCov = h->h2Cov->GetBinContent(x, y);
-          double cTmp = h->htmp->GetBinContent(x) * h->htmp->GetBinContent(y);
-          h->h2Cov->SetBinContent(x, y, cCov + cTmp);
+        // Fill hCov using stored binIDs
+        for (auto x : binIDs) {
+          for (auto y : binIDs) {
+            double cCov = h->h2Cov->GetBinContent(x, y);
+            double cTmp = h->htmp->GetBinContent(x) * h->htmp->GetBinContent(y);
+            h->h2Cov->SetBinContent(x, y, cCov + cTmp);
+          }
         }
-      }
 
-      // Only reset after all binIDs have been processed
-      h->htmp->Reset();
-      binIDs.clear();              
+        // Only reset after all binIDs have been processed
+        h->htmp->Reset();
+        binIDs.clear();              
       
-    } // End Unfolding Cov matrix
+      } // End Unfolding Cov matrix
+    }
 
     // Calculate unclustered MET from the remainders
     // met = -j2 -jn -ju = m2 + mn + mu => mu = met -m2 -mn
