@@ -2095,7 +2095,8 @@ if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
 				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		                "Prompt24_Run2024B_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V8 -> nib
 	}
 }
 
@@ -2128,7 +2129,8 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024C_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 }
 
@@ -2145,11 +2147,13 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
 			//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
 	    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
 	    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt24_Run2024D_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
 {
+	/*
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
@@ -2162,11 +2166,30 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
 	    		//"Prompt24_Run2024E_V5M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024E_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024E_V7M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+        if (TString(dataset.c_str()).Contains("2024Ev1_nib"))
+        {       
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024Ev1_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        } else if (TString(dataset.c_str()).Contains("2024Ev2_nib"))
+	{
+	        jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024Ev2_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+	} else 
+	{
+	        jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024E_V7M_DATA_L2L3Residual_AK4PFPuppi");
+	}
+
 
 }
 
 if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
 {
+	/*
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
@@ -2180,36 +2203,98 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
 	    		//"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024F_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024F_V7M_DATA_L2L3Residual_AK4PFPuppi");
-
+	*/
+        if (TString(dataset.c_str()).Contains("2024F_nib1"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024F_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        } else if (TString(dataset.c_str()).Contains("2024F_nib2"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024F_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+	} else if (TString(dataset.c_str()).Contains("2024F_nib3"))
+	{
+		jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024F_nib3_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        } else
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024F_V7M_DATA_L2L3Residual_AK4PFPuppi");
+        }
 }
 
 if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 {
+	/*
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Prompt24_Run2024F_V5M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024G_V7M_DATA_L2L3Residual_AK4PFPuppi");
-
+	*/
+        if (TString(dataset.c_str()).Contains("2024G_nib1"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024G_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        } else if (TString(dataset.c_str()).Contains("2024G_nib2"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        } else
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024G_V7M_DATA_L2L3Residual_AK4PFPuppi");
+        }
 }
 
 if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || dataset == "2024H_Skim")
 {
+	/*
         jec = getFJC("",
                         "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
-
+	*/
+        if (TString(dataset.c_str()).Contains("2024H_nib1"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        } else
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
+        }
 }
 
 if (TString(dataset.c_str()).Contains("2024I"))
     //dataset == "2024Iv1" || dataset == "2024Iv2" || dataset == "2024Iv1_ZB" || dataset == "2024Iv2_ZB" || dataset == "2024I_Skim")
 {
+	/*
         jec = getFJC("",
                         "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
-
+	*/
+        if (TString(dataset.c_str()).Contains("2024Iv1_nib1") || TString(dataset.c_str()).Contains("2024Iv2_nib1"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        } else
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
+        }
 }
 
 if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
