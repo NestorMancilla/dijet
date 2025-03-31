@@ -53,7 +53,7 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = false;
+bool reweightPU = true;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
@@ -102,8 +102,10 @@ std::set<std::string> mcIOV = {"Summer22",
                                "Summer22MG", "Summer22EEMG", "Summer22MG1", "Summer22MG2",
                                "Summer22EEMG1", "Summer22EEMG2", "Summer22EEMG3", "Summer22EEMG4",
                                "TestSummer23MGBPix",
-			       "Summer23MC_Cas"
-                               "Winter24MCFlat", "Winter24MG", "Summer24MG"};
+			       "Summer23MC_Cas",
+                               "Winter24MCFlat", "Winter24MG", "Summer24MG",
+                               "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig",
+                               "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero"};
 
 // UTILITIES
 double DELTAPHI(double phi1, double phi2)
@@ -151,7 +153,7 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 113> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 126> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -266,6 +268,19 @@ constexpr std::array<std::pair<const char*, const char*>, 113> lumifiles = {{
     {"2024H_nib1_ZB", lumibyls2024BCDEFG},
     {"2024Iv1_nib1_ZB", lumibyls2024BCDEFG},
     {"2024Iv2_nib1_ZB", lumibyls2024BCDEFG},
+    {"2024H_NT", lumibyls2024BCDEFG},
+    {"2024C_Rp", lumibyls2024BCDEFG},
+    {"2024C_Rp_ZB", lumibyls2024BCDEFG},
+    {"2024D_Rp", lumibyls2024BCDEFG},
+    {"2024D_Rp_ZB", lumibyls2024BCDEFG},
+    {"2024E_Rp", lumibyls2024BCDEFG},
+    {"2024E_Rp_ZB", lumibyls2024BCDEFG},
+    {"2024I_ZB_HCPF1x", lumibyls2024BCDEFG},
+    {"2024I_ZB_HCPF2x", lumibyls2024BCDEFG},
+    {"2024I_ZB_HCPF3x", lumibyls2024BCDEFG},
+    {"2024I_ZB_HCPF4x", lumibyls2024BCDEFG},
+    {"2024I_ZB_HCPF5x", lumibyls2024BCDEFG},
+    {"2024I_ZB_HCPFSpecial", lumibyls2024BCDEFG},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -375,6 +390,8 @@ public:
   int trgpt;
   double ptmin, ptmax, absetamin, absetamax;
 
+  TH1D *hptprobe, *hetaprobe, *hpttag, *hetatag; //JEC4Prompt
+
   TH2D *h2pteta_aball, *h2pteta_absel;
   TH2D *h2pteta_adall, *h2pteta_adsel;
   TH2D *h2pteta_tcall, *h2pteta_tcsel;
@@ -443,6 +460,9 @@ public:
 
   // (Optional) composition plots
   TProfile2D *p2pt, *p2rho, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;      // probe,avp
+  TProfile2D *p2chf_tg, *p2nhf_tg, *p2nef_tg; // Tag
+  TProfile2D *p2chf_fw, *p2nhf_fw, *p2nef_fw; // Pt probe, Forward
+  //TProfile2D *p2chf_abs, *p2nhf_abs, *p2nef_abs; // Fraction x raw Pt probe
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13; // tag
 };
 
@@ -457,6 +477,7 @@ public:
   TProfile *ptleada, *ptleadm, *ptleadl, *ptleadr;
   TProfile *pcrecoila, *pcrecoilm, *pcrecoill, *pcrecoilr;
   TH1D *hpta_all, *hptm_all, *hptl_all, *hptr_all;
+  TH1D *hetar_all; // JEC4Prompt
   TH1D *hpta_sel, *hptm_sel, *hptl_sel, *hptr_sel;
   TProfile *presa, *presm, *presl, *presr;
   TProfile *pm0a, *pm2a, *pmna, *pmua; // *pmoa; // pT,avp3
@@ -2032,7 +2053,7 @@ if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
 	useJERSFvsPt = true;
 }
 
-if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG"))
+if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") || TString(dataset.c_str()).Contains("QCDFlatECAL"))
 {
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2049,9 +2070,10 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
            	
 	   if (reweightPU && !doPU_per_trigger)
 	   {
-	      if (TString(dataset.c_str()).Contains("Winter24MGV14_")) {
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/PUWeight2024Iv2/PUWeights_HLT_ZeroBias_2024Iv2.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_ZeroBias_2024Iv2");
+	      if (TString(dataset.c_str()).Contains("Winter24MGV14_") || TString(dataset.c_str()).Contains("Summer24MG")) {
+		 TFile f("luminosityscripts/PUWeights/69mb/PUWeight2024BCDEFGHI/PUWeights_HLT_PFJet500_2024BCDEFGHI.root");
+		 //TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/Summer24/PUWeight2024BCDEFGHI/PUWeights_HLT_PFJet500_2024BCDEFGHI.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024BCDEFGHI");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 		 cout << "PU weight file: " << f.GetName() << endl;
@@ -2104,19 +2126,24 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 { 
 	if (TString(dataset.c_str()).Contains("2024CR"))
 	{
-		jec = getFJC(""
+		jec = getFJC("",
 				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
 		    "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 	else if (dataset == "2024CS" || dataset == "2024CT")
 	{
-		jec = getFJC(""
+		jec = getFJC("",
 				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
 		    "Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
 	}
-
+	else if (TString(dataset.c_str()).Contains("2024C_Rp"))
+	{
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                    		"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+	}
 	else {
 		jec = getFJC("",
 				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2136,19 +2163,27 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 
 if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
 {
-	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
-			//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-			//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
-			//"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
-	    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
-	    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
-			//"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt24_Run2024D_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        if (TString(dataset.c_str()).Contains("2024D_Rp"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        }
+	else {
+	        jec = getFJC("",
+                        "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                        //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
+                        //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
+                        //"Prompt24_Run2024BC_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024BC_V2M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024BCD_V3M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+                        "Prompt24_Run2024D_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+	}
 }
 
 if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || dataset == "2024Ev2_ZB" )
@@ -2177,7 +2212,13 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
 	        jec = getFJC("",
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024Ev2_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
-	} else 
+	} else if (TString(dataset.c_str()).Contains("2024E_Rp"))
+        {
+                jec = getFJC("",
+                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+        }
+       	else 
 	{
 	        jec = getFJC("",
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2262,7 +2303,7 @@ if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || d
                         //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
-        if (TString(dataset.c_str()).Contains("2024H_nib1"))
+        if (TString(dataset.c_str()).Contains("2024H_nib1") || TString(dataset.c_str()).Contains("2024H_NT"))
         {
                 jec = getFJC("",
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2284,7 +2325,8 @@ if (TString(dataset.c_str()).Contains("2024I"))
                         //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
-        if (TString(dataset.c_str()).Contains("2024Iv1_nib1") || TString(dataset.c_str()).Contains("2024Iv2_nib1"))
+        if (TString(dataset.c_str()).Contains("2024Iv1_nib1") || TString(dataset.c_str()).Contains("2024Iv2_nib1") ||
+	    TString(dataset.c_str()).Contains("2024I_ZB_HCPF"))
         {
                 jec = getFJC("",
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2354,6 +2396,8 @@ TFile *fout = new TFile(Form("rootfiles/%s/jmenano_%s_out_%s_%s.root",
 // Monitor trigger rates
 TH1D *htrg = new TH1D("htrg", "Triggers;Trigger;N_{events}",
 		vtrg.size(), 0, vtrg.size());
+// JEC4Prompt
+TH1D *hnrecoil = new TH1D("hnrecoil", "hnrecoil", 12, 0, 12);
 //cout << "AAAA :"  <<htrg->GetNbinsX() << endl;
 for (int i = 1; i != htrg->GetNbinsX() + 1; ++i)
 {
@@ -3170,6 +3214,13 @@ if (isMG)
       h->absetamin = r.absetamin;
       h->absetamax = r.absetamax;
 
+      //JEC4Prompt
+      h->hptprobe = new TH1D("hptprobe", "",npt, vpt);
+      h->hetaprobe = new TH1D("hetaprobe", "",nx, vx);
+      h->hpttag = new TH1D("hpttag", "",npt, vpt);
+      h->hetatag = new TH1D("hetatag", "",nx, vx);
+
+
       // Counting of events, and JEC L2L3Res for undoing
       h->h2pteta_aball = new TH2D("h2pteta_aball", ";#eta;p_{T,avp} (GeV);"
                                                    "N_{events}",
@@ -3716,6 +3767,39 @@ if (isMG)
         h->p2muf = new TProfile2D("p2muf", ";#eta;p_{T,avp} (GeV);"
                                            "MUF",
                                   nx, vx, npt, vpt);
+	// Tag binning
+	h->p2chf_tg = new TProfile2D("p2chf_tg", ";#eta;p_{T,tag} (GeV);"
+                                           "CHF",
+                                  nx, vx, npt, vpt);
+        h->p2nhf_tg = new TProfile2D("p2nhf_tg", ";#eta;p_{T,tag} (GeV);"
+                                           "NHF",
+                                  nx, vx, npt, vpt);
+        h->p2nef_tg = new TProfile2D("p2nef_tg", ";#eta;p_{T,tag} (GeV);"
+                                           "NEF",
+                                  nx, vx, npt, vpt);
+	// Forward binning 
+	h->p2chf_fw = new TProfile2D("p2chf_fw", ";#eta;p_{T,probe} (GeV);"
+                                           "CHF",
+                                  nx, vx, npt, vpt);
+        h->p2nhf_fw = new TProfile2D("p2nhf_fw", ";#eta;p_{T,probe} (GeV);"
+                                           "NHF",
+                                  nx, vx, npt, vpt);
+        h->p2nef_fw = new TProfile2D("p2nef_fw", ";#eta;p_{T,probe} (GeV);"
+                                           "NEF",
+                                  nx, vx, npt, vpt);
+	// Fraction x raw Pt probe
+	/*
+	h->p2chf_abs = new TProfile2D("p2chf_abs", ";#eta;p_{T,tag} (GeV);"
+                                           "CHF",
+                                  nx, vx, npt, vpt);
+        h->p2nhf_abs = new TProfile2D("p2nhf_abs", ";#eta;p_{T,tag} (GeV);"
+                                           "NHF",
+                                  nx, vx, npt, vpt);
+        h->p2nef_abs = new TProfile2D("p2nef_abs", ";#eta;p_{T,tag} (GeV);"
+                                           "NEF",
+                                  nx, vx, npt, vpt);
+	*/
+
 
         h->ppt13 = new TProfile("ppt13", ";#eta;p_{T,avp} (GeV);"
                                          "p_{T,tag}",
@@ -3799,6 +3883,8 @@ if (isMG)
       h->pmul = new TProfile("pmul", "", npti, vpti);
 
       h->hptr_all = new TH1D("hptr_all", "", npti, vpti);
+      h->hetar_all = new TH1D("hetar_all", "", nx, vx); //JEC4Prompt
+
       h->hptr_sel = new TH1D("hptr_sel", "", npti, vpti);
       h->presr = new TProfile("presr", "", npti, vpti);
       h->ptleadr = new TProfile("ptleadr", "", npti, vpti);
@@ -4068,6 +4154,7 @@ if (isMG)
       TString(dataset.c_str()).Contains("2024I") ||
       //dataset == "2024G_ZB" || 
       TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") ||
+      TString(dataset.c_str()).Contains("QCDFlatECAL") ||
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
@@ -4140,7 +4227,8 @@ if (isMG)
       //dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
       //dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || 
-      TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG"))
+      TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG") ||
+      TString(dataset.c_str()).Contains("QCDFlatECAL"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (TString(dataset.c_str()).Contains("2024F") || //dataset == "2024F_ZB" || 
       TString(dataset.c_str()).Contains("2024G") || //dataset == "2024G_ZB" ||
@@ -4468,10 +4556,12 @@ if (isMG)
 
     //Nestor Aug16, 2024.
     //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
-    if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3)
-    {
-      std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
-      std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
+    if (!isMC){
+      if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3)
+      {
+        std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
+        std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
+      }
     }
     //
     
@@ -5211,6 +5301,8 @@ if (isMG)
     if (ismultijet && doMultijet)
     {
 
+      hnrecoil->Fill(nrecoil, w); //JEC4Prompt
+
       // Proper bisector axis (equal angles to each jet)
       p4b3.SetPtEtaPhiM(0, 0, 0, 0);
       p4b3r.SetPtEtaPhiM(1, 0, p4recoil.Phi(), 0);
@@ -5510,6 +5602,12 @@ if (isMG)
             h->h2pteta_tcall->Fill(eta, pttag, w);
             h->h2pteta_pfall->Fill(eta, ptprobe, w);
 
+	    //JEC4Prompt
+	      h->hptprobe->Fill(p4p.Pt(), w);
+	      h->hetaprobe->Fill(p4p.Eta(), w);
+              h->hpttag->Fill(p4t.Pt(), w);
+	      h->hetatag->Fill(p4t.Eta(), w);
+
             // Bisector (proper)
             if (ptavp2 >= h->ptmin && ptavp2 < h->ptmax &&
                 fabs(eta) >= h->absetamin && fabs(eta) < h->absetamax)
@@ -5771,6 +5869,23 @@ if (isMG)
                 h->p2cef->Fill(eta, ptavp2, Jet_chEmEF[iprobe], w);
                 h->p2muf->Fill(eta, ptavp2, Jet_muEF[iprobe], w);
 
+		// Tag
+		h->p2chf_tg->Fill(eta, pttag, Jet_chHEF[iprobe], w);
+                h->p2nhf_tg->Fill(eta, pttag, Jet_neHEF[iprobe], w);
+                h->p2nef_tg->Fill(eta, pttag, Jet_neEmEF[iprobe], w);
+
+		// Forward
+		h->p2chf_fw->Fill(eta, ptprobe, Jet_chHEF[iprobe], w);
+		h->p2nhf_fw->Fill(eta, ptprobe, Jet_neHEF[iprobe], w);
+                h->p2nef_fw->Fill(eta, ptprobe, Jet_neEmEF[iprobe], w);
+
+		// Fraction x raw Pt Probe
+		/*
+		h->p2chf_abs->Fill(eta, pttag, (Jet_chHEF[iprobe]* ( (1.0 - Jet_rawFactor[iprobe])* ptavp2) ) / pttag, w);
+		h->p2nhf_abs->Fill(eta, pttag, (Jet_neHEF[iprobe]* ( (1.0 - Jet_rawFactor[iprobe])* ptavp2) ) / pttag, w);
+		h->p2nef_abs->Fill(eta, pttag, (Jet_neEmEF[iprobe]* ( (1.0 - Jet_rawFactor[iprobe])* ptavp2) ) / pttag, w);
+		*/
+
                 h->ppt13->Fill(ptavp2, Jet_pt[itag], w);
                 h->prho13->Fill(ptavp2, rho, w);
                 h->pchf13->Fill(ptavp2, Jet_chHEF[itag], w);
@@ -5928,6 +6043,7 @@ if (isMG)
         h->hptm_all->Fill(ptave, w);
         h->hptl_all->Fill(ptlead, w);
         h->hptr_all->Fill(ptrecoil, w);
+	h->hetar_all->Fill(p4recoil.Eta(), w); //JEC4Prompt
 
         if (ptavp3 >= h->ptmin && ptavp3 < h->ptmax)
           h->hpta_sel->Fill(ptavp3, w);

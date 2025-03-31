@@ -44,14 +44,18 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2024B_nib1_ZB', '2024C_nib1_ZB', '2024D_nib1_ZB', '2024Ev1_nib1_ZB', '2024Ev2_nib1_ZB', '2024H_nib1_ZB', '2024Iv1_nib1_ZB', '2024Iv2_nib1_ZB',
     '2024F_nib1_ZB', '2024F_nib2_ZB', '2024F_nib3_ZB', '2024G_nib1_ZB', '2024G_nib2_ZB',
     '2024F_nib1_ZeroBias', '2024F_nib2_ZeroBias', '2024F_nib3_ZeroBias',
-    '2024G_1', '2024G_2', '2024G_3', '2024G_4', '2024G_5',
+    '2024G_1', '2024G_2', '2024G_3', '2024G_4', '2024G_5', '2024H_NT',
     '2024H', '2024H_ZB', '2024Iv1', '2024Iv1_ZB', '2024Iv2', '2024Iv2_ZB',
-    '2024BR', '2024CR', '2024Crs', '2024CS', '2024CT', '2024F_TeVJet', '2024F_JetHT', 
+    '2024BR', '2024CR', '2024Crs', '2024CS', '2024CT', '2024F_TeVJet', '2024F_JetHT',
+    '2024C_Rp', '2024C_Rp_ZB', '2024D_Rp', '2024D_Rp_ZB', '2024E_Rp', '2024E_Rp_ZB',
+    '2024I_ZB_HCPF1x', '2024I_ZB_HCPF2x', '2024I_ZB_HCPF3x', '2024I_ZB_HCPF4x', '2024I_ZB_HCPF5x', '2024I_ZB_HCPFSpecial',
     '2024_skim', '2024I_Skim', '2024H_Skim',
     '2024F_ECAL_CC_1', '2024F_ECAL_CC_2', '2024F_ECAL_CC_3', '2024F_ECAL_CC_4',
+    '2024F_ECAL2_1', '2024F_ECAL2_2', '2024F_ECAL2_3', '2024F_ECAL2_4',
     'Winter24MG_1', 'Winter24MG_2', 'Winter24MG_3', 'Winter24MG_4', 'Winter24MG_5',
     'Summer24MG_1', 'Summer24MG_2', 'Summer24MG_3', 'Summer24MG_4', 'Summer24MG_5',
-    'Winter24MGV14_1', 'Winter24MGV14_2', 'Winter24MGV14_3', 'Winter24MGV14_4', 'Winter24MGV14_5', 'Winter24MGV14_OneHTFile'
+    'Winter24MGV14_1', 'Winter24MGV14_2', 'Winter24MGV14_3', 'Winter24MGV14_4', 'Winter24MGV14_5', 'Winter24MGV14_OneHTFile',
+    'QCDFlatECAL_1Sig', 'QCDFlatECAL_2Sig', 'QCDFlatECAL_3Sig', 'QCDFlatECAL_4Sig', 'QCDFlatECAL_Baseline', 'QCDFlatECAL_Zero' 
 ]
 
 # Run 3 is all samples with year 2023 and 2022 from the full IOV_list
@@ -60,7 +64,8 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v116_2024'
+version = 'v122'
+#version = 'v120'
 
 IOV_input = []
 

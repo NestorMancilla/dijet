@@ -72,11 +72,22 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
-// v116. V8M nib corrections.
-// v115. Summer24, Summer24 PU reweighting for 69.2 and 75.3 mb. 2D unfolding cov matrix. v2 eta until 2.5
+// v122. 2024I ZB HCal PF Cuts.
+// v121. Re-reco 2024 CDE and 2024 FGHI Prompt.
+// v120. New histograms PFComposition chf, nhf and nef in tag and Probe forward binning for ECALPFThreshold with PU.
+// v119. Different versions Summer24 69.2 mb PU. REMEMBER: v119_2024BCDEFGHI is with 75.3 mb. The file was copied and moved to the v116 folder (v116_2024BCDEFGHI),
+//       but the log file still the same (v119_2024BCDEFGHI). The v119_69mb will be renamed v119_2024BCDEFGHI.
+// v118. Process 2024H for JEC4Prompt. Two histograms are added now for pt tag and probe. Process QCD Flat 2022 ECALPFThreshold with PU.
+//       v2 doJEC4Prompt = false. Comment the line for the corrections, now everything is without the correction. 
+//       v3 no more doJEC4Prompt. Return to "original" values.
+//       v4 Tag and probe eta and pt histograms. JEC V8M. nrecoil histogram.
+//       v5 Trigger thresholds removed. 
+// v117. Re-reco 2024CDE using V8M 2024G_nib2 JEC as placeholder.
+// v116. V8M nib corrections. PU reweighting for Summer24 Prompt per nib with 75.3 mb. double fwdeta = 3.0; at least for 2024I.
+// v115. Summer24, Summer24 PU reweighting for 69.2 and 75.3 mb. 2D unfolding cov matrix. REMINDER: v2 eta until 2.5
 // v114. Inclusive jet cross section plots for unfolding.
 // v113. Run 2024 for nibs.
-// v112. Run all 2024 IOV eras. Full Golden JSON file. 
+// v112. Run all 2024 IOV eras. Full Golden JSON file. Prompt24_V7M 
 // v111. Test on 2024I Skim. Full 2024 H and I without skim. JSON: CombinedJSON_GoldenRuns_378985to386319_DCSRuns_386320to386951.
 //	 JRSF_2024[H,I] and 2024[H,I] includes PU reweighting and SF. v111_2024_GH includes PU rew for GH eras.
 // v110. Prompt24_V6M for all eras (L2L3 and jetvetomaps). v110_1_era corresponds to the PU reweigting and the JRSF.

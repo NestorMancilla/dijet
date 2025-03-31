@@ -6,6 +6,7 @@
 #include "../CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "../CondFormats/JetMETObjects/interface/SimpleJetCorrector.h"
 #include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrectorWrapper.h"
 
 #include "../CondFormats/JetMETObjects/interface/SimpleJetCorrectionUncertainty.h"
 #include "../CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -53,6 +54,7 @@ R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/JetCorrectionUncertainty.cc+)
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/JetCorrectorParameters_cc)
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/SimpleJetCorrector_cc)
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/FactorizedJetCorrector_cc)
+//R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/FactorizedJetCorrectorWrapper_cc)
 
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/SimpleJetCorrectionUncertainty_cc)
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/JetCorrectionUncertainty_cc)
@@ -94,7 +96,9 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer23MCBPix_Cas", "Summer23MC_Cas",
      "Winter24MCFlat", "Winter24MCFlat_Sv10", "Winter24MCFlat_Sv9",
      "Winter24MG_1", "Winter24MG_2", "Winter24MG_3", "Winter24MG_4", "Winter24MG_5",
-     "Winter24MGV14_1", "Winter24MGV14_2", "Winter24MGV14_3", "Winter24MGV14_4", "Winter24MGV14_5", "Winter24MGV14_OneHTFile"
+     "Summer24MG_1", "Summer24MG_2", "Summer24MG_3", "Summer24MG_4", "Summer24MG_5",
+     "Winter24MGV14_1", "Winter24MGV14_2", "Winter24MGV14_3", "Winter24MGV14_4", "Winter24MGV14_5", "Winter24MGV14_OneHTFile",
+     "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig", "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero" //ECALPFT
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 
@@ -123,9 +127,12 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2024F_nib1_ZeroBias", "2024F_nib2_ZeroBias", "2024F_nib3_ZeroBias",
   "2024G_1", "2024G_2", "2024G_3", "2024G_4", "2024G_5",
   "2024H", "2024H_ZB", "2024Iv1", "2024Iv1_ZB", "2024Iv2", "2024Iv2_ZB",
-  "2024F_TeVJet", "2024F_JetHT", "2024I_Skim", "2024H_Skim",
+  "2024F_TeVJet", "2024F_JetHT", "2024I_Skim", "2024H_Skim", "2024H_NT",
   "2024BR", "2024CR", "2024Ev2", "2024Crs", "2024CS", "2024CT",
+  "2024C_Rp", "2024C_Rp_ZB", "2024D_Rp", "2024D_Rp_ZB", "2024E_Rp", "2024E_Rp_ZB",
   "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
+  "2024F_ECAL2_1", "2024F_ECAL2_2", "2024F_ECAL2_3", "2024F_ECAL2_4",
+  "2024I_ZB_HCPF1x", "2024I_ZB_HCPF2x", "2024I_ZB_HCPF3x", "2024I_ZB_HCPF4x", "2024I_ZB_HCPF5x", "2024I_ZB_HCPFSpecial",
   "2024_skim"
   };
 

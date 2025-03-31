@@ -3,15 +3,15 @@
 #include "TFile.h"
 #include "TKey.h"
 #include "TDirectory.h"
-#include "TH1.h"
+
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TProfile2D.h"
 #include "TH3D.h"
 #include <iostream>
 
-int debug = 0; // 1=trg, 2=dir, 3=all
-string version = "v118";
+int debug = 1; // 1=trg, 2=dir, 3=all
+string version = "v119";
 void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 			 string trg, string folder);
 //void mergeDijet(TDirectory *dir, TDirectory *dout);
@@ -60,8 +60,8 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev1_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev2_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_nib2_JME_v116.root");
+
+
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024GH_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_JME_"+version+".root");
@@ -73,22 +73,23 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_TeVJet_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_JetHT_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_Skim_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024B_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024C_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024D_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024Ev1_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024Ev2_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024F_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024F_nib2_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024F_nib3_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024G_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024G_nib2_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev1_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Ev2_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_nib2_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024F_nib3_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024G_nib2_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_nib1_JME_"+version+".root");
-  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_nib1_"+version+".root");
-  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024Iv1_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024Iv2_nib1_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024I_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024H_nib1_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Iv1_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024Iv2_nib1_JME_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024I_nib1_JME_"+version+".root");
+
+
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_JME_"+version+".root");
   //DijetHistosCombines("/Users/nestorma/Documents/Helsinki/dijet/rootfiles/"+version+"/jmenano_data_out_2024BC_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2023Cv123_JME_"+version+".root");
@@ -101,10 +102,10 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2022CD_JME_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_ECALv2_"+version+".root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024B_ECALv1_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_data_out_2024F_ECAL2_"+version+"_2024.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024C_Rp_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024D_Rp_JME_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_data_out_2024E_Rp_JME_"+version+".root");
+
+
+
+
 
   // Really slow on this after all the others, rerun separately (then sec)
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer22MG_"+version+".root");
@@ -143,10 +144,16 @@ void DijetHistosCombine() {
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024H_JRSF.root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024Hv2_JRSF.root");
   //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_v112_2024I_JRSF.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Winter24MGV14_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer24MG_"+version+".root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer24MG_v116_2024F_nib2.root");
-  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer24MG_v116_2024Ev2_nib1.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_QCDFlatECAL_4Sig_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_QCDFlatECAL_3Sig_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_QCDFlatECAL_2Sig_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_QCDFlatECAL_1Sig_"+version+".root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_QCDFlatECAL_Baseline_"+version+".root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer24MG_v119_2024Ev1_nib1.root");
+  DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"/jmenano_mc_out_Summer24MG_v119_2024Ev2_nib1.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_mc_out_Summer24MG_v116_2024F_nib1.root");
+  //DijetHistosCombines("/media/storage/nestorma/dijet/rootfiles/"+version+"_2024/jmenano_mc_out_Summer24MG_v116_2024BCDEFGHI.root");
+
 
   //DijetHistosCombines("rootfiles/jmenano_mc_out_v23ul16flat.root");
   //DijetHistosCombines("rootfiles/jmenano_mc_out_v23ul16mg.root");
@@ -190,18 +197,18 @@ void DijetHistosCombine() {
   //
   //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_data_out_2223_JME_v1.root");
   //DijetHistosCombines("../jecsys3/rootfiles/Iita_20230824_jetveto/jmenano_mc_out_Summer22Both_v1.root");
-  
+
 } // DijetHistosCombine
 
 void DijetHistosCombines(string file) {
 
   cout << "DijetHistosCombines(\"" << file << "\")" << endl;
   TDirectory *curdir = gDirectory;
-  
+
   // Open input and output files
   TFile *fin = new TFile(file.c_str(),"READ");
   assert(fin && !fin->IsZombie());
-  
+
   TString t = file.c_str();
   t.ReplaceAll("_out","_cmb");
   string file2 = t.Data();
@@ -211,7 +218,7 @@ void DijetHistosCombines(string file) {
   TFile *fout = new TFile(file2.c_str(),"RECREATE");
   assert(fout && !fout->IsZombie());
 
-  
+
   // Retrieve listing of available triggers from input file
   TH1D *htrg = (TH1D*)fin->Get("htrg");
   assert(htrg);
@@ -222,12 +229,14 @@ void DijetHistosCombines(string file) {
   TDirectory *dir = gDirectory;
   if (debug>0) cout << "Initialize with " << dir->GetName() << endl << flush;
   loopOverDirectories(dir,fout,"none","");
-  
+
   // Then copy stuff over
   for (int i = 1; i != htrg->GetNbinsX()+1; ++i) {
-    
+
     string trg = htrg->GetXaxis()->GetBinLabel(i);
+    // Only HLT triggers
     if (!TString(trg.c_str()).Contains("HLT_")) continue;
+
     fin->cd(trg.c_str());
     dir = gDirectory;
     if (debug>0) cout << "Process " << trg << " in "
@@ -266,10 +275,10 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
     else {
 
       TObject *obj = key->ReadObj();
-      
+
       if (obj->InheritsFrom("TProfile2D")) {
 	TProfile2D *p2 = (TProfile2D*)obj;
-	
+
 	/*
 	// Collapse to TH2D until can figure out how to copy bins of TProfile2D
 	// This unfortunately makes rebinning later trickier
@@ -323,7 +332,7 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 			p2o->GetYaxis()->GetBinCenter(biny),
 			p2o->GetXaxis()->GetBinCenter(binx))) {
 	      if (folder=="Jetveto") {
-	
+
 		p2o->SetEntries(p2o->GetEntries()+p2->GetEntries());
 		(*p2o)[ibin] = (*p2)[ibin] + (*p2o)[ibin];
 		(*p2o->GetSumw2())[ibin] = (*p2->GetSumw2())[ibin] +
@@ -446,7 +455,7 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	      //po->Sumw2(); // Nestor, Oct 24, 2024. Problems with 2024F_TeVJet.
           }
 
-	  // https://root-forum.cern.ch/t/copy-entries-of-tprofile/11828
+          // Copy bins for JetsperRuns without checking pt and eta
           for (int ibin = 1; ibin != p->GetNbinsX()+1; ++ibin) {
               if (folder == "JetsperRuns") {
                   // Directly copy for JetsperRuns
@@ -468,13 +477,45 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 		      //if (p->GetBinSumw2()->fN > ibin && po->GetBinSumw2()->fN > ibin) {
                           (*po->GetBinSumw2())[ibin] = (*p->GetBinSumw2())[ibin];  // copy sumw2
                       }
+		      
+		      //else{
+		      //   cout << "GetBinSumw2 of po is not greater than ibin " <<  endl << flush;
+		      //}
                   }
               }
           } // for ibin
       } // TProfile
 
+      /*
+      else if (obj->InheritsFrom("TProfile")) {
+	TProfile *p = (TProfile*)obj;
+
+	TProfile *po = (TProfile*)outdir->FindObject(key->GetName());
+	if (!po) {
+	  outdir->cd();
+	  po = (TProfile*)p->Clone(key->GetName());
+	  po->Reset();
+	}
+
+	// https://root-forum.cern.ch/t/copy-entries-of-tprofile/11828
+	for (int ibin = 1; ibin != p->GetNbinsX()+1; ++ibin) {
+	  if (copyBin(trg, folder, key->GetName(),
+		      po->GetBinCenter(ibin),0.)) {
+	    (*po)[ibin] = (*p)[ibin]; // copy bin y values
+	    (*po->GetSumw2())[ibin] = (*p->GetSumw2())[ibin]; // copy bin y*y
+	    po->SetBinEntries(ibin, p->GetBinEntries(ibin));  // copy entries
+	    // copy (if needed) bin sum of weight square
+	    if ( p->GetBinSumw2()->fN > ibin ) { 
+	      //po->Sumw2(); // already copied when cloning
+	      //cout  << ibin << " , " << key->GetName() << endl << flush; //to seach the problem with prompt skim data
+	      (*po->GetBinSumw2())[ibin] = (*p->GetBinSumw2())[ibin];   
+	    }
+	  }
+	} // for ibin
+      } // TProfile
+      */
       else if (obj->InheritsFrom("TH1D")) {
-	//cout << __LINE__ << ' ' << folder << endl;
+
 	TH1D *h = (TH1D*)obj;
 	TH1D *ho = (TH1D*)outdir->FindObject(key->GetName());
 	if (!ho) {
@@ -482,11 +523,11 @@ void loopOverDirectories(TDirectory *dir, TDirectory *outdir,
 	  ho = (TH1D*)h->Clone(key->GetName());
 	  ho->Reset();
 	}
-	string hist = key->GetName();
+
 	for (int ibin = 1; ibin != h->GetNbinsX()+1; ++ibin) {
 	  int ieta(0);
 	  if (folder=="Incjet") sscanf(key->GetName(),"hpt%d",&ieta);
-	  if (folder=="JetsperRuns") {
+          if (folder=="JetsperRuns") {
 
             if (copyBin(trg, folder, key->GetName(),
                         //ho->GetBinCenter(ibin),0)) {
@@ -525,116 +566,11 @@ std::map<std::string, struct range> md2pf;
 std::map<std::string, struct range> mj;
 std::map<std::string, struct range> mi;
 
-// Simple struct to hold the region boundaries for each trigger
-struct TriggerBox {
-    std::string triggerName;
-    double ptMin;
-    double ptMax;
-    double absyMin;
-    double absyMax;
-};
-// Inclusive jets pT bins in relevan trigger range
-//28, 32, 37, 43, 49, 56, 64, 74, 84, 97, 114, 133, 153, 174, 196, 220, 245,
-//272, 300, 330, 362, 395, 430, 468, 507, 548, 592, 638, 686, 737, 790, 846,
-// Example: define a vector of TriggerBoxes for the inclusive-jet folder
-std::vector<TriggerBox> incjetBoxes = {
-  //{"HLT_ZeroBias", 0,   49,  0, 5.2},
-  {"HLT_ZeroBias", 0,   56,  0.0, 0.5},
-  {"HLT_ZeroBias", 0,   56,  0.5, 1.0},
-  {"HLT_ZeroBias", 0,   64,  1.0, 1.5},
-  {"HLT_ZeroBias", 0,   64,  1.5, 2.0},
-  {"HLT_ZeroBias", 0,  114,  2.0, 2.5},
-  {"HLT_ZeroBias", 0,   97,  2.5, 3.0},
-  //{"HLT_PFJet40",  49,  84,  0, 3.0},
-  {"HLT_PFJet40", 56,  84,  0.0, 0.5},
-  {"HLT_PFJet40", 56,  84,  0.5, 1.0},
-  {"HLT_PFJet40", 64,  84,  1.0, 1.5},
-  {"HLT_PFJet40", 64,  84,  1.5, 2.0},
-  {"HLT_PFJet40", 114, 153,  2.0, 2.5},
-  {"HLT_PFJet40", 97,  114,  2.5, 3.0},  
-  //{"HLT_PFJet60",  84,  114, 0, 3.0},
-  {"HLT_PFJet60", 84,  114,  0.0, 0.5},
-  {"HLT_PFJet60", 84,  114,  0.5, 1.0},
-  {"HLT_PFJet60", 84,  114,  1.0, 1.5},
-  {"HLT_PFJet60", 84,  114,  1.5, 2.0},
-  {"HLT_PFJet60", 153, 174,  2.0, 2.5},
-  {"HLT_PFJet60", 114, 133,  2.5, 3.0},  
-  //{"HLT_PFJet80",  114, 196, 0, 3.0},
-  {"HLT_PFJet80", 114, 196,  0.0, 0.5},
-  {"HLT_PFJet80", 114, 196,  0.5, 1.0},
-  {"HLT_PFJet80", 114, 196,  1.0, 1.5},
-  {"HLT_PFJet80", 114, 196,  1.5, 2.0},
-  {"HLT_PFJet80", 174, 196,  2.0, 2.5},
-  {"HLT_PFJet80", 133, 196,  2.5, 3.0},  
-  
-  {"HLT_PFJet140", 196, 272, 0, 3.0},
-  {"HLT_PFJet200", 272, 330, 0, 3.0},
-  {"HLT_PFJet260", 330, 395, 0, 3.0},
-  {"HLT_PFJet320", 395, 468, 0, 3.0},
-  {"HLT_PFJet400", 468, 548, 0, 3.0},
-  {"HLT_PFJet450", 548, 686, 0, 3.0},
-  {"HLT_PFJet500", 686,7000, 0, 3.0},
-
-  //{"HLT_ZeroBias", 0,   49,  0, 5.2}, 
-  {"HLT_ZeroBias", 0,   64,  3.0, 3.5},
-  {"HLT_ZeroBias", 0,   64,  3.5, 4.0},
-  {"HLT_ZeroBias", 0,   64,  4.0, 4.5},
-  {"HLT_ZeroBias", 0,   64,  4.5, 5.2},
-  //{"HLT_PFJetFwd40",  49,  84,  3.0, 5.2},
-  {"HLT_PFJetFwd40",  64,   97,  3.0, 3.5},
-  {"HLT_PFJetFwd40",  64,   97,  3.5, 4.0},
-  {"HLT_PFJetFwd40",  64,   97,  4.0, 4.5},
-  {"HLT_PFJetFwd40",  64,   97,  4.5, 5.2},
-  //{"HLT_PFJetFwd60",  84,  114, 3.0, 5.2},
-  {"HLT_PFJetFwd60",  97,  220,  3.0, 3.5},
-  {"HLT_PFJetFwd60",  97,  220,  3.5, 4.0},
-  {"HLT_PFJetFwd60",  97,  220,  4.0, 4.5},
-  {"HLT_PFJetFwd60",  97,  153,  4.5, 5.2},
-  //{"HLT_PFJetFwd80",  114, 196, 3.0, 5.2},
-  // Fwd80 somehow botched up, very bad turn-on at ~196 (last 133?)
-  {"HLT_PFJetFwd80", 220,  220,  3.0, 3.5},
-  {"HLT_PFJetFwd80", 220,  220,  3.5, 4.0},
-  {"HLT_PFJetFwd80", 220,  220,  4.0, 4.5},
-  {"HLT_PFJetFwd80", 153,  153,  4.5, 5.2},
-  //{"HLT_PFJetFwd140", 196, 272, 3.0, 5.2},
-  {"HLT_PFJetFwd140", 220,  272,  3.0, 3.5},
-  {"HLT_PFJetFwd140", 220,  272,  3.5, 4.0},
-  {"HLT_PFJetFwd140", 220,  272,  4.0, 4.5},
-  {"HLT_PFJetFwd140", 153, 7000,  4.5, 5.2}, // E<150 for hpt50
-  
-  //{"HLT_PFJetFwd200", 272, 330, 3.0, 5.2},
-  {"HLT_PFJetFwd200", 272, 330, 3.0, 4.0},
-  {"HLT_PFJetFwd200", 272, 300, 4.0, 4.5},
-  {"HLT_PFJetFwd200",7000,7000, 4.5, 5.2}, // 150-200 for hpt50
-  //{"HLT_PFJetFwd260", 330, 395, 3.0, 5.2},
-  {"HLT_PFJetFwd260", 330, 362, 3.0, 4.0},
-  {"HLT_PFJetFwd260", 300,7000, 4.0, 4.5}, // 300 for hpt45
-  {"HLT_PFJetFwd260",7000,7000, 4.5, 5.2}, // 150-200 for hpt50
-  //{"HLT_PFJetFwd320", 395, 468, 3.0, 5.2},
-  {"HLT_PFJetFwd320", 362, 430, 3.0, 4.0},
-  {"HLT_PFJetFwd320",7000,7000, 4.0, 4.5},
-  {"HLT_PFJetFwd320",7000,7000, 4.5, 5.2},
-  //{"HLT_PFJetFwd400", 468, 7000, 3.0, 5.2},
-  {"HLT_PFJetFwd400", 430,7000, 3.0, 4.0},
-  {"HLT_PFJetFwd400",7000,7000, 4.0, 4.5},
-  {"HLT_PFJetFwd400",7000,7000, 4.5, 5.2},
-  //{"HLT_PFJetFwd400", 468, 548, 3.0, 5.2},
-  //{"HLT_PFJetFwd450", 548, 686, 3.0, 5.2},
-  //{"HLT_PFJetFwd500", 686,7000, 3.0, 5.2},
-  /*
-    {"HLT_PFJet40",   40.0,   60.0,   0.0,   0.5},
-    {"HLT_PFJet40",   40.0,   60.0,   0.5,   1.0},
-    {"HLT_PFJet500", 500.0, 1000.0,   0.0,   2.0},
-    // ... Add as many boxes as you like
-  */
-};
-// Utility to check if a bin center is in range
-inline bool inRange(double val, double minVal, double maxVal) {
-    return (val >= minVal) && (val < maxVal);
-}
 
 bool copyBin(string trg, string folder, string hist, double pt, double eta) {
 
+  //cout << "trg:"<<trg<<" folder:"<<folder<<" hist:"<<hist
+  //   << " pt:"<<pt<<" eta:"<<eta<<endl;
 
   // Setup triggers only once
   if (md.find("HLT_ZeroBias")==md.end()) {
@@ -646,7 +582,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     // Dijet thresholds
     md["HLT_ZeroBias"]      = range{15,  40,  0, 5.2};
     md["HLT_MC"]            = range{15,6500,  0, 5.2};
-    
+
     md["HLT_DiPFJetAve40"]  = range{40,  85,  0, 5.2};
     md["HLT_DiPFJetAve60"]  = range{85,  100, 0, fwdeta};
     md["HLT_DiPFJetAve80"]  = range{100, 155, 0, fwdeta};
@@ -657,20 +593,20 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     md["HLT_DiPFJetAve400"] = range{500, 600, 0, fwdeta0};
     md["HLT_DiPFJetAve500"] = range{600,3000, 0, fwdeta0};
 
-    //JEC4Prompt
-    
+
+
     md["HLT_DiPFJetAve60_HFJEC"]  = range{85,  100, fwdeta, 5.2};
     md["HLT_DiPFJetAve80_HFJEC"]  = range{100, 125, fwdeta, 5.2};
     md["HLT_DiPFJetAve100_HFJEC"] = range{125, 180, fwdeta, 5.2};
     md["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
     md["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
     md["HLT_DiPFJetAve300_HFJEC"] = range{350,3000, fwdeta0, 5.2};
-    
+
 
     // https://indico.cern.ch/event/1263476/contributions/5311425/attachments/2612023/4513129/L2Res+HDM-March15.pdf
     md2["HLT_ZeroBias"]      = range{15,  59,  0, 5.2};
     md2["HLT_MC"]            = range{15,6500,  0, 5.2};
-    
+
     md2["HLT_DiPFJetAve40"]  = range{59,  86,  0, 5.2};
     md2["HLT_DiPFJetAve60"]  = range{86,  110, 0, fwdetad};
     md2["HLT_DiPFJetAve80"]  = range{110, 170, 0, fwdetad};
@@ -680,7 +616,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     md2["HLT_DiPFJetAve320"] = range{373, 460, 0, fwdetad};
     md2["HLT_DiPFJetAve400"] = range{460, 575, 0, fwdetad};
     md2["HLT_DiPFJetAve500"] = range{575,6500, 0, fwdetad};
-    
+
     md2["HLT_DiPFJetAve60_HFJEC"]  = range{86,  110, fwdetad, 5.2};
     md2["HLT_DiPFJetAve80_HFJEC"]  = range{110, 132, fwdetad, 5.2};
     md2["HLT_DiPFJetAve100_HFJEC"] = range{132, 204, fwdetad, 5.2};
@@ -699,7 +635,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     md2pf["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
     md2pf["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
     md2pf["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-    
+
     md2pf["HLT_PFJetFwd40"]  = range{49,  84,  fwdetad, 5.2};   //Added to check HLT PFJetFwd. Nestor. April 25, 2024.
     md2pf["HLT_PFJetFwd60"]  = range{84,  114, fwdetad, 5.2};
     md2pf["HLT_PFJetFwd80"]  = range{114, 196, fwdetad, 5.2};
@@ -710,7 +646,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     md2pf["HLT_PFJetFwd400"] = range{468, 548, fwdetad, 5.2};
     md2pf["HLT_PFJetFwd450"] = range{548, 686, fwdetad, 5.2};
     md2pf["HLT_PFJetFwd500"] = range{686,6500, fwdetad, 5.2};   //
-    
+
     md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
     md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
     md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
@@ -722,7 +658,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     md2tc["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
     md2tc["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
     md2tc["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
-    
+
     // Multijet or dijet tag/probe thresholds
     mj["HLT_PFJet40"]  = range{40,  85,  0, fwdeta0};
     mj["HLT_PFJet60"]  = range{85,  100, 0, fwdeta};
@@ -736,7 +672,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     mj["HLT_PFJet500"] = range{600,3000, 0, fwdeta0};
     //mj["HLT_PFJet500"] = range{600, 700, 0, fwdeta0};
     //mj["HLT_PFJet550"] = range{700,3000, 0, fwdeta0};
-    
+
     mj["HLT_PFJetFwd40"]  = range{40,  85,  fwdeta0, 5.2};
     mj["HLT_PFJetFwd60"]  = range{85,  100, fwdeta, 5.2};
     mj["HLT_PFJetFwd80"]  = range{100, 155, fwdeta, 5.2};
@@ -762,33 +698,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     mi["HLT_PFJet450"] = range{548, 686, 0, 5.2};
     mi["HLT_PFJet500"] = range{686,6500, 0, 5.2};
     */
-    double fwdetatrk(3.0);
-    mi["HLT_PFJet40"]  = range{49,  84,  0, fwdetatrk};
-    mi["HLT_PFJet60"]  = range{84,  114, 0, fwdetatrk};
-    mi["HLT_PFJet80"]  = range{114, 196, 0, fwdetatrk};
-    mi["HLT_PFJet140"] = range{196, 272, 0, fwdetatrk};
-    mi["HLT_PFJet200"] = range{272, 330, 0, fwdetatrk};
-    mi["HLT_PFJet260"] = range{330, 395, 0, fwdetatrk};
-    mi["HLT_PFJet320"] = range{395, 468, 0, fwdetatrk};
-    mi["HLT_PFJet400"] = range{468, 548, 0, fwdetatrk};
-    mi["HLT_PFJet450"] = range{548, 686, 0, fwdetatrk};
-    mi["HLT_PFJet500"] = range{686,6500, 0, fwdetatrk};
 
-    //JEC4Prompt
-    
-    mi["HLT_PFJetFwd40"]  = range{49,  84,  fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd60"]  = range{84,  114, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd80"]  = range{114, 196, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd140"] = range{196, 272, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd200"] = range{272, 330, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd260"] = range{330, 395, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd320"] = range{395, 468, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd400"] = range{468, 548, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd450"] = range{548, 686, fwdetatrk, 5.2};
-    mi["HLT_PFJetFwd500"] = range{686,6500, fwdetatrk, 5.2};
-    
-
-    /*
     mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0};
     mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};
     mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta};
@@ -811,7 +721,7 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     mi["HLT_PFJetFwd400"] = range{468, 548, fwdeta0, 5.2};
     mi["HLT_PFJetFwd450"] = range{548, 686, fwdeta0, 5.2};
     mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2};
-    */
+
   }
 
   if (folder=="MCtruth" && (hist=="ptreco/ptgen" || hist=="response_ptgen" || hist=="response_etagen" ||
@@ -829,22 +739,20 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
 				      hist=="p2mnpf" || hist=="p2mupf"));
   bool h3MPF = (folder=="Dijet2" && (hist=="h3m0" || hist=="h3m2"));
 
-    if (folder=="Incjet" && (hist=="hpteta20" || hist=="hpteta30" ||
-			   hist=="hpteta40" || hist=="hpteta50"))
-    return true;
-
-    if (folder=="Dijet" && (hist=="hetatag" || hist=="hetaprobe")){
-      return true;
-    }
-
-    if (folder=="Multijet" && (hist=="hetalead" || hist=="hetarecoil")){
-      return true;
-    }
 
   bool h1JetRuns = (folder=="JetsperRuns" && (hist=="h1jetrate"));
 
   bool h3asymm = (folder=="Jetveto" && (hist=="Asymm"||hist=="h3asymm"));
-  
+
+  if (folder=="Dijet" && (hist=="hetaprobe" || hist=="hetatag"))
+    return true;
+
+  if (folder=="Multijet" && (hist=="hetar_all"))
+    return true;
+
+  if(hist=="hnrecoil")
+    return true;
+
   if (folder=="Jetveto" && (hist=="p2chf" || hist=="p2nhf" || hist=="p2nef" ||
 			    hist=="p2asymm" || hist=="h2phieta" ||
 			    hist=="h2phieta_ave" || hist=="p2asymm_noveto" ||
@@ -868,50 +776,13 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
     }
   }
 
-  /*
+
   if (folder=="Incjet" &&
       mi.find(trg)!=mi.end() &&
       pt >= mi[trg].ptmin && pt < mi[trg].ptmax &&
       fabs(eta) >= mi[trg].absetamin && fabs(eta) < mi[trg].absetamax)
     return true;
-  */
-  if (folder=="Incjet") {
 
-    string trigger("none");
-    bool covered = false;
-    for (auto& box : incjetBoxes) {
-      // Check if (pt, eta) is in the region
-      if (inRange(pt, box.ptMin, box.ptMax) &&
-	  inRange(fabs(eta), box.absyMin, box.absyMax)) {
-
-	// Copy bin content for this trigger
-	trigger = box.triggerName;
-
-	// Sanity check for overlapping boxes
-	if (covered) {
-	  std::cerr << "Warning: Histogram " << hist
-		    << " trigger " << trigger
-		    << " bin (pt=" << pt << ", eta=" << eta << ")"
-		    << " already covered by another trigger!\n";
-	}
-
-	// Mark as covered and break if you expect only one coverage
-	covered = true;
-	//break;
-      }
-    }
-
-    // Sanity check for missing phase space corners
-    /*
-    if (!covered) {
-      std::cerr << "Warning: Histogram " << hist
-		<< " bin (pt=" << pt
-		<< ", eta=" << eta << ") not covered by any trigger!\n";
-    }
-    */
-
-    if (trigger==trg) return true;
-  } // Incjet
   if (folder=="Dijet" &&
       md.find(trg)!=md.end() &&
       pt >= md[trg].ptmin && pt < md[trg].ptmax &&
@@ -929,9 +800,9 @@ bool copyBin(string trg, string folder, string hist, double pt, double eta) {
       //pt >= md2[trg].ptmin && pt < md2[trg].ptmax &&
       //fabs(eta) >= md2[trg].absetamin && fabs(eta) < md2[trg].absetamax)
     return true; 
-      
+
   if (folder=="Dijet2") {
-    
+
     if (tcHist) { // pT,tag binning
       if (md2tc.find(trg)!=md2tc.end() &&
 	  pt >= md2tc[trg].ptmin && pt < md2tc[trg].ptmax &&
