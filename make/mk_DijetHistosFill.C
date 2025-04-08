@@ -8,6 +8,8 @@
 #include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrectorWrapper.h"
 
+#include "../CondFormats/JetMETObjects/interface/JetIdHelper.h" // Substitute of JetId branch for NANOAODV15. Nestor, April 7.
+
 #include "../CondFormats/JetMETObjects/interface/SimpleJetCorrectionUncertainty.h"
 #include "../CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
@@ -55,6 +57,7 @@ R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/JetCorrectorParameters_cc)
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/SimpleJetCorrector_cc)
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/FactorizedJetCorrector_cc)
 //R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/FactorizedJetCorrectorWrapper_cc)
+R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/JetIdHelper_cc) //Substitute of JetId branch for NANOAODV15. Nestor, April 7.
 
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/SimpleJetCorrectionUncertainty_cc)
 R__LOAD_LIBRARY(CondFormats/JetMETObjects/src/JetCorrectionUncertainty_cc)
@@ -96,7 +99,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer23MCBPix_Cas", "Summer23MC_Cas",
      "Winter24MCFlat", "Winter24MCFlat_Sv10", "Winter24MCFlat_Sv9",
      "Winter24MG_1", "Winter24MG_2", "Winter24MG_3", "Winter24MG_4", "Winter24MG_5",
-     "Summer24MG_1", "Summer24MG_2", "Summer24MG_3", "Summer24MG_4", "Summer24MG_5",
+     "Summer24MG_1", "Summer24MG_2", "Summer24MG_3", "Summer24MG_4", "Summer24MG_5", "Summer24MG_oneHT",
+     "Winter25MC_Flat2022",
      "Winter24MGV14_1", "Winter24MGV14_2", "Winter24MGV14_3", "Winter24MGV14_4", "Winter24MGV14_5", "Winter24MGV14_OneHTFile",
      "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig", "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero" //ECALPFT
      };
@@ -132,7 +136,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2024C_Rp", "2024C_Rp_ZB", "2024D_Rp", "2024D_Rp_ZB", "2024E_Rp", "2024E_Rp_ZB",
   "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
   "2024F_ECAL2_1", "2024F_ECAL2_2", "2024F_ECAL2_3", "2024F_ECAL2_4",
-  "2024I_ZB_HCPF1x", "2024I_ZB_HCPF2x", "2024I_ZB_HCPF3x", "2024I_ZB_HCPF4x", "2024I_ZB_HCPF5x", "2024I_ZB_HCPFSpecial",
+  "2024I_ZB_HCPF1x", "2024I_ZB_HCPF2x", "2024I_ZB_HCPF3x", "2024I_ZB_HCPF4x", "2024I_ZB_HCPF5x", "2024I_ZB_HCPFSpecial", "2024I_ZB_Special",
   "2024_skim"
   };
 
@@ -175,7 +179,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   // Compile these libraries into *.so first with root -l -b -q mk_CondFormats.C
   // Compile .cc files in CondFormats/JetMETObjects/src
   std::unordered_set<std::string> files = {"Utilities.cc", "JetCorrectorParameters.cc", "SimpleJetCorrector.cc", "FactorizedJetCorrector.cc",
-  "SimpleJetCorrectionUncertainty.cc", "JetCorrectionUncertainty.cc", "JetResolutionObject.cc"};
+  "JetIdHelper.cc", "SimpleJetCorrectionUncertainty.cc", "JetCorrectionUncertainty.cc", "JetResolutionObject.cc"};
 
   for (auto it=files.begin(); it!=files.end(); ++it) {
     gROOT->ProcessLine(Form(".L CondFormats/JetMETObjects/src/%s+",it->c_str()));

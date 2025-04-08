@@ -72,8 +72,11 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
-// v122. 2024I ZB HCal PF Cuts.
-// v121. Re-reco 2024 CDE and 2024 FGHI Prompt.
+// v123. Implements the new method for the JetId branch for NANOAODV15. v2 for testing Summer24MG with tightLepVeto (6).
+//       v3 with normal Jet_jetId. The test for v2 and v3 are considering 50 files (less than 5 percentage).
+//       v4 includes the new histograms for MC truth. For the 3 leading gen jets and the neutral multiplicity selection.
+// v122. 2024I ZB HCal PF Cuts. V122_v2 updates the trigger thresholds. v122_v3 to process the QCD flat samples from Fikri.
+// v121. Re-reco 2024 CDE and 2024 FGHI Prompt. V121_v2 updates the trigger thresholds to the original ones. The Summer24MG results are copied from v115.
 // v120. New histograms PFComposition chf, nhf and nef in tag and Probe forward binning for ECALPFThreshold with PU.
 // v119. Different versions Summer24 69.2 mb PU. REMEMBER: v119_2024BCDEFGHI is with 75.3 mb. The file was copied and moved to the v116 folder (v116_2024BCDEFGHI),
 //       but the log file still the same (v119_2024BCDEFGHI). The v119_69mb will be renamed v119_2024BCDEFGHI.

@@ -1,4 +1,5 @@
 #define DijetHistosFill_cxx
+//#define Jet_jetId Jet_jetId_ref // NANOAODV15
 //#ifdef NANOVO9
 //      #include "../interface/DijetHistosFillV09.h" // Specific for NanoV09
 //#else
@@ -53,7 +54,7 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = true;
+bool reweightPU = false;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
@@ -104,6 +105,7 @@ std::set<std::string> mcIOV = {"Summer22",
                                "TestSummer23MGBPix",
 			       "Summer23MC_Cas",
                                "Winter24MCFlat", "Winter24MG", "Summer24MG",
+			       "Winter25MC_Flat2022",
                                "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig",
                                "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero"};
 
@@ -281,6 +283,7 @@ constexpr std::array<std::pair<const char*, const char*>, 126> lumifiles = {{
     {"2024I_ZB_HCPF4x", lumibyls2024BCDEFG},
     {"2024I_ZB_HCPF5x", lumibyls2024BCDEFG},
     {"2024I_ZB_HCPFSpecial", lumibyls2024BCDEFG},
+    {"2024I_ZB_Special", lumibyls2024BCDEFG}
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -1405,6 +1408,13 @@ fChain->SetBranchStatus("Jet_phi", 1);
 fChain->SetBranchStatus("Jet_mass", 1);
 fChain->SetBranchStatus("Jet_jetId", 1);
 
+if (TString(dataset.c_str()).Contains("Winter25MC"))
+{
+  fChain->SetBranchStatus("Jet_chMultiplicity", 1);
+  fChain->SetBranchStatus("Jet_neMultiplicity", 1);
+}
+
+
 fChain->SetBranchStatus("Jet_rawFactor", 1);
 if (isRun2)
 	fChain->SetBranchStatus("Jet_area", 1);
@@ -1467,13 +1477,13 @@ if (doTriggerMatch)
 
 // List reference pT and abseta thresholds for triggers
 mt["HLT_MC"] = range{10, 3000, 0, 5.2};
-//mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
-mt["HLT_ZeroBias"] = range{0,   56,  0.0, 0.5};
-mt["HLT_ZeroBias"] = range{0,   56,  0.5, 1.0};
-mt["HLT_ZeroBias"] = range{0,   64,  1.0, 1.5};
-mt["HLT_ZeroBias"] = range{0,   64,  1.5, 2.0};
-mt["HLT_ZeroBias"] = range{0,  114,  2.0, 2.5};
-mt["HLT_ZeroBias"] = range{0,   97,  2.5, 3.0};
+mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
+//mt["HLT_ZeroBias"] = range{0,   56,  0.0, 0.5};
+//mt["HLT_ZeroBias"] = range{0,   56,  0.5, 1.0};
+//mt["HLT_ZeroBias"] = range{0,   64,  1.0, 1.5};
+//mt["HLT_ZeroBias"] = range{0,   64,  1.5, 2.0};
+//mt["HLT_ZeroBias"] = range{0,  114,  2.0, 2.5};
+//mt["HLT_ZeroBias"] = range{0,   97,  2.5, 3.0};
 
 mt["HLT_DiPFJetAve40"] = range{40, 85, 0, 5.2};
 mt["HLT_DiPFJetAve60"] = range{85, 100, 0, 5.2};
@@ -1516,28 +1526,28 @@ mt["HLT_PFJet550"] = range{700, 6500, 0, 5.2};
 //Mikko's thresholds for Inclusive jet analysis
 //https://github.com/miquork/jecsys3/blob/main/minitools/DijetHistosCombine.C#L264-L370
 //mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
-//mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
-//mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
-mt["HLT_PFJet40"] = range{56, 84, 0.0, 0.5},
-mt["HLT_PFJet40"] = range{56, 84, 0.5, 1.0},
-mt["HLT_PFJet40"] = range{64, 84, 1.0, 1.5},
-mt["HLT_PFJet40"] = range{64, 84, 1.5, 2.0},
-mt["HLT_PFJet40"] = range{114, 153, 2.0, 2.5},
-mt["HLT_PFJet40"] = range{97, 114, 2.5, 3.0},
+mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
+mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
+//mt["HLT_PFJet40"] = range{56, 84, 0.0, 0.5},
+//mt["HLT_PFJet40"] = range{56, 84, 0.5, 1.0},
+//mt["HLT_PFJet40"] = range{64, 84, 1.0, 1.5},
+//mt["HLT_PFJet40"] = range{64, 84, 1.5, 2.0},
+//mt["HLT_PFJet40"] = range{114, 153, 2.0, 2.5},
+//mt["HLT_PFJet40"] = range{97, 114, 2.5, 3.0},
 
-mt["HLT_PFJet60"] = range{84,  114, 0.0, 0.5},
-mt["HLT_PFJet60"] = range{84,  114, 0.5, 1.0},
-mt["HLT_PFJet60"] = range{84,  114, 1.0, 1.5},
-mt["HLT_PFJet60"] = range{84,  114, 1.5, 2.0},
-mt["HLT_PFJet60"] = range{153, 174, 2.0, 2.5},
-mt["HLT_PFJet60"] = range{114, 133, 2.5, 3.0}, 
-//mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
-mt["HLT_PFJet80"] = range{114, 196, 0.0, 0.5},
-mt["HLT_PFJet80"] = range{114, 196, 0.5, 1.0},
-mt["HLT_PFJet80"] = range{114, 196, 1.0, 1.5},
-mt["HLT_PFJet80"] = range{114, 196, 1.5, 2.0},
-mt["HLT_PFJet80"] = range{174, 196, 2.0, 2.5},
-mt["HLT_PFJet80"] = range{133, 196, 2.5, 3.0},
+//mt["HLT_PFJet60"] = range{84,  114, 0.0, 0.5},
+//mt["HLT_PFJet60"] = range{84,  114, 0.5, 1.0},
+//mt["HLT_PFJet60"] = range{84,  114, 1.0, 1.5},
+//mt["HLT_PFJet60"] = range{84,  114, 1.5, 2.0},
+//mt["HLT_PFJet60"] = range{153, 174, 2.0, 2.5},
+//mt["HLT_PFJet60"] = range{114, 133, 2.5, 3.0}, 
+mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
+//mt["HLT_PFJet80"] = range{114, 196, 0.0, 0.5},
+//mt["HLT_PFJet80"] = range{114, 196, 0.5, 1.0},
+//mt["HLT_PFJet80"] = range{114, 196, 1.0, 1.5},
+//mt["HLT_PFJet80"] = range{114, 196, 1.5, 2.0},
+//mt["HLT_PFJet80"] = range{174, 196, 2.0, 2.5},
+//mt["HLT_PFJet80"] = range{133, 196, 2.5, 3.0},
 
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
 mt["HLT_PFJet200"] = range{272, 330, 0, 3.0};
@@ -2053,7 +2063,8 @@ if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
 	useJERSFvsPt = true;
 }
 
-if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") || TString(dataset.c_str()).Contains("QCDFlatECAL"))
+if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") || TString(dataset.c_str()).Contains("QCDFlatECAL") ||
+    TString(dataset.c_str()).Contains("Winter25MC"))
 {
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2071,9 +2082,9 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_") || TString(dataset.c_str()).Contains("Summer24MG")) {
-		 TFile f("luminosityscripts/PUWeights/69mb/PUWeight2024BCDEFGHI/PUWeights_HLT_PFJet500_2024BCDEFGHI.root");
-		 //TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/Summer24/PUWeight2024BCDEFGHI/PUWeights_HLT_PFJet500_2024BCDEFGHI.root");
-	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024BCDEFGHI");
+		 //TFile f("luminosityscripts/PUWeights/69mb/PUWeight2024BCDEFGHI/PUWeights_HLT_PFJet500_2024BCDEFGHI.root");
+		 TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/Summer24/PUWeight2024CDEFGHI/PUWeights_HLT_PFJet500_2024CDEFGHI.root");
+	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024CDEFGHI");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
 		 cout << "PU weight file: " << f.GetName() << endl;
@@ -4154,7 +4165,7 @@ if (isMG)
       TString(dataset.c_str()).Contains("2024I") ||
       //dataset == "2024G_ZB" || 
       TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") ||
-      TString(dataset.c_str()).Contains("QCDFlatECAL") ||
+      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25MC") ||
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
@@ -4228,7 +4239,7 @@ if (isMG)
       //dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || 
       TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG") ||
-      TString(dataset.c_str()).Contains("QCDFlatECAL"))
+      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25MC"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (TString(dataset.c_str()).Contains("2024F") || //dataset == "2024F_ZB" || 
       TString(dataset.c_str()).Contains("2024G") || //dataset == "2024G_ZB" ||
@@ -4554,6 +4565,24 @@ if (isMG)
     bool allJetsGood(true);
     int njet = nJet;
 
+    // From the CondFormats/JetMETObjects/src/JetIdHelper.cc
+    // To include function that replaces the JetId for NANOAODV15.
+    const std::vector<UChar_t>& Jet_jetId_ref = InitJetId(
+    dataset,
+    nJet,
+    Jet_eta,
+    Jet_neHEF,
+    Jet_neEmEF,
+    Jet_chHEF,
+    Jet_chMultiplicity,
+    Jet_neMultiplicity,
+    Jet_muEF,
+    Jet_chEmEF,
+    Jet_jetId // this is the original branch, ignored in v15
+    );
+    
+    #define Jet_jetId Jet_jetId_ref
+
     //Nestor Aug16, 2024.
     //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
     if (!isMC){
@@ -4849,10 +4878,6 @@ if (isMG)
 	  h->h2res_etagen->Fill(p4g.Eta(), p4.Pt()/p4g.Pt(), w);
 	  h->h3res->Fill(p4g.Eta(), p4g.Pt(), p4.Pt()/p4g.Pt(), w);
 	  h->p2r_NoMatch->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
-	  //if (abs(p4g.Eta()) < 0.5 && p4g.Pt() >= 97 && p4g.Pt() < 114)
-	  //{
-	  //  h->h1res_bar->Fill(p4.Pt()/p4g.Pt(), w);
-	  //}
         }
 	h->hpt_gen->Fill(p4g.Pt(), w);
 	h->hpt_reco->Fill(p4.Pt(), w);
@@ -4873,6 +4898,13 @@ if (isMG)
         h->p2effz->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
         if (hasMatchVtx)
           h->p2eff->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w);
+
+	// To compare with Athens results
+	//if (j<4)
+	//{
+	//  f
+	//}
+
       } // for j
 
       // Finally check fake rates
@@ -5026,11 +5058,15 @@ if (isMG)
           assert(h);
 	  double abseta = fabs(p4.Eta());
           double pt = p4.Pt();
+
+
+	  //vtrg[itrg] == "HLT_ZeroBias"
           if (pt >= h->ptmin && pt < h->ptmax &&
               abseta >= h->absetamin && abseta < h->absetamax)
           {
 	    if (abseta<1.3)
 	    {
+	      //std::cout << "Flag that pass the selections " << std::endl;
 	      if (isMC){
                 h->h_PUProfile->Fill(Pileup_nTrue, w);
               }
@@ -5047,6 +5083,12 @@ if (isMG)
             //h->h_NPV->Fill(NPV, w);
             //h->h_NPVGood->Fill(NPV_Good, w);
 	  }
+	  /*
+	  else{
+	    std::cout << "pt: " << pt << "abseta: " << abseta << std::endl;
+	    std::cout << "pt min: " << h->ptmin << "abseta min: " << h->absetamin << std::endl;
+	  }
+	  */
 	}
       }
 
