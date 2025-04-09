@@ -81,6 +81,7 @@ bool doMultijetControl = true;
 bool doMultijet2Drecoil = true;
 bool doDijet2NM = false; // true;
 bool doJetID = false;    // add JetID class
+bool doLeadingJet = true; // To compare with Athens results
 
 bool debug = false;      // general debug
 bool debugevent = false; // per-event debug
@@ -324,9 +325,13 @@ class mctruthHistos
 {
 public:
   TH1D *ptreco_ptgen, *hpt_gen, *hpt_reco; //, *h1res_bar;
+  TH1D *ptreco_ptgen_Athens, *hpt_gen_Athens, *hpt_reco_Athens; // LeadinJet folder
   TH2D *h2pteta, *h2pteta_gen, *h2pteta_rec, *h2res_ptgen, *h2res_etagen, *h2_btagUpar;//, *h2res_bar;
+  TH2D *h2pteta_Athens, *h2pteta_gen_Athens, *h2res_ptgen_Athens, *h2res_etagen_Athens, *h2_btagUpar_Athens; // LeadinJet folder
   TH3D *h3res, *h3res_Match, *h3res_raw;
-  TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff, *p2pur;
+  TH3D *h3res_Athens, *h3res_Match_Athens, *h3res_raw_Athens; // LeadinJet folder
+  TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff, *p2pur, *p2r_gEta, *p2eff_recEta;
+  TProfile2D *p2jes_Athens, *p2jsf_Athens, *p2r_Athens, *p2r_NoMatch_Athens, *p2r_raw_Athens, *p2effz_Athens, *p2eff_Athens, *p2pur_Athens, *p2r_gEta_Athens, *p2eff_recEta_Athens; // LeadinJet folder
 };
 
 class jetvetoHistos
@@ -1408,11 +1413,8 @@ fChain->SetBranchStatus("Jet_phi", 1);
 fChain->SetBranchStatus("Jet_mass", 1);
 fChain->SetBranchStatus("Jet_jetId", 1);
 
-if (TString(dataset.c_str()).Contains("Winter25MC"))
-{
-  fChain->SetBranchStatus("Jet_chMultiplicity", 1);
-  fChain->SetBranchStatus("Jet_neMultiplicity", 1);
-}
+fChain->SetBranchStatus("Jet_chMultiplicity", 1);
+fChain->SetBranchStatus("Jet_neMultiplicity", 1);
 
 
 fChain->SetBranchStatus("Jet_rawFactor", 1);
@@ -1476,7 +1478,8 @@ if (doTriggerMatch)
 }
 
 // List reference pT and abseta thresholds for triggers
-mt["HLT_MC"] = range{10, 3000, 0, 5.2};
+//mt["HLT_MC"] = range{10, 3000, 0, 5.2};
+mt["HLT_MC"] = range{0, 3000, 0, 5.2}; // Low pT winter25 studies
 mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
 //mt["HLT_ZeroBias"] = range{0,   56,  0.0, 0.5};
 //mt["HLT_ZeroBias"] = range{0,   56,  0.5, 1.0};
@@ -2892,6 +2895,9 @@ if (isMG)
       h->p2r = new TProfile2D("p2r", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                      "p_{T,jet}/p_{T,gen}",
                               nxd, vxd, nptd, vptd);
+      h->p2r_gEta = new TProfile2D("p2r_gEta", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
       h->p2r_NoMatch = new TProfile2D("p2r_NoMatch", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                      "p_{T,jet}/p_{T,gen}",
                               nxd, vxd, nptd, vptd);
@@ -2904,10 +2910,90 @@ if (isMG)
       h->p2eff = new TProfile2D("p2eff", ";|#eta_{gen}|;p_{T,gen} (GeV);"
                                          "Efficiency",
                                 nxd, vxd, nptd, vptd);
+      h->p2eff_recEta = new TProfile2D("p2eff_recEta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                         "Efficiency",
+                                nxd, vxd, nptd, vptd);
       h->p2pur = new TProfile2D("p2pur", ";|#eta_{jet}|;p_{T,jet} (GeV);"
                                          "Purity",
                                 nxd, vxd, nptd, vptd);
+      if (doLeadingJet){
+      dout->mkdir("MCtruth/LeadingJ");
+      dout->cd("MCtruth/LeadingJ");
 
+//
+      h->ptreco_ptgen_Athens = new TH1D("ptreco/ptgen",";p_{T,reco}/p_{T,gen} (GeV);N_{events};"
+                                       "N_{events}",
+                            //100, 0.0, 2.0);
+                            vres.size()-1, vres.data());
+      //h->h1res_bar = new TH1D("res_barrel", ";p_{T,reco}/p_{T,gen} (GeV);N_{events}", 100, 0.0, 2.0);
+
+      h->h2res_ptgen_Athens = new TH2D("response_ptgen","p_{T,gen} (GeV);p_{T,gen} (GeV);"
+                                       "p_{T,reco}/p_{T,gen} (GeV)",
+                            nptd, vptd, 100, 0.0, 2.0);
+      // Jet_btagUParTAK4QvG
+      h->h2_btagUpar_Athens = new TH2D("h2_btagUpar","Jet_btagUParTAK4QvG;p_{T,gen} (GeV);"
+                                       "Fraction",
+                            nptd, vptd, 100, 0.0, 1.0);
+      //
+      h->h2res_etagen_Athens = new TH2D("response_etagen","|#eta_{gen}|;|#eta_{gen}|;"
+                                       "p_{T,reco}/p_{T,gen} (GeV)",
+                            nxd, vxd, 100, 0.0, 2.0);
+      h->h3res_Athens = new TH3D("Response3D", ";#eta_{gen};p_{T,gen} (GeV);p_{T,reco}/p_{T,gen}",
+                        nxd, vxd, nptd, vptd, vres.size()-1, vres.data());
+      h->h3res_Match_Athens = new TH3D("Response3D Match", ";#eta_{gen};p_{T,gen} (GeV);p_{T,reco}/p_{T,gen}",
+                        nxd, vxd, nptd, vptd, vres.size()-1, vres.data());
+      h->h3res_raw_Athens = new TH3D("Response3D_raw", ";#eta_{gen};p_{T,gen} (GeV);p_{T,reco}/p_{T,gen}",
+                        nxd, vxd, nptd, vptd, vres.size()-1, vres.data());
+      //h->h2res_bar = new TH2D("response_barrel", ";p_{T,gen} (GeV);p_{T,reco}/p_{T,gen} (GeV);", 
+        //                  nptd, vptd, 100, 0.0, 2.0);
+
+      h->h2pteta_Athens = new TH2D("h2pteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                       "N_{events}",
+                            nxd, vxd, nptd, vptd);
+      h->h2pteta_gen_Athens = new TH2D("h2pteta_gen", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                               "N_{events}",
+                                nxd, vxd, nptd, vptd);
+      //h->h2pteta_rec_Athens = new TH2D("h2pteta_rec_Athens", ";|#eta_{jet}|;p_{T,jet} (GeV);"
+        //                                       "N_{events}",
+          //                      nxd, vxd, nptd, vptd);
+      h->hpt_gen_Athens = new TH1D("hpt_gen",";p_{T,gen} (GeV);N_{events};"
+                                       "N_{events}",
+                            npti, vpti);
+      h->hpt_reco_Athens = new TH1D("hpt_reco",";p_{T,reco} (GeV);N_{events};"
+                                       "N_{events}",
+                            npti, vpti);
+      h->p2jes_Athens = new TProfile2D("p2jes", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                         "JES(jet)",
+                                nxd, vxd, nptd, vptd);
+      h->p2jsf_Athens = new TProfile2D("p2jsf", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                         "JERSF(jet)",
+                                nxd, vxd, nptd, vptd);
+      h->p2r_Athens = new TProfile2D("p2r", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
+      h->p2r_gEta_Athens = new TProfile2D("p2r_gEta", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
+      h->p2r_NoMatch_Athens = new TProfile2D("p2r_NoMatch", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
+      h->p2r_raw_Athens = new TProfile2D("p2r_raw", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
+      h->p2effz_Athens = new TProfile2D("p2effz", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                           "Vertex efficiency",
+                                 nxd, vxd, nptd, vptd);
+      h->p2eff_Athens = new TProfile2D("p2eff", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                         "Efficiency",
+                                nxd, vxd, nptd, vptd);
+      h->p2eff_recEta_Athens = new TProfile2D("p2eff_recEta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
+                                         "Efficiency",
+                                nxd, vxd, nptd, vptd);
+      h->p2pur_Athens = new TProfile2D("p2pur", ";|#eta_{jet}|;p_{T,jet} (GeV);"
+                                         "Purity",
+                                nxd, vxd, nptd, vptd);
+//
+      }
       /*
       if (reweightPU || doPU_per_trigger){
          h->h1_PURho = new TH1D("h1_PURW", ";p_{T,jet} (GeV);" "#rho",
@@ -4893,17 +4979,54 @@ if (isMG)
           h->h3res_Match->Fill(p4g.Eta(), p4g.Pt(), p4.Pt()/p4g.Pt(), w);
 	  h->h3res_raw->Fill(p4g.Eta(), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
 	  h->p2r->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
+	  h->p2r_gEta->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w); // p4g.Eta
           h->p2r_raw->Fill(fabs(p4.Eta()), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
         }
         h->p2effz->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
-        if (hasMatchVtx)
+        if (hasMatchVtx){
           h->p2eff->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w);
-
+          h->p2eff_recEta->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
+	}
 	// To compare with Athens results
-	//if (j<4)
-	//{
-	//  f
-	//}
+	if (doLeadingJet)
+	{
+	  if (j<3 && hasMatchVtx && hasMatchJet)
+	  {
+            if ((fabs(p4.Eta()) <= 3) || (fabs(p4.Eta()) > 3 && Jet_neMultiplicity[i] > 1)) {
+              h->ptreco_ptgen_Athens->Fill(p4.Pt()/p4g.Pt(), w);
+              h->h2res_ptgen_Athens->Fill(p4g.Pt(), p4.Pt()/p4g.Pt(), w);
+              h->h2_btagUpar_Athens->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
+              h->h2res_etagen_Athens->Fill(p4g.Eta(), p4.Pt()/p4g.Pt(), w);
+              h->h3res_Athens->Fill(p4g.Eta(), p4g.Pt(), p4.Pt()/p4g.Pt(), w);
+              h->p2r_NoMatch_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
+
+	      h->hpt_gen_Athens->Fill(p4g.Pt(), w);
+              h->hpt_reco_Athens->Fill(p4.Pt(), w);
+	      h->h2pteta_gen_Athens->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
+
+              h->h2pteta_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), w);
+              h->p2jes_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), (1. - Jet_rawFactor[i]), w);
+              h->p2jsf_Athens->Fill(fabs(p4.Eta()), p4g.Pt(),
+                             smearJets ? Jet_CF[i] : 1, w);
+              h->h3res_Match_Athens->Fill(p4g.Eta(), p4g.Pt(), p4.Pt()/p4g.Pt(), w);
+              h->h3res_raw_Athens->Fill(p4g.Eta(), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
+              h->p2r_raw_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
+
+              h->p2r_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
+              h->p2r_gEta_Athens->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
+              h->p2r_raw_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
+            }
+	  }
+	  if (j<3){
+            if ((fabs(p4.Eta()) <= 3) || (fabs(p4.Eta()) > 3 && Jet_neMultiplicity[i] > 1)) {
+              h->p2effz_Athens->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
+              if (hasMatchVtx){
+                h->p2eff_Athens->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w);
+                h->p2eff_recEta_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
+              }
+	    }
+	  }
+	}
 
       } // for j
 
