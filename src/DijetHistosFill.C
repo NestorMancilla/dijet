@@ -306,7 +306,7 @@ public:
   TH3D *h3res, *h3res_Match, *h3res_raw;
   TH3D *h3res_Athens, *h3res_Match_Athens, *h3res_raw_Athens; // LeadinJet folder
   TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff, *p2pur, *p2r_gEta, *p2eff_recEta;
-  TProfile2D *p2jes_Athens, *p2jsf_Athens, *p2r_Athens, *p2r_NoMatch_Athens, *p2r_raw_Athens, *p2effz_Athens, *p2eff_Athens, *p2pur_Athens, *p2r_gEta_Athens, *p2eff_recEta_Athens; // LeadinJet folder
+  TProfile2D *p2jes_Athens, *p2jsf_Athens, *p2r_Athens, *p2r_NoMatch_Athens, *p2r_raw_Athens, *p2effz_Athens, *p2eff_Athens, *p2pur_Athens, *p2r_gEta_Athens, *p2eff_recEta_Athens; // LeadingJet folder
 };
 
 class jetvetoHistos
@@ -327,7 +327,6 @@ public:
 
   // Balancing
   TProfile2D *p2asymm, *p2asymm_noveto, *p2asymm_pttag, *p2asymm_noveto_pttag;
-  //Tprofile2D *p2asymm_noveto;
 
   // (Optional) composition plots
   TProfile2D *p2chf, *p2nhf, *p2nef;
@@ -566,30 +565,20 @@ FactorizedJetCorrector *getFJC(string l1 = "", string l2 = "", string res = "",
 
   return jec;
 } // getFJC
-/////////////////////////
-/////////////////////////
+
+
 //// PU reweighting
 //// Nestor. 10, 2024.
-/////////////////////////
-/////////////////////////
-
-/////////////////////////
 //Get the PU from the root files
 /////////////////////////
 void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
-    // Open the ROOT file
-    //std::string file_path = "luminosityscripts/PUWeights/PU_weights_2024_trgs.root";
     std::string file_path = "luminosityscripts/PUWeights/PU_weights_2024_trgs_v2.root";
     TFile* root_file = TFile::Open(file_path.c_str(), "READ");
 
-    // Check if the file opened successfully
     if (!root_file || root_file->IsZombie()) {
         std::cerr << "Error opening file: " << file_path << std::endl;
         return;
     }
-
-    // Get the directory corresponding to the dataset
-    //TDirectory* dir = (TDirectory*)root_file->Get(PUdataset);
     TDirectory* dir = (TDirectory*)root_file->Get(PUdataset.c_str());
     if (!dir) {
         std::cerr << "Directory " << PUdataset << " not found in file." << std::endl;
@@ -598,9 +587,6 @@ void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
     } else{
         std::cerr << "Directory " << PUdataset << " found in file." << std::endl;
     }
-
-
-    // List of triggers
     std::vector<std::string> vtrg = {
 	"HLT_ZeroBias",
         "HLT_PFJet40", "HLT_PFJet60", "HLT_PFJet80", "HLT_PFJet140", "HLT_PFJet200",
@@ -613,17 +599,13 @@ void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
         "HLT_DiPFJetAve160_HFJEC", "HLT_DiPFJetAve220_HFJEC", "HLT_DiPFJetAve300_HFJEC"
     };
 
-    // Clear the existing histograms (if necessary)
     pu_hist_map.clear();
 
-    // Loop over each trigger and retrieve the corresponding histogram
     for (const auto& trg : vtrg) {
         std::string hist_name = "PU_weights_" + trg;
         TH1D* hist = (TH1D*)dir->Get(hist_name.c_str());
-	//std::cerr << "hist name string " << hist_name.c_str() << std::endl;
 
         if (hist && !hist->IsZombie() && hist->InheritsFrom(TH1::Class())) {
-            //std::cout << "Found histogram " << hist_name << " in directory." << std::endl;
             TH1D* cloned_hist = (TH1D*)hist->Clone();
             if (cloned_hist) {
 		cloned_hist->SetDirectory(0);
@@ -638,15 +620,10 @@ void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
             std::cerr << "Histogram " << hist_name << " not found in directory " << PUdataset << std::endl;
         }
     }
-
-    // Close the ROOT file
     root_file->Close();
 }
 
-
-////
 // Function to verify the mapping is correct
-////
 void DijetHistosFill::print_PU_hist_map() const {
     for (const auto& pair : pu_hist_map) {
         if (pair.second && pair.second->InheritsFrom(TH1::Class())) {
@@ -659,11 +636,7 @@ void DijetHistosFill::print_PU_hist_map() const {
     }
 }
 
-/////////////////////////
-//End PU from the root files
-/////////////////////////
 //// Function to get the PU_weight
-/////////////////////////
 void DijetHistosFill::get_weight(float pt, float eta, string analysis) {
 
     eta = std::abs(eta);
@@ -698,22 +671,18 @@ void DijetHistosFill::get_weight(float pt, float eta, string analysis) {
         }
     }
 
-    //std::cerr << "selected_trigger after the function selection:  " << selected_trigger << std::endl;
-
     if (selected_trigger.empty()) {
         //std::cerr << "No matching trigger found for pt: " << pt << " and eta: " << eta << std::endl;
         PU_weight = 1;
         return;
     }
 
-    //auto hist_it = pu_hist_map.find("PU_weights_" + selected_trigger);
     auto hist_it = pu_hist_map.find(selected_trigger);
     if (hist_it == pu_hist_map.end()) {
         std::cerr << "No histogram found for trigger: " << selected_trigger << std::endl;
         PU_weight = 1;
         return;
     } 
-
 
     TH1D* h1_PU_weight = hist_it->second;
     int ibin = h1_PU_weight->FindBin(Pileup_nTrueInt);
@@ -722,12 +691,8 @@ void DijetHistosFill::get_weight(float pt, float eta, string analysis) {
 
 }
 /////////////////////////
-//// End Function to get the PU_weight
-/////////////////////////
-/////////////////////////
 bool DijetHistosFill::LoadLumi()
 {
-	// To read the luminosity based on the .csv file and take only events with non-zero luminosity
 	vector<string> vtrg = {
 		"HLT_ZeroBias",
 		"HLT_PFJet40",
@@ -766,17 +731,6 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
-	//string JSON_version = "378981_381199_DCSOnly"; // 2024 Prompt
-	//string JSON_version = "366442_370790_Golden"; //2023 Golden
-	//string JSON_version = "378981_380649_Golden";
-	//string JSON_version = "eraB_Golden";
-	//string JSON_version = "378981_381478_DCSOnly";
-	//string JSON_version = "GoldenRuns_378985to380945_DCSRuns_380946to381516";
-	//string JSON_version = "GoldenRuns_378985to381152_DCSRuns_381153to381594";
-	//string JSON_version = "GoldenRuns_378981to382329_DCSRuns_382330to382686";
-	//string JSON_version = "2022_Golden";
-	//string JSON_version = "GoldenRuns_378981to383724_DCSRuns_383725to384446";
-	//string JSON_version = "GoldenRuns_378985to386319_DCSRuns_386320to386951";
 	string JSON_version = "Collisions2024_378981_386951_Golden";
 	//string JSON_version = "Collisions2023_366442_370790_Golden";
 	//string JSON_version = "Collisions2022_355100_362760_Golden";
@@ -860,17 +814,8 @@ bool DijetHistosFill::LoadLumi()
 				mlumi[trigger][run] = lum; // * 1000. to have it in pb
 			}
 		}
-		// Close the file
 		file.close();
 	}
-           /*	
-	   for (const auto& trigger : mlumi) {
-	   cout << "Trigger: " << trigger.first << endl;
-	   for (const auto& run : trigger.second) {
-	   cout << "  Run: " << run.first << ", Luminosity: " << run.second << endl;
-	   }
-	   }
-	   */
 
 	const char *lumifile = getLumifile(dataset.c_str());
 
@@ -943,16 +888,6 @@ bool DijetHistosFill::LoadLumi()
 		std::cout << "First line does not match expected data tag" << std::endl;
 		return false;
 	}
-	/*
-	if (s == expectedTag) {
-            std::cout << "Matched expectedTag: " << expectedTag << std::endl;
-        } else if (s == expectedTag_2) {
-            std::cout << "Matched expectedTag_2: " << expectedTag_2 << std::endl;
-        } else {
-            std::cout << "First line does not match any expected data tag" << std::endl;
-            return false;
-        }
-        */
 
 	// Read and validate the second line
 	bool getsuccess2 = static_cast<bool>(getline(f, s, '\n'));
@@ -1457,12 +1392,6 @@ if (doTriggerMatch)
 //mt["HLT_MC"] = range{10, 3000, 0, 5.2};
 mt["HLT_MC"] = range{0, 3000, 0, 5.2}; // Low pT winter25 studies
 mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
-//mt["HLT_ZeroBias"] = range{0,   56,  0.0, 0.5};
-//mt["HLT_ZeroBias"] = range{0,   56,  0.5, 1.0};
-//mt["HLT_ZeroBias"] = range{0,   64,  1.0, 1.5};
-//mt["HLT_ZeroBias"] = range{0,   64,  1.5, 2.0};
-//mt["HLT_ZeroBias"] = range{0,  114,  2.0, 2.5};
-//mt["HLT_ZeroBias"] = range{0,   97,  2.5, 3.0};
 
 mt["HLT_DiPFJetAve40"] = range{40, 85, 0, 5.2};
 mt["HLT_DiPFJetAve60"] = range{85, 100, 0, 5.2};
@@ -1487,47 +1416,13 @@ mt["HLT_DiPFJetAve160_HFJEC"] = range{180, 250, fwdeta, 5.2};
 mt["HLT_DiPFJetAve220_HFJEC"] = range{250, 350, fwdeta0, 5.2};
 mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
 
-/*
-mt["HLT_PFJet40"] = range{40, 85, 0, 5.2};
-mt["HLT_PFJet60"] = range{85, 100, 0, 5.2};
-mt["HLT_PFJet80"] = range{100, 155, 0, 5.2};
-mt["HLT_PFJet140"] = range{155, 210, 0, 5.2};
-mt["HLT_PFJet200"] = range{210, 300, 0, 5.2};
-mt["HLT_PFJet260"] = range{300, 400, 0, 5.2};
-mt["HLT_PFJet320"] = range{400, 500, 0, 5.2};
-mt["HLT_PFJet400"] = range{500, 600, 0, 5.2};
-mt["HLT_PFJet450"] = range{500, 600, 0, 5.2};
-mt["HLT_PFJet500"] = range{600, 6500, 0, 5.2};
-mt["HLT_PFJet550"] = range{700, 6500, 0, 5.2};
-*/
-
 
 //Mikko's thresholds for Inclusive jet analysis
 //https://github.com/miquork/jecsys3/blob/main/minitools/DijetHistosCombine.C#L264-L370
 //mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
 mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
 mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
-//mt["HLT_PFJet40"] = range{56, 84, 0.0, 0.5},
-//mt["HLT_PFJet40"] = range{56, 84, 0.5, 1.0},
-//mt["HLT_PFJet40"] = range{64, 84, 1.0, 1.5},
-//mt["HLT_PFJet40"] = range{64, 84, 1.5, 2.0},
-//mt["HLT_PFJet40"] = range{114, 153, 2.0, 2.5},
-//mt["HLT_PFJet40"] = range{97, 114, 2.5, 3.0},
-
-//mt["HLT_PFJet60"] = range{84,  114, 0.0, 0.5},
-//mt["HLT_PFJet60"] = range{84,  114, 0.5, 1.0},
-//mt["HLT_PFJet60"] = range{84,  114, 1.0, 1.5},
-//mt["HLT_PFJet60"] = range{84,  114, 1.5, 2.0},
-//mt["HLT_PFJet60"] = range{153, 174, 2.0, 2.5},
-//mt["HLT_PFJet60"] = range{114, 133, 2.5, 3.0}, 
 mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
-//mt["HLT_PFJet80"] = range{114, 196, 0.0, 0.5},
-//mt["HLT_PFJet80"] = range{114, 196, 0.5, 1.0},
-//mt["HLT_PFJet80"] = range{114, 196, 1.0, 1.5},
-//mt["HLT_PFJet80"] = range{114, 196, 1.5, 2.0},
-//mt["HLT_PFJet80"] = range{174, 196, 2.0, 2.5},
-//mt["HLT_PFJet80"] = range{133, 196, 2.5, 3.0},
-
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
 mt["HLT_PFJet200"] = range{272, 330, 0, 3.0};
 mt["HLT_PFJet260"] = range{330, 395, 0, 3.0};
@@ -1653,12 +1548,8 @@ md2tc["HLT_PFJet400"] = range{460, 575, 0, 5.2};//fwdetad};
 md2tc["HLT_PFJet500"] = range{575,6500, 0, 5.2};//fwdetad};
 
 
-////
-//
-//
 if (doPU_per_trigger){
   get_PU_hist("PUWeight2024F");
-  //print_PU_hist_map();
 }
 
 if (debug)
@@ -2779,11 +2670,6 @@ if (isMG)
   map<string, jetsperRuns *> mjet;
   map<string, PUHistos *> mhPU;
 
-  //bool dolumi = true; //Nestor. xsection plot. April 17, 2024.
-  //if (dolumi)
-  //  LoadLumi();
-
-
   for (int itrg = 0; itrg != ntrg; ++itrg)
   {
 
@@ -2838,7 +2724,6 @@ if (isMG)
 		                       "N_{events}",
 		            //100, 0.0, 2.0);
                             vres.size()-1, vres.data());
-      //h->h1res_bar = new TH1D("res_barrel", ";p_{T,reco}/p_{T,gen} (GeV);N_{events}", 100, 0.0, 2.0);
 
       h->h2res_ptgen = new TH2D("response_ptgen","p_{T,gen} (GeV);p_{T,gen} (GeV);"
 		                       "p_{T,reco}/p_{T,gen} (GeV)",
@@ -2857,8 +2742,6 @@ if (isMG)
                         nxd, vxd, nptd, vptd, vres.size()-1, vres.data());
       h->h3res_raw = new TH3D("Response3D_raw", ";#eta_{gen};p_{T,gen} (GeV);p_{T,reco}/p_{T,gen}",
                         nxd, vxd, nptd, vptd, vres.size()-1, vres.data());
-      //h->h2res_bar = new TH2D("response_barrel", ";p_{T,gen} (GeV);p_{T,reco}/p_{T,gen} (GeV);", 
-	//	            nptd, vptd, 100, 0.0, 2.0);
 
       h->h2pteta = new TH2D("h2pteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                        "N_{events}",
@@ -2909,12 +2792,10 @@ if (isMG)
       dout->mkdir("MCtruth/LeadingJ");
       dout->cd("MCtruth/LeadingJ");
 
-//
       h->ptreco_ptgen_Athens = new TH1D("ptreco/ptgen",";p_{T,reco}/p_{T,gen} (GeV);N_{events};"
                                        "N_{events}",
                             //100, 0.0, 2.0);
                             vres.size()-1, vres.data());
-      //h->h1res_bar = new TH1D("res_barrel", ";p_{T,reco}/p_{T,gen} (GeV);N_{events}", 100, 0.0, 2.0);
 
       h->h2res_ptgen_Athens = new TH2D("response_ptgen","p_{T,gen} (GeV);p_{T,gen} (GeV);"
                                        "p_{T,reco}/p_{T,gen} (GeV)",
@@ -2933,8 +2814,6 @@ if (isMG)
                         nxd, vxd, nptd, vptd, vres.size()-1, vres.data());
       h->h3res_raw_Athens = new TH3D("Response3D_raw", ";#eta_{gen};p_{T,gen} (GeV);p_{T,reco}/p_{T,gen}",
                         nxd, vxd, nptd, vptd, vres.size()-1, vres.data());
-      //h->h2res_bar = new TH2D("response_barrel", ";p_{T,gen} (GeV);p_{T,reco}/p_{T,gen} (GeV);", 
-        //                  nptd, vptd, 100, 0.0, 2.0);
 
       h->h2pteta_Athens = new TH2D("h2pteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                        "N_{events}",
@@ -2942,9 +2821,6 @@ if (isMG)
       h->h2pteta_gen_Athens = new TH2D("h2pteta_gen", ";|#eta_{gen}|;p_{T,gen} (GeV);"
                                                "N_{events}",
                                 nxd, vxd, nptd, vptd);
-      //h->h2pteta_rec_Athens = new TH2D("h2pteta_rec_Athens", ";|#eta_{jet}|;p_{T,jet} (GeV);"
-        //                                       "N_{events}",
-          //                      nxd, vxd, nptd, vptd);
       h->hpt_gen_Athens = new TH1D("hpt_gen",";p_{T,gen} (GeV);N_{events};"
                                        "N_{events}",
                             npti, vpti);
@@ -2983,17 +2859,6 @@ if (isMG)
                                 nxd, vxd, nptd, vptd);
 //
       }
-      /*
-      if (reweightPU || doPU_per_trigger){
-         h->h1_PURho = new TH1D("h1_PURW", ";p_{T,jet} (GeV);" "#rho",
-                                        npt, vpt);
-	 h->h1_PUMu = new TH1D("h1_PUMu", "#mu", 119, 0, 120);
-
-	 h->h1_PUNPV = new TH1D("h1_PUNPV", "NPV", 119, 0, 120);
-
-	 h->h1_PUNPVGood = new TH1D("h1_PUNPVGood", "NPV_good", 119, 0, 120);
-      }
-      */
 
     } // isMC && doMCtruth
 
@@ -3021,7 +2886,6 @@ if (isMG)
       if (isMC){
          h->h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
       }
-      //h_PUProfile = new TH1D("h_PUProfile", "PUProfile", 119, 0, 120);
       h->h_RhoAll = new TH1D("h_RhoAll", "RhoFastjetAll", 119, 0, 120);
       h->h_Rho_C = new TH1D("h_Rho_C", "RhoFastjetCentral", 119, 0, 120);
       h->h_Rho_CCPU = new TH1D("h_Rho_CCPU", "RhoFastjetCentralChargedPileUp", 119, 0, 120);
@@ -3255,13 +3119,6 @@ if (isMG)
           h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
           h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
         }
-	
-        //h->hpt05_reco = new TH1D("hpt05_reco", ";p_{T} (GeV);"
-          //                           "N_{jet}",
-            //                  npti, vpti);
-        //h->hpt05_gen = new TH1D("hpt05_Gen", ";p_{T} (GeV);"
-          //                           "N_{jet}",
-            //                  npti, vpti);
 	
         for (int iy = 0; iy != h->ny; ++iy)
         {
@@ -3548,28 +3405,7 @@ if (isMG)
         h->p2mupf_t = new TProfile2D("p2mupf_t", ";#eta;p_{T,probe} (GeV);MPFu",
                                    nx, vx, npt, vpt);
       }
-      /*
-      if (doDijetJER)
-      {
-        dout->mkdir("GluonJets/JER");
-        dout->cd("GluonJets/JER");
 
-        // Basic profiles with RMS as error ("S") for JER studies
-        h->p2m0_t = new TProfile2D("p2m0_t", ";#eta;p_{T,avp} (GeV);"
-                                         "MPF0 (MPF)",
-                                 nx, vx, npt, vpt, "S");
-        h->p2m0x_t = new TProfile2D("p2m0x_t", ";#eta;p_{T,avp} (GeV);"
-                                           "MPFX0 (MPFX)",
-                                  nx, vx, npt, vpt, "S");
-        h->p2m2_t = new TProfile2D("p2m2_t", ";#eta;p_{T,avp} (GeV);"
-                                         "MPF2 (DB)",
-                                 nx, vx, npt, vpt, "S");
-        h->p2m2x_t = new TProfile2D("p2m2x_t", ";#eta;p_{T,avp} (GeV);"
-                                           "MPF2 (DBX)",
-                                  nx, vx, npt, vpt, "S");
-	
-      }
-      */
       if (bool doWP_m = true){
         dout->mkdir("GluonJets/medium");
         dout->cd("GluonJets/medium");
@@ -3614,28 +3450,7 @@ if (isMG)
         h->p2mupf_m = new TProfile2D("p2mupf_m", ";#eta;p_{T,probe} (GeV);MPFu",
                                    nx, vx, npt, vpt);
       }
-      /*
-      if (doDijetJER)
-      {
-        //dout->mkdir("GluonJets/JER");
-        dout->cd("GluonJets/JER");
 
-        // Basic profiles with RMS as error ("S") for JER studies
-        h->p2m0_m = new TProfile2D("p2m0_m", ";#eta;p_{T,avp} (GeV);"
-                                         "MPF0 (MPF)",
-                                 nx, vx, npt, vpt, "S");
-        h->p2m0x_m = new TProfile2D("p2m0x_m", ";#eta;p_{T,avp} (GeV);"
-                                           "MPFX0 (MPFX)",
-                                  nx, vx, npt, vpt, "S");
-        h->p2m2_m = new TProfile2D("p2m2_m", ";#eta;p_{T,avp} (GeV);"
-                                         "MPF2 (DB)",
-                                 nx, vx, npt, vpt, "S");
-        h->p2m2x_m = new TProfile2D("p2m2x_m", ";#eta;p_{T,avp} (GeV);"
-                                           "MPF2 (DBX)",
-                                  nx, vx, npt, vpt, "S");
-
-      }
-      */
       if (bool doWP_l = true){
         dout->mkdir("GluonJets/loose");
         dout->cd("GluonJets/loose");
@@ -3731,8 +3546,6 @@ if (isMG)
       }
 
     } // GluonJets
-
-
 
     if (doDijet2)
     {
@@ -3892,19 +3705,6 @@ if (isMG)
         h->p2nef_fw = new TProfile2D("p2nef_fw", ";#eta;p_{T,probe} (GeV);"
                                            "NEF",
                                   nx, vx, npt, vpt);
-	// Fraction x raw Pt probe
-	/*
-	h->p2chf_abs = new TProfile2D("p2chf_abs", ";#eta;p_{T,tag} (GeV);"
-                                           "CHF",
-                                  nx, vx, npt, vpt);
-        h->p2nhf_abs = new TProfile2D("p2nhf_abs", ";#eta;p_{T,tag} (GeV);"
-                                           "NHF",
-                                  nx, vx, npt, vpt);
-        h->p2nef_abs = new TProfile2D("p2nef_abs", ";#eta;p_{T,tag} (GeV);"
-                                           "NEF",
-                                  nx, vx, npt, vpt);
-	*/
-
 
         h->ppt13 = new TProfile("ppt13", ";#eta;p_{T,avp} (GeV);"
                                          "p_{T,tag}",
@@ -4067,37 +3867,6 @@ if (isMG)
 
     } // doMultijet
 
-
-    
-    // Lumi per trigger
-    /* 
-    if (dolumi)
-    {
-      dout->mkdir("LumiInfo");
-      dout->cd("LumiInfo");
-
-      lumiHistos *h = new lumiHistos();
-
-      string &t = vtrg[itrg];
-      mhlumi[t] = h;
-
-      h->trg = t;
-      h->trgpt = trgpt;
-
-      h->lum = 0.0;
-      h->lum2 = 0.0;
-
-      h->lumsum = 0.0;
-      h->lumsum2 = 0.0;
-      h->htrglumi = new TH1D("htrglumi", "", 100, 0, 1);
-      h->htrgpu = new TH1D("htrgpu", "", 100, 0, 100);
-      //h->hLumiPerRun = new TH1F("hLumiPerRun", "Average Luminosity per Run", 1, 0, 0);
-      //h->hnpv = new TH1D("hnpv", "", 100, 0, 100);
-      h->hnpvgood = new TH1D("hnpvgood", "", 100, 0, 100);
-    }
-    */
-
-    
     // Jets per runs per triggers
     if (doJetsperRuns && dolumi)
     {
@@ -4121,19 +3890,7 @@ if (isMG)
       h->ptmax = r.ptmax;
       h->absetamin = r.absetamin;
       h->absetamax = r.absetamax;
-      //for (int i = 0; i < _runNumberBin.size(); ++i) {
-      //  std::cout << i << " " << _runNumberBin[i] << std::endl;
-      //}
-      //std::cout << std::endl;
-      //std::cout << "_runNumberBin size: "  << _runNumberBin.size() <<  std::endl;
-      
-      //std::cout << "binEdges: ";
-      //for (auto it4 = _runNumberBin.begin(); it4 != _runNumberBin.end(); ++it4) {
-       // std::cout << *it4;
-        //if (it4 != _runNumberBin.end() - 1) { // Print a comma after all elements except the last one
-         //   std::cout << ", ";
-       // }
-      //}
+
       h->h1pt13 = new TH1D("h1pt13", ";p_{T,jet} (GeV);Jets;", npti, vpti);
       h->h1pt13_w = new TH1D("h1pt13_w", ";p_{T,jet} (GeV);xsec;", npti, vpti); 
       h->h1jetrate = new TH1D("h1jetrate", ";RunNumber;Rate;", _runNumberBin.size()-1, _runNumberBin.data());
@@ -4147,14 +3904,7 @@ if (isMG)
       h->h2jetpteta = new TH2D("h2jetpteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                           "N_{events}",
                                nxd, vxd, nptd, vptd);
-      /*
-      h->p2MPF = new TProfile2D("p2MPF", ";RunNumber;p_{T,lead} (GeV);"
-                                         "MPF",
-                                 _runNumberBin.size()-1, _runNumberBin.data(), npti, vpti);
-      h->p2MPF_bar = new TProfile2D("p2MPF_bar", ";RunNumber;p_{T,lead} (GeV);"
-                                         "MPF",
-                                 _runNumberBin.size()-1, _runNumberBin.data(), npti, vpti);
-      */
+
       if (itrg == 9) // itrg 9 represents a specific trigger
       { 
         h->pMPF_500 = new TProfile("pMPF_500", "", _runNumberBin.size()-1, _runNumberBin.data());
@@ -6061,23 +5811,8 @@ if (isMG)
       if (doPU_per_trigger){
          get_weight(ptlead, 0, "doMultijets");
       }
-      //get_weight(ptavp3, 0, "doMultijets");
-
-      //get_weight(ptrecoil, 0, "doMultijets");
-
-      //get_weight(ptave, 0, "doMultijets");
-        //std::cerr << "w weight before the func: " << w << std::endl;  
-        //std::cerr << "w_ptlead before the func: " << w_ptlead << std::endl;
-        //std::cerr << "w_ptavp3 before the func: " << w_ptavp3 << std::endl;
-	//std::cerr << "w_ptave before the func: " << w_ptave << std::endl;
-        //std::cerr << "w_ptrecoil before the func: " << w_ptrecoil << std::endl;
-
 
         if (doPU_per_trigger){
-           //get_weight(ptlead, p4l.Eta(), "doMultijets");
-           //get_weight(700., 2., "doMultijets");
-           //std::cerr << "ptlead: " << ptlead << " and eta are " << p4l.Eta() <<std::endl;
-           //std::cerr << "PU_weight: " << PU_weight <<std::endl;
            if (PU_weight > 0){
               w_ptlead = w * PU_weight;
               w_ptavp3 = w * PU_weight;
@@ -6097,16 +5832,6 @@ if (isMG)
 	   w_ptave = w;
            w_ptrecoil = w;
         }
-        //std::cerr << "w weight after the func: " << w << std::endl;
-        //std::cerr << "w_ptlead: " << w_ptlead << std::endl;
-        //std::cerr << "w_ptavp3: " << w_ptavp3 << std::endl;
-	//std::cerr << "w_ptave: " << w_ptave << std::endl;
-        //std::cerr << "w_ptrecoil: " << w_ptrecoil << std::endl;
-	
-
-
-      //std::cerr << "PU_weight: " << PU_weight <<std::endl;
-      //
 
       // Projection to transverse plane (is this necessary?)
       p4m0.SetPtEtaPhiM(p4m0.Pt(), 0., p4m0.Phi(), 0.);
@@ -6161,15 +5886,14 @@ if (isMG)
         multijetHistos *h = mhmj[trg];
 
 
-	// PU reweighintg histograms
 	// Histograms from multijet analysis
 	// Nestor. Sep 12, 2024.
-        h->pm0l->Fill(ptlead, m0l, w_ptlead);
-        h->pm0a->Fill(ptavp3, m0b, w_ptavp3);
-	h->pm0r->Fill(ptrecoil, m0r, w_ptrecoil);
-        h->pm2l->Fill(ptlead, m3l, w_ptlead);
-        h->pm2a->Fill(ptavp3, m3b, w_ptavp3);
-        h->pm2r->Fill(ptrecoil, m3r, w_ptrecoil);
+        h->pm0l->Fill(ptlead, m0l, w);
+        h->pm0a->Fill(ptavp3, m0b, w);
+	h->pm0r->Fill(ptrecoil, m0r, w);
+        h->pm2l->Fill(ptlead, m3l, w);
+        h->pm2a->Fill(ptavp3, m3b, w);
+        h->pm2r->Fill(ptrecoil, m3r, w);
         //
 
         h->hpta_all->Fill(ptavp3, w);
