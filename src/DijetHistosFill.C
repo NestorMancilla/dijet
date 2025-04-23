@@ -1,14 +1,8 @@
 #define DijetHistosFill_cxx
-//#define Jet_jetId Jet_jetId_ref // NANOAODV15
-//#ifdef NANOVO9
-//      #include "../interface/DijetHistosFillV09.h" // Specific for NanoV09
-//#else
-//     #include "../interface/DijetHistosFill.h" // Specific for NanoV12 (assumed default)
-//#endif
 //#include "../interface/DijetHistosFillNanoV9.h"
 //#include "../interface/DijetHistosFill.h"
 //#include "../interface/DijetHistosFill_2024Prompt.h"
-#include "../interface/DijetHistosFill_2024Prompt_2024Skim.h" // Skimm Files. Nestor Oct25, 2024.
+#include "../interface/DijetHistosFill_2024Prompt_2024Skim.h" // Prompt 2024 Skim files.
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -26,7 +20,6 @@
 #include <set>
 #include <map>
 #include <string>
-// #include <utility>
 #include <random>
 #include <sstream>
 #include <unordered_map>
@@ -83,6 +76,7 @@ bool doDijet2NM = false; // true;
 bool doJetID = false;    // add JetID class
 bool doLeadingJet = true; // To compare with Athens results
 
+bool doJetId_variables = true; // To compare Jet_jetId branch 
 bool debug = false;      // general debug
 bool debugevent = false; // per-event debug
 
@@ -106,7 +100,7 @@ std::set<std::string> mcIOV = {"Summer22",
                                "TestSummer23MGBPix",
 			       "Summer23MC_Cas",
                                "Winter24MCFlat", "Winter24MG", "Summer24MG",
-			       "Winter25MC_Flat2022",
+			       "Winter25MC_Flat2022", "Winter25MC_NoPU",
                                "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig",
                                "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero"};
 
@@ -135,26 +129,9 @@ constexpr const char lumibyls2023C123[] = "luminosityscripts/csvfiles/lumibyls20
 constexpr const char lumibyls2023ABC[] = "luminosityscripts/csvfiles/lumibyls2023ABC.csv";
 constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
 constexpr const char lumibyls2023BCD[] = "luminosityscripts/csvfiles/lumibyls2023_366442_370790_Golden.csv";
-//constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyrun2023_366442_370790_Golden.csv";
-//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_379866_Golden.csv";
-//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380115_Golden.csv";
-//constexpr const char lumibyls2024BC[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380470_Golden.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_DCSOnly.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381199_DCSOnly.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_380649_Golden.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to380945_DCSRuns_380946to381516.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381152_DCSRuns_381153to381594.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to381417_DCSRuns_381418to381594.csv";
-//constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to382329_DCSRuns_382330to382686.csv";
-//constexpr const char lumibyls2024BCDEF[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to383163_DCSRuns_383164to383467.csv";
-//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to383724_DCSRuns_383725to384446.csv";
-//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378981to385863_DCSRuns_378981to386319.csv";
-//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumi_GoldenRuns_378985to386319_DCSRuns_386320to386951.csv";
 constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumibyls2024_378981_386951_Golden.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
-//constexpr const char lumibyls2024BCDE[] = "luminosityscripts/csvfiles/lumibyrun2024_378981_381478_DCSOnly.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 126> lumifiles = {{
     {"2022C", lumibyls2022C},
@@ -202,16 +179,14 @@ constexpr std::array<std::pair<const char*, const char*>, 126> lumifiles = {{
     {"2023Cv4_nib2_ZB", lumibyls2023BCD},
     {"2023Dv1_nib1_ZB", lumibyls2023BCD},
     {"2023Dv2_nib1_ZB", lumibyls2023BCD},
-    //{"2024B", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
-    //{"2024B_ZB", lumibyls2024eraB}, //Luminosity per run for prompt 2024BC 
-    {"2024B", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC 
-    {"2024B_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC 
-    {"2024C", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC
-    {"2024C_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024BC
-    {"2024D", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024D
-    {"2024D_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024D
-    {"2024Ev1", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024E
-    {"2024Ev1_ZB", lumibyls2024BCDEFG}, //Luminosity per run for prompt 2024E
+    {"2024B", lumibyls2024BCDEFG}, 
+    {"2024B_ZB", lumibyls2024BCDEFG},
+    {"2024C", lumibyls2024BCDEFG},
+    {"2024C_ZB", lumibyls2024BCDEFG},
+    {"2024D", lumibyls2024BCDEFG},
+    {"2024D_ZB", lumibyls2024BCDEFG},
+    {"2024Ev1", lumibyls2024BCDEFG},
+    {"2024Ev1_ZB", lumibyls2024BCDEFG},
     {"2024BR", lumibyls2024BCDEFG},
     {"2024CR", lumibyls2024BCDEFG},
     {"2024Ev2", lumibyls2024BCDEFG},
@@ -372,6 +347,7 @@ public:
   TH2D *h2pteta_all;
   TH2D *h2pteta_sel;
   TH2D *h2pteta, *h2pteta_lumi;
+  TH2D *h2neHEF, *h2neEmEF, *h2chHEF, *h2muEF, *h2chEmEF, *h2chMultiplicity, *h2neMultiplicity;
   TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50, *hpt05_reco, *hpt05_gen;
   TH1D *vpt[ny], *vpt_RecU[ny], *vpt_GenU[ny];
 
@@ -2067,7 +2043,7 @@ if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
 }
 
 if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") || TString(dataset.c_str()).Contains("QCDFlatECAL") ||
-    TString(dataset.c_str()).Contains("Winter25MC"))
+    TString(dataset.c_str()).Contains("Winter25MC") || TString(dataset.c_str()).Contains("Summer24MC"))
 {
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2085,8 +2061,8 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 	   if (reweightPU && !doPU_per_trigger)
 	   {
 	      if (TString(dataset.c_str()).Contains("Winter24MGV14_") || TString(dataset.c_str()).Contains("Summer24MG")) {
-		 //TFile f("luminosityscripts/PUWeights/69mb/PUWeight2024BCDEFGHI/PUWeights_HLT_PFJet500_2024BCDEFGHI.root");
-		 TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/Summer24/PUWeight2024CDEFGHI/PUWeights_HLT_PFJet500_2024CDEFGHI.root");
+		 TFile f("luminosityscripts/PUWeights/69mb/PUWeight2024CDEFGHI/PUWeights_HLT_PFJet500_2024CDEFGHI.root");
+		 //TFile f("luminosityscripts/PUWeights/75mb/PUWeights2024/Summer24/PUWeight2024CDEFGHI/PUWeights_HLT_PFJet500_2024CDEFGHI.root");
 	         pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024CDEFGHI");
 	         pileupRatio->SetDirectory(0);
 	         // Print mean, min weight, max weight
@@ -2591,6 +2567,19 @@ if (isMG)
       vres[i] = minValue + i * stepSize;
   }
   const int nres = sizeof(vres) / sizeof(vres[0]) - 1;
+
+
+  // JetID binning
+  const int nyEF = 50;
+  double vyEF[nyEF + 1];
+  for (int i = 0; i <= nyEF; ++i)
+    vyEF[i] = 0.0 + 1.0 * i / nyEF;
+
+  const int nyMult = 60;
+  double vyMult[nyMult + 1];
+  for (int i = 0; i <= nyMult; ++i)
+    vyMult[i] = 0 + i;  // Integer bins from 0 to 60
+
 
   // Binning for 3D histo. Nestor. April 25, 2024. Format example (xAxis.size()-1, xAxis.data())
   // phi binning
@@ -3283,6 +3272,25 @@ if (isMG)
                                                              "N_{jet}",
                                      npti, vpti);
         } // for iy                      npti, vpti);
+      }
+      if (doJetId_variables)
+      {
+        dout->mkdir("Incjet/JetId_Var");
+        dout->cd("Incjet/JetId_Var");
+	h->h2neHEF = new TH2D("h2neHEF", ";#eta;neHEF;N_{jet}",
+                                  nx, vx, nyEF, vyEF);
+	h->h2neEmEF = new TH2D("h2neEmEF", ";#eta;neEmEF;N_{jet}",
+                                  nx, vx, nyEF, vyEF);
+	h->h2chHEF = new TH2D("h2chHEF", ";#eta;chHEF;N_{jet}",
+                                  nx, vx, nyEF, vyEF);
+	h->h2chMultiplicity = new TH2D("h2chMultiplicity", ";#eta;chMultiplicity;N_{jet}",
+                                  nx, vx, nyMult, vyMult);
+	h->h2neMultiplicity = new TH2D("h2neMultiplicity", ";#eta;neMultiplicity;N_{jet}",
+                                  nx, vx, nyMult, vyMult);
+	h->h2muEF = new TH2D("h2muEF", ";#eta;muEF;N_{jet}",
+                                  nx, vx, nyEF, vyEF);
+	h->h2chEmEF = new TH2D("h2chEmEF", ";#eta;chEmEF;N_{jet}",
+                                  nx, vx, nyEF, vyEF);
       }
 
     } // incjet
@@ -4252,6 +4260,7 @@ if (isMG)
       //dataset == "2024G_ZB" || 
       TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") ||
       TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25MC") ||
+      TString(dataset.c_str()).Contains("Summer24MC") ||
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
@@ -4325,7 +4334,8 @@ if (isMG)
       //dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || 
       TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG") ||
-      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25MC"))
+      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25MC") ||
+      TString(dataset.c_str()).Contains("Summer24MC"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (TString(dataset.c_str()).Contains("2024F") || //dataset == "2024F_ZB" || 
       TString(dataset.c_str()).Contains("2024G") || //dataset == "2024G_ZB" ||
@@ -4404,12 +4414,6 @@ if (isMG)
   Float_t Jet_genDR[nJetMax];
   // Float_t Jet_smearFactor[nJetMax];
 
-  /*
-  //To check the luminosity and the function Load Lumi is called 
-  bool is_load_lumi = LoadLumi(); // try to load lumi information
-  cout << "Load Lumi test: " << is_load_lumi << endl;
-  cout << "_lumsum test: " << _lumsum << endl;
-  */ 
 
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry = 0; jentry < nentries; jentry++)
@@ -4683,16 +4687,6 @@ if (isMG)
     for (int i = 0; i != njet; ++i)
     {
 
-      /*
-      //Nestor Aug16, 2024.
-      //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
-      if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3 && Jet_eta[0] != Jet_eta[1])
-      {
-        std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
-	std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
-      }
-      */
-
       if (redoJEC)
       {
         double rawJetPt = Jet_pt[i] * (1.0 - Jet_rawFactor[i]);
@@ -4769,31 +4763,6 @@ if (isMG)
     } // reset Jet_CF
 
 
-/*
-    std::string triggerString(double pt, double eta) {
-        std::map<std::string, range> *triggers;
-        if (analysis == "ismultijet") triggers = &mi;
-        else if (analysis == "isdijet") triggers = &md;
-        else if (analysis == "isdijet2") triggers = &md2;
-        else {
-            std::cerr << "Unknown analysis type: " << analysis << std::endl;
-            return "HLT_ZeroBias";
-        }
-
-        for (const auto &entry : *triggers) {
-            const std::string &trigger = entry.first;
-            const range &r = entry.second;
-            if (pt > r.pt_min && pt <= r.pt_max && eta >= r.eta_min && eta <= r.eta_max) {
-                return trigger;
-            }
-        }
-
-    return "HLT_ZeroBias"; // Default
-    } 
-
-
-*/
-    // reweightPU
     
     
     if (isMC && reweightPU && !doPU_per_trigger)
@@ -4804,22 +4773,8 @@ if (isMG)
       double pileup_weight = pileupRatio->GetBinContent(ibin);
       w *= pileup_weight;
 
-      //std::cerr << "pileup_weight original: " << pileup_weight << std::endl;
-      //get_weight(700., 2., "doMultijets");
-      //std::cerr << "PU_weight using the function: " << PU_weight <<std::endl;
     }
 
-/*    
-    if (do_PUProfiles){
-       if (isMC){
-          h_PUProfile->Fill(Pileup_nTrue, w);
-       }
-       //h_PUProfile->Fill(Pileup_nTrue, w);
-       h_RhoAll->Fill(rho, w);
-       h_NPV->Fill(NPV, w);
-       h_NPVGood->Fill(NPV_Good, w);
-    }
-*/
 
     if (isMC && smearJets)
     {
@@ -4970,6 +4925,7 @@ if (isMG)
         h->h2pteta_gen->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
         bool hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
         bool hasMatchJet = (dR < 0.2 && p4g.Pt() > 0 && p4.Pt() > 0);
+	bool hasMatchJet_dR4 = (dR < 0.4 && p4g.Pt() > 0 && p4.Pt() > 0);
         if (hasMatchVtx && hasMatchJet)
         {
           h->h2pteta->Fill(fabs(p4.Eta()), p4g.Pt(), w);
@@ -4985,7 +4941,8 @@ if (isMG)
         h->p2effz->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
         if (hasMatchVtx){
           h->p2eff->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w);
-          h->p2eff_recEta->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
+          //h->p2eff_recEta->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
+          h->p2eff_recEta->Fill(fabs(hasMatchJet_dR4 ? p4.Eta() : p4g.Eta()), p4g.Pt(), hasMatchJet_dR4 ? 1 : 0, w);
 	}
 	// To compare with Athens results
 	if (doLeadingJet)
@@ -5022,7 +4979,8 @@ if (isMG)
               h->p2effz_Athens->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
               if (hasMatchVtx){
                 h->p2eff_Athens->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w);
-                h->p2eff_recEta_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
+                //h->p2eff_recEta_Athens->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
+		h->p2eff_recEta_Athens->Fill(fabs(hasMatchJet_dR4 ? p4.Eta() : p4g.Eta()), p4g.Pt(), hasMatchJet_dR4 ? 1 : 0, w); // p4.Eta
               }
 	    }
 	  }
@@ -5230,6 +5188,16 @@ if (isMG)
           h->h2pteta_all->Fill(p4.Eta(), p4.Pt(), w);
           if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0)
           {
+	    if (doJetId_variables){
+	      h->h2neHEF->Fill(p4.Eta(), Jet_neHEF[i], w);
+	      h->h2neEmEF->Fill(p4.Eta(), Jet_neEmEF[i], w);
+	      h->h2chHEF->Fill(p4.Eta(), Jet_chHEF[i], w);
+	      h->h2chMultiplicity->Fill(p4.Eta(), Jet_chMultiplicity[i], w);
+	      h->h2neMultiplicity->Fill(p4.Eta(), Jet_neMultiplicity[i], w);
+	      h->h2muEF->Fill(p4.Eta(), Jet_muEF[i], w);
+	      h->h2chEmEF->Fill(p4.Eta(), Jet_chEmEF[i], w);
+
+	    }
 
 	    //std::cout << run << " Inclusive h2pteta weight: " << w << std::endl;
             h->h2pteta->Fill(p4.Eta(), p4.Pt(), w);
@@ -5855,7 +5823,7 @@ if (isMG)
 
           if (doGluonJets && isdijet)
           {
-            /*
+            
             gluonHistos *h = mhgj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
 	    for (int i = 0; i != njet; ++i){
@@ -5974,7 +5942,7 @@ if (isMG)
               } // WP_l
 
 	    } //njets 
-          */
+          
           } // doGluonJets
           
 
