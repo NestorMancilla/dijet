@@ -99,10 +99,12 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer23MCBPix_Cas", "Summer23MC_Cas",
      "Winter24MCFlat", "Winter24MCFlat_Sv10", "Winter24MCFlat_Sv9",
      "Winter24MG_1", "Winter24MG_2", "Winter24MG_3", "Winter24MG_4", "Winter24MG_5",
-     "Summer24MG_1", "Summer24MG_2", "Summer24MG_3", "Summer24MG_4", "Summer24MG_5", "Summer24MG_oneHT",
-     "Winter25MC_Flat2022",
+     "Summer24MG_1", "Summer24MG_2", "Summer24MG_3", "Summer24MG_4", "Summer24MG_5", "Summer24MG_oneHT", "Summer24MC_FlatJMEN",
+     "Winter25MC_Flat2022", "Summer24MC_NoPU", "Winter25MC_NoPU", "Summer24MC_NoPU_JME", "Winter25MC_JME",
+     "Summer24MC_SingleNeutrino",
      "Winter24MGV14_1", "Winter24MGV14_2", "Winter24MGV14_3", "Winter24MGV14_4", "Winter24MGV14_5", "Winter24MGV14_OneHTFile",
-     "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig", "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero" //ECALPFT
+     "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig", "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero", //ECALPFT
+     "Winter25MG_1", "Winter25MG_2", "Winter25MG_3", "Winter25MG_4", "Winter25MG_5"
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 
@@ -137,7 +139,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
   "2024F_ECAL2_1", "2024F_ECAL2_2", "2024F_ECAL2_3", "2024F_ECAL2_4",
   "2024I_ZB_HCPF1x", "2024I_ZB_HCPF2x", "2024I_ZB_HCPF3x", "2024I_ZB_HCPF4x", "2024I_ZB_HCPF5x", "2024I_ZB_HCPFSpecial", "2024I_ZB_Special",
-  "2024_skim"
+  "2024_skim", "2025B", "2025B_ZB", "2025C", "2025C_ZB"
   };
 
   // Check if dataset is supported

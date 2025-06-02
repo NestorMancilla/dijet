@@ -75,6 +75,7 @@ bool doMultijet2Drecoil = true;
 bool doDijet2NM = false; // true;
 bool doJetID = false;    // add JetID class
 bool doLeadingJet = true; // To compare with Athens results
+bool doEtaPhi = true;
 
 bool doJetId_variables = true; // To compare Jet_jetId branch 
 bool debug = false;      // general debug
@@ -100,7 +101,7 @@ std::set<std::string> mcIOV = {"Summer22",
                                "TestSummer23MGBPix",
 			       "Summer23MC_Cas",
                                "Winter24MCFlat", "Winter24MG", "Summer24MG",
-			       "Winter25MC_Flat2022", "Winter25MC_NoPU",
+			       "Winter25MC_Flat2022", "Winter25MC_NoPU", "Winter25MC_JME",
                                "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig",
                                "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero"};
 
@@ -132,8 +133,14 @@ constexpr const char lumibyls2023BCD[] = "luminosityscripts/csvfiles/lumibyls202
 constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumibyls2024_378981_386951_Golden.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
+//constexpr const char lumibyls2025B[] = "luminosityscripts/csvfiles/2025/lumi_391658_392221_DIALS.csv";
+//constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392382_DIALS.csv";
+//constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
+//constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392542_DIALS.csv";
+//constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392669_DIALS.csv";
+constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392751_DIALS.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 126> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 130> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -259,7 +266,11 @@ constexpr std::array<std::pair<const char*, const char*>, 126> lumifiles = {{
     {"2024I_ZB_HCPF4x", lumibyls2024BCDEFG},
     {"2024I_ZB_HCPF5x", lumibyls2024BCDEFG},
     {"2024I_ZB_HCPFSpecial", lumibyls2024BCDEFG},
-    {"2024I_ZB_Special", lumibyls2024BCDEFG}
+    {"2024I_ZB_Special", lumibyls2024BCDEFG},
+    {"2025B", lumibyls2025BC},
+    {"2025B_ZB", lumibyls2025BC},
+    {"2025C", lumibyls2025BC},
+    {"2025C_ZB", lumibyls2025BC}
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -301,11 +312,15 @@ class mctruthHistos
 public:
   TH1D *ptreco_ptgen, *hpt_gen, *hpt_reco; //, *h1res_bar;
   TH1D *ptreco_ptgen_Athens, *hpt_gen_Athens, *hpt_reco_Athens; // LeadinJet folder
+  //TH1D *hUnf_gen, *hUnf_missNoMatch, *hUnf_missOut, *hUnf_fakeNoMatch, *hUnf_fakeOut, *hUnf_RM; // For MCUnfold
   TH2D *h2pteta, *h2pteta_gen, *h2pteta_rec, *h2res_ptgen, *h2res_etagen, *h2_btagUpar;//, *h2res_bar;
+  TH2D *h2pteta_gEta, *h2pteta_gEtaNoVtx, *h2pteta_gEtaIDNoVtx, *h2pteta_gEtaIDVtx; //JetID Eff
   TH2D *h2pteta_Athens, *h2pteta_gen_Athens, *h2res_ptgen_Athens, *h2res_etagen_Athens, *h2_btagUpar_Athens; // LeadinJet folder
   TH3D *h3res, *h3res_Match, *h3res_raw;
   TH3D *h3res_Athens, *h3res_Match_Athens, *h3res_raw_Athens; // LeadinJet folder
-  TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff, *p2pur, *p2r_gEta, *p2eff_recEta;
+  TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff, *p2pur, *p2eff_recEta;
+  TProfile2D *p2r_gEta, *p2r_gEtaNoVtx, *p2r_gEtaIDNoVtx, *p2r_gEtaIDVtx; //JetID Eff
+  TProfile2D *p2r_EtaPhi30, *p2r_EtaPhi132, *p2r_EtaPhi500; // Response for eta and phi
   TProfile2D *p2jes_Athens, *p2jsf_Athens, *p2r_Athens, *p2r_NoMatch_Athens, *p2r_raw_Athens, *p2effz_Athens, *p2eff_Athens, *p2pur_Athens, *p2r_gEta_Athens, *p2eff_recEta_Athens; // LeadingJet folder
 };
 
@@ -347,6 +362,7 @@ public:
   TH2D *h2pteta_sel;
   TH2D *h2pteta, *h2pteta_lumi;
   TH2D *h2neHEF, *h2neEmEF, *h2chHEF, *h2muEF, *h2chEmEF, *h2chMultiplicity, *h2neMultiplicity;
+  TH2D *h2neHEF_pt, *h2neEmEF_pt, *h2chHEF_pt;
   TH1D *hpt13, *hpteta20, *hpteta30, *hpteta40, *hpteta50, *hpt05_reco, *hpt05_gen;
   TH1D *vpt[ny], *vpt_RecU[ny], *vpt_GenU[ny];
 
@@ -731,47 +747,54 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
-	string JSON_version = "Collisions2024_378981_386951_Golden";
+	string JSON_version = "Collisions2025_391658_392751_DIALS"; //2025BC
+	//string JSON_version = "Collisions2025_391658_392669_DIALS"; //2025BC
+	//string JSON_version = "Collisions2025_391658_392542_DIALS"; //2025BC
+	//string JSON_version = "Collisions2025_391658_392526_DIALS"; //2025BC
+	//string JSON_version = "Collisions2025_391658_392382_DIALS"; //2025B
+	//string JSON_version = "Collisions2025_391658_392221_DIALS"; //2025B
+	//string JSON_version = "Collisions2024_378981_386951_Golden"; // 2024 full year
 	//string JSON_version = "Collisions2023_366442_370790_Golden";
 	//string JSON_version = "Collisions2022_355100_362760_Golden";
+	//string era_year_path = "luminosityscripts/csvfiles/"
 	// List of filenames
 	vector<string> filenames = {
-		"luminosityscripts/csvfiles/lumi_HLT_ZeroBias_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
+		"luminosityscripts/csvfiles/2025/lumi_HLT_ZeroBias_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
 	};
 
 	for (size_t idx = 0; idx < vtrg.size(); ++idx) {
@@ -867,6 +890,10 @@ bool DijetHistosFill::LoadLumi()
 	} else if (lumifile_str.Contains("2023")) {
 		expectedTag = "#Data tag : 23v1 , Norm tag: None";
                 expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source";
+	} else if (lumifile_str.Contains("2025")){
+		//expectedTag = "#Data tag : 24v2 , Norm tag: None";
+		expectedTag = "#Data tag : online , Norm tag: None";
+	        expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
 	} else {
 		expectedTag = "#Data tag : 24v1 , Norm tag: None";
 		expectedTag_2 = "#Data tag : 24v2 , Norm tag: None";
@@ -1362,7 +1389,10 @@ else
 	//fChain->SetBranchStatus("MET_sumEt", 1);
 }
 
-fChain->SetBranchStatus("Flag_METFilters", 1);
+if (TString(dataset.c_str()).Contains("2022") || TString(dataset.c_str()).Contains("2023") ||
+    TString(dataset.c_str()).Contains("2024")){
+        fChain->SetBranchStatus("Flag_METFilters", 1);
+}
 if (isRun2 || isRun3) //April 2, 2024: Same filters for UL Run2 and Run3
 {
 	// https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Run_3_recommendations
@@ -1938,6 +1968,7 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 {
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+			//"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
 	jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
@@ -2178,13 +2209,14 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 
 if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || dataset == "2024H_Skim")
 {
-	/*
+	
         jec = getFJC("",
                         "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
-	*/
-        if (TString(dataset.c_str()).Contains("2024H_nib1") || TString(dataset.c_str()).Contains("2024H_NT"))
+			"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+	
+	/*
+        if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_NT"))
         {
                 jec = getFJC("",
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2195,6 +2227,7 @@ if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || d
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
+	*/
 }
 
 if (TString(dataset.c_str()).Contains("2024I"))
@@ -2218,6 +2251,38 @@ if (TString(dataset.c_str()).Contains("2024I"))
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
+}
+
+if (TString(dataset.c_str()).Contains("Winter25MG"))
+{
+        jec = getFJC("",
+                        "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "");
+        jerpathsf = "";
+        jersfvspt = getFJC("", "", "");
+        jerpath = "";
+        useJERSFvsPt = false; 
+
+           if (reweightPU && !doPU_per_trigger)
+           {
+                 TFile f("luminosityscripts/PUWeights/69mb/PUWeight2024CDEFGHI/PUWeights_HLT_PFJet500_2024CDEFGHI.root");
+                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024CDEFGHI");
+                 pileupRatio->SetDirectory(0);
+                 // Print mean, min weight, max weight
+                 cout << "PU weight file: " << f.GetName() << endl;
+                 cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+                 cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+                 cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+
+           }
+}
+
+if (TString(dataset.c_str()).Contains("2025B") || TString(dataset.c_str()).Contains("2025C"))
+{
+        jec = getFJC("",
+                        "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+                        //"Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025C_V1M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
@@ -2439,6 +2504,9 @@ if (isMG)
                             3637,3832};
   const int nptdU = sizeof(vptdU) / sizeof(vptdU[0]) - 1;
 
+  //const double vptgendU[] = {74   ,97    ,133    ,174    ,220    ,272    ,330    ,395    ,468    ,548    ,638    ,737    ,846    ,967     ,1101     ,1248     ,1410     ,1588     ,1784     ,2000     ,2238     ,2500     ,2787     ,3103     ,3450,     3832};
+  //const int nptgendU = sizeof(vptgendU) / sizeof(vptgendU[0]) - 1;
+
   //Unfolding eta binning
   //https://gitlab.cern.ch/cms-analysis/general/DasAnalysisSystem/Core/-/blob/master/Unfolding/interface/PtY.h?ref_type=heads#L21-23
   //const double vetadU[] = {0., 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
@@ -2646,6 +2714,13 @@ if (isMG)
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to385863_DCSRuns_385864to386319.json");
       //LoadJSON("rootfiles/CombinedJSON_GoldenRuns_378985to386319_DCSRuns_386320to386951.json");
       LoadJSON("rootfiles/Cert_Collisions2024_378981_386951_Golden.json");
+    if (TString(dataset.c_str()).Contains("2025"))
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392221_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392382_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392526_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392542_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392669_DIALS.json");
+      LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392751_DIALS.json");
 
   }
   int _nbadevts_json(0);
@@ -2746,6 +2821,18 @@ if (isMG)
       h->h2pteta = new TH2D("h2pteta", ";|#eta_{jet}|;p_{T,gen} (GeV);"
                                        "N_{events}",
                             nxd, vxd, nptd, vptd);
+      h->h2pteta_gEta = new TH2D("h2pteta_gEta", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                       "N_{events}",
+                            nxd, vxd, nptd, vptd);
+      h->h2pteta_gEtaNoVtx = new TH2D("h2pteta_gEtaNoVtx", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                       "N_{events}",
+                            nxd, vxd, nptd, vptd);
+      h->h2pteta_gEtaIDNoVtx = new TH2D("h2pteta_gEtaIDNoVtx", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                       "N_{events}",
+                            nxd, vxd, nptd, vptd);
+      h->h2pteta_gEtaIDVtx = new TH2D("h2pteta_gEtaIDVtx", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                       "N_{events}",
+                            nxd, vxd, nptd, vptd);
       h->h2pteta_gen = new TH2D("h2pteta_gen", ";|#eta_{gen}|;p_{T,gen} (GeV);"
                                                "N_{events}",
                                 nxd, vxd, nptd, vptd);
@@ -2768,6 +2855,15 @@ if (isMG)
                                      "p_{T,jet}/p_{T,gen}",
                               nxd, vxd, nptd, vptd);
       h->p2r_gEta = new TProfile2D("p2r_gEta", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
+      h->p2r_gEtaNoVtx = new TProfile2D("p2r_gEtaNoVtx", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
+      h->p2r_gEtaIDNoVtx = new TProfile2D("p2r_gEtaIDNoVtx", ";|#eta_{gen}|;p_{T,gen} (GeV);"
+                                     "p_{T,jet}/p_{T,gen}",
+                              nxd, vxd, nptd, vptd);
+      h->p2r_gEtaIDVtx = new TProfile2D("p2r_gEtaIDVtx", ";|#eta_{gen}|;p_{T,gen} (GeV);"
                                      "p_{T,jet}/p_{T,gen}",
                               nxd, vxd, nptd, vptd);
       h->p2r_NoMatch = new TProfile2D("p2r_NoMatch", ";|#eta_{jet}|;p_{T,gen} (GeV);"
@@ -2859,8 +2955,48 @@ if (isMG)
                                 nxd, vxd, nptd, vptd);
 //
       }
+      
+      
+      if (doEtaPhi){
+        dout->mkdir("MCtruth/Res_EtaPhi");
+        dout->cd("MCtruth/Res_EtaPhi");
+	h->p2r_EtaPhi30 = new TProfile2D("p2r_EtaPhi30", ";|#eta_{jet}|;#phi;"
+			               "p_{T,jet}/p_{T,gen}",
+				       nxd, vxd, 72, -TMath::Pi(), +TMath::Pi());
+	h->p2r_EtaPhi132 = new TProfile2D("p2r_EtaPhi132", ";|#eta_{jet}|;#phi;"
+                                       "p_{T,jet}/p_{T,gen}",
+                                       nxd, vxd, 72, -TMath::Pi(), +TMath::Pi());
+	h->p2r_EtaPhi500 = new TProfile2D("p2r_EtaPhi500", ";|#eta_{jet}|;#phi;"
+                                       "p_{T,jet}/p_{T,gen}",
+                                       nxd, vxd, 72, -TMath::Pi(), +TMath::Pi());
+      }
+      
 
     } // isMC && doMCtruth
+
+    /*
+    if(isMC && doUnfolding && vtrg[itrg] == "HLT_MC") {
+      if (debug)
+        cout << "Setup MC Unfold" << endl
+             << flush;
+
+      dout->mkdir("MCUnfold");
+      dout->cd("MCUnfold");
+
+      mctruthHistos *h = new mctruthHistos();
+
+      string &t = vtrg[itrg];
+      mhmc[t] = h;
+
+      h->hUnf_gen = new TH1D("hUnf_gen", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+      h->hUnf_missNoMatch = new TH1D("hUnf_missNoMatch", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+      h->hUnf_missOut = new TH1D("hUnf_missOut", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+      h->hUnf_fakeNoMatch = new TH1D("hUnf_fakeNoMatch", ";p_{T,jet} (GeV)", nptdU, vptdU);
+      h->hUnf_fakeOut = new TH1D("hUnf_fakeOut", ";p_{T,jet} (GeV)", nptdU, vptdU);
+      h->hUnf_RM = new TH1D("hUnf_RM", ";p_{T,jet} (GeV)", nptdU, vptdU);
+
+    } // isMC && doUnfolding
+    */
 
     if (do_PUProfiles)
     {
@@ -3140,6 +3276,12 @@ if (isMG)
                                   nx, vx, nyEF, vyEF);
 	h->h2chHEF = new TH2D("h2chHEF", ";#eta;chHEF;N_{jet}",
                                   nx, vx, nyEF, vyEF);
+	h->h2neHEF_pt = new TH2D("h2neHEF_pt", ";p_{T} (GeV);neHEF;N_{jet}",
+                                  npti, vpti, nyEF, vyEF);
+        h->h2neEmEF_pt = new TH2D("h2neEmEF_pt", ";p_{T} (GeV);neEmEF;N_{jet}",
+                                  npti, vpti, nyEF, vyEF);
+        h->h2chHEF_pt = new TH2D("h2chHEF_pt", ";p_{T} (GeV);chHEF;N_{jet}",
+                                  npti, vpti, nyEF, vyEF);
 	h->h2chMultiplicity = new TH2D("h2chMultiplicity", ";#eta;chMultiplicity;N_{jet}",
                                   nx, vx, nyMult, vyMult);
 	h->h2neMultiplicity = new TH2D("h2neMultiplicity", ";#eta;neMultiplicity;N_{jet}",
@@ -4009,12 +4151,13 @@ if (isMG)
       TString(dataset.c_str()).Contains("2024I") ||
       //dataset == "2024G_ZB" || 
       TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") ||
-      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25MC") ||
+      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25") ||
       TString(dataset.c_str()).Contains("Summer24MC") ||
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
-      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim")
+      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim" ||
+      TString(dataset.c_str()).Contains("2025"))
     //fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
     fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
@@ -4084,7 +4227,7 @@ if (isMG)
       //dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || 
       TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG") ||
-      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25MC") ||
+      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25") ||
       TString(dataset.c_str()).Contains("Summer24MC"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (TString(dataset.c_str()).Contains("2024F") || //dataset == "2024F_ZB" || 
@@ -4094,7 +4237,8 @@ if (isMG)
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" || 
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
-      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim")
+      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim" ||
+      TString(dataset.c_str()).Contains("2025"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
@@ -4281,6 +4425,11 @@ if (isMG)
       if ((dataset == "2023Cv4") && (run < 367765)) {
         continue;
       }
+      // Separate 2024E reprocessing for 2024Ev1 and 2024Ev2
+      //if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run >= 381384) {
+      if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run < 381384) {
+      	continue;
+      }
     } // doJSON
 
     
@@ -4423,17 +4572,6 @@ if (isMG)
     
     #define Jet_jetId Jet_jetId_ref
 
-    //Nestor Aug16, 2024.
-    //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
-    if (!isMC){
-      if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3)
-      {
-        std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
-        std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
-      }
-    }
-    //
-    
     for (int i = 0; i != njet; ++i)
     {
 
@@ -4501,6 +4639,17 @@ if (isMG)
         allJetsGood = false;
       // NB: should move this after smearing. Separate loop for type-I MET?
     } // for njet
+
+    //Nestor Aug16, 2024.
+    //Search for two jets at about 4.2 TeV in 2024F, at two different |eta| in barrel.
+    if (!isMC){
+      if (Jet_pt[0] > 4000 && Jet_pt[1] > 4000 && fabs(Jet_eta[0]) < 1.3 && fabs(Jet_eta[1]) < 1.3)
+      {
+        std::cout << "Event: " << event << ", LS: " << luminosityBlock << ", Run: " << run << std::endl;
+        std::cout << "Jet0 pT: " << Jet_pt[0] << "Jet1 pT: " << Jet_pt[1] << std::endl;
+      }
+    }
+    //
 
     // Apply JER smearing to MC immediately after JEC. Don't change order.
     // Need after JEC to ensure mean is at 1, but ideally should recalculate
@@ -4672,13 +4821,14 @@ if (isMG)
         }
 	h->hpt_gen->Fill(p4g.Pt(), w);
 	h->hpt_reco->Fill(p4.Pt(), w);
-        h->h2pteta_gen->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
+        h->h2pteta_gen->Fill(fabs(p4g.Eta()), p4g.Pt(), w); // remove this histo. Alredy covered by h2pteta_gEtaNoVxt.
         bool hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
         bool hasMatchJet = (dR < 0.2 && p4g.Pt() > 0 && p4.Pt() > 0);
 	bool hasMatchJet_dR4 = (dR < 0.4 && p4g.Pt() > 0 && p4.Pt() > 0);
         if (hasMatchVtx && hasMatchJet)
         {
           h->h2pteta->Fill(fabs(p4.Eta()), p4g.Pt(), w);
+	  h->h2pteta_gEta->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
           h->p2jes->Fill(fabs(p4.Eta()), p4g.Pt(), (1. - Jet_rawFactor[i]), w);
           h->p2jsf->Fill(fabs(p4.Eta()), p4g.Pt(),
                          smearJets ? Jet_CF[i] : 1, w);
@@ -4687,12 +4837,41 @@ if (isMG)
 	  h->p2r->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
 	  h->p2r_gEta->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w); // p4g.Eta
           h->p2r_raw->Fill(fabs(p4.Eta()), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
+	  if(doEtaPhi)
+	  { 
+	    if (p4.Pt() >= 30 && p4.Pt() < 60){
+	      h->p2r_EtaPhi30->Fill(fabs(p4g.Eta()), p4g.Phi(), p4.Pt() / p4g.Pt(), w);
+	    }
+	    if (p4.Pt() >= 132 && p4.Pt() < 236){
+              h->p2r_EtaPhi132->Fill(fabs(p4g.Eta()), p4g.Phi(), p4.Pt() / p4g.Pt(), w);
+	    }
+	    if (p4.Pt() >= 500 && p4.Pt() < 1000){
+	      h->p2r_EtaPhi500->Fill(fabs(p4g.Eta()), p4g.Phi(), p4.Pt() / p4g.Pt(), w);
+	    }
+	  }
         }
+	
+	h->h2pteta_gEtaNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
+	h->p2r_gEtaNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
+	
+
         h->p2effz->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
         if (hasMatchVtx){
           h->p2eff->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w);
           //h->p2eff_recEta->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
           h->p2eff_recEta->Fill(fabs(hasMatchJet_dR4 ? p4.Eta() : p4g.Eta()), p4g.Pt(), hasMatchJet_dR4 ? 1 : 0, w);
+	}
+
+	// To compare JetID results
+	if (Jet_jetId[i] >= 4) {
+          
+          h->h2pteta_gEtaIDNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
+          h->p2r_gEtaIDNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
+	  
+          if (hasMatchVtx && hasMatchJet){
+	    h->h2pteta_gEtaIDVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
+	    h->p2r_gEtaIDVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w); 
+	  }	  
 	}
 	// To compare with Athens results
 	if (doLeadingJet)
@@ -4942,6 +5121,9 @@ if (isMG)
 	      h->h2neHEF->Fill(p4.Eta(), Jet_neHEF[i], w);
 	      h->h2neEmEF->Fill(p4.Eta(), Jet_neEmEF[i], w);
 	      h->h2chHEF->Fill(p4.Eta(), Jet_chHEF[i], w);
+	      h->h2neHEF_pt->Fill(p4.Pt(), Jet_neHEF[i], w);
+              h->h2neEmEF_pt->Fill(p4.Pt(), Jet_neEmEF[i], w);
+              h->h2chHEF_pt->Fill(p4.Pt(), Jet_chHEF[i], w);
 	      h->h2chMultiplicity->Fill(p4.Eta(), Jet_chMultiplicity[i], w);
 	      h->h2neMultiplicity->Fill(p4.Eta(), Jet_neMultiplicity[i], w);
 	      h->h2muEF->Fill(p4.Eta(), Jet_muEF[i], w);
@@ -5018,36 +5200,15 @@ if (isMG)
                 h->pmuf13->Fill(pt, Jet_muEF[i], w);
               }
             } // doPFcomposition
+
             if (dohpt05)
             {
 	      if (iy < h->ny)
                 h->vpt_RecU[iy]->Fill(p4.Pt(), w);
-	      /*
-              if (iy == 0)
-	      //if (abs(p4g.Eta()) <0.5)
-	      {
-		h->hpt05_reco->Fill(p4.Pt(), w);
-		
-	        if (isMC)
-	        {
-		  h->hpt05_reco->Fill(p4.Pt(), w);
-		  //h->hpt05_gen->Fill(p4g.Pt(), w);
-
-	        } // isMC
-		else
-		{
-	          h->hpt05_reco->Fill(p4.Pt(), w);
-
-		  //h->h2Cov->Fill(iRec,iRec);
-		  //TH2 *h2rec = (TH2*) rec->ExtractHistogram("hRecIncjet",hRec);
-		  // End Unfolding
-		}
-		
-	      } // iy=0
-	      */
 
             } // dohtp05
-	          // Unfolding
+
+	    // Unfolding
             if (doUnfolding && !isMC)
             {
               if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
@@ -5256,6 +5417,14 @@ if (isMG)
         }     // good recoil jet
       }       // for i in injet
     }         // doMultijet
+    /*
+    if (!ismultijet && doMultijet)
+    {
+      std::cout << " Jet_pt[0] > 30." << Jet_pt[0] << std::endl;
+      std::cout << " Jet_pt[0] > 30." << Jet_pt[0] << std::endl;
+      std::cout << " Jet_pt[0] > 30." << Jet_pt[0] << std::endl;
+    }
+    */
     double Crecoil = exp(logCrecoil);
 
     hnjet->Fill(njet, w);
