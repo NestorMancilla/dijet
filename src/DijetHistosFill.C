@@ -40,7 +40,7 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = false;
+bool smearJets = true;
 bool useJERSFvsPt = false; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
@@ -312,7 +312,8 @@ class mctruthHistos
 public:
   TH1D *ptreco_ptgen, *hpt_gen, *hpt_reco; //, *h1res_bar;
   TH1D *ptreco_ptgen_Athens, *hpt_gen_Athens, *hpt_reco_Athens; // LeadinJet folder
-  //TH1D *hUnf_gen, *hUnf_missNoMatch, *hUnf_missOut, *hUnf_fakeNoMatch, *hUnf_fakeOut, *hUnf_RM; // For MCUnfold
+  TH1D *hUnf_gen, *hUnf_missNoMatch, *hUnf_missOut, *hUnf_fakeNoMatch, *hUnf_fakeOut; // For MCUnfold
+  TH2D *h2Unf_RM; // For MCUnfold
   TH2D *h2pteta, *h2pteta_gen, *h2pteta_rec, *h2res_ptgen, *h2res_etagen, *h2_btagUpar;//, *h2res_bar;
   TH2D *h2pteta_gEta, *h2pteta_gEtaNoVtx, *h2pteta_gEtaIDNoVtx, *h2pteta_gEtaIDVtx; //JetID Eff
   TH2D *h2pteta_Athens, *h2pteta_gen_Athens, *h2res_ptgen_Athens, *h2res_etagen_Athens, *h2_btagUpar_Athens; // LeadinJet folder
@@ -747,54 +748,54 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
-	string JSON_version = "Collisions2025_391658_392751_DIALS"; //2025BC
+	//string JSON_version = "Collisions2025_391658_392751_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392669_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392542_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392526_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392382_DIALS"; //2025B
 	//string JSON_version = "Collisions2025_391658_392221_DIALS"; //2025B
-	//string JSON_version = "Collisions2024_378981_386951_Golden"; // 2024 full year
+	string JSON_version = "Collisions2024_378981_386951_Golden"; // 2024 full year
 	//string JSON_version = "Collisions2023_366442_370790_Golden";
 	//string JSON_version = "Collisions2022_355100_362760_Golden";
 	//string era_year_path = "luminosityscripts/csvfiles/"
 	// List of filenames
 	vector<string> filenames = {
-		"luminosityscripts/csvfiles/2025/lumi_HLT_ZeroBias_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
+		"luminosityscripts/csvfiles/lumi_HLT_ZeroBias_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJet500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
 	};
 
 	for (size_t idx = 0; idx < vtrg.size(); ++idx) {
@@ -1969,14 +1970,15 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+			//"Winter24Run3_V3_MC_L2Relative_AK4PUPPI", // Test for Summer24_V2 format
 			"");
-	jerpathsf = "";
-	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024F_JRV5M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "";
+	jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024I_JRV7M_MC_SF_AK4PFPuppi.txt";
-	//jersfvspt = getFJC("", "Prompt24_2024I_JRV7M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi", "");
 	jersfvspt = getFJC("", "", "");
-	//jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	jerpath = "";
+	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+	//jerpath = "";
 	useJERSFvsPt = false; //Nestor, Sep20, 2024.
 
            	
@@ -2019,7 +2021,8 @@ if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
 	}
 	else {
 		jec = getFJC("",
-				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 				//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
 				//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
 				//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
@@ -2053,8 +2056,10 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 	else if (TString(dataset.c_str()).Contains("2024C_Rp"))
 	{
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                    		"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                    		//"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024C_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 	else {
 		jec = getFJC("",
@@ -2078,8 +2083,10 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
         if (TString(dataset.c_str()).Contains("2024D_Rp"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024D_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
         }
 	else {
 	        jec = getFJC("",
@@ -2127,8 +2134,10 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
 	} else if (TString(dataset.c_str()).Contains("2024E_Rp"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024E_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
         }
        	else 
 	{
@@ -2160,18 +2169,24 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
         if (TString(dataset.c_str()).Contains("2024F_nib1"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024F_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024F_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024F_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
         } else if (TString(dataset.c_str()).Contains("2024F_nib2"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024F_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024F_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024F_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
 	} else if (TString(dataset.c_str()).Contains("2024F_nib3"))
 	{
 		jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024F_nib3_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024F_nib3_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024F_nib3_V9M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -2192,17 +2207,22 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
         if (TString(dataset.c_str()).Contains("2024G_nib1"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024G_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024G_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024G_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
         } else if (TString(dataset.c_str()).Contains("2024G_nib2"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024G_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024G_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
 }
@@ -2211,9 +2231,11 @@ if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || d
 {
 	
         jec = getFJC("",
-                        "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                        //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+			"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 	
 	/*
         if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_NT"))
@@ -2243,8 +2265,10 @@ if (TString(dataset.c_str()).Contains("2024I"))
 	    TString(dataset.c_str()).Contains("2024I_ZB_HCPF"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+                                //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                //"Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024I_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -2258,8 +2282,9 @@ if (TString(dataset.c_str()).Contains("Winter25MG"))
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         "");
-        jerpathsf = "";
-        jersfvspt = getFJC("", "", "");
+        //jerpathsf = "";
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV1M_MC_SF_AK4PFPuppi.txt";
+        jersfvspt = getFJC("", "Prompt25_2025C_JRV1M_MC_SF_AK4PFPuppi", "");
         jerpath = "";
         useJERSFvsPt = false; 
 
@@ -2504,8 +2529,8 @@ if (isMG)
                             3637,3832};
   const int nptdU = sizeof(vptdU) / sizeof(vptdU[0]) - 1;
 
-  //const double vptgendU[] = {74   ,97    ,133    ,174    ,220    ,272    ,330    ,395    ,468    ,548    ,638    ,737    ,846    ,967     ,1101     ,1248     ,1410     ,1588     ,1784     ,2000     ,2238     ,2500     ,2787     ,3103     ,3450,     3832};
-  //const int nptgendU = sizeof(vptgendU) / sizeof(vptgendU[0]) - 1;
+  const double vptgendU[] = {74   ,97    ,133    ,174    ,220    ,272    ,330    ,395    ,468    ,548    ,638    ,737    ,846    ,967     ,1101     ,1248     ,1410     ,1588     ,1784     ,2000     ,2238     ,2500     ,2787     ,3103     ,3450,     3832};
+  const int nptgendU = sizeof(vptgendU) / sizeof(vptgendU[0]) - 1;
 
   //Unfolding eta binning
   //https://gitlab.cern.ch/cms-analysis/general/DasAnalysisSystem/Core/-/blob/master/Unfolding/interface/PtY.h?ref_type=heads#L21-23
@@ -2970,6 +2995,18 @@ if (isMG)
                                        "p_{T,jet}/p_{T,gen}",
                                        nxd, vxd, 72, -TMath::Pi(), +TMath::Pi());
       }
+
+      if (doUnfolding)
+        dout->mkdir("MCtruth/Unfolding");
+        dout->cd("MCtruth/Unfolding");
+      {
+        h->hUnf_gen = new TH1D("hUnf_gen", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+        h->hUnf_missNoMatch = new TH1D("hUnf_missNoMatch", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+        h->hUnf_missOut = new TH1D("hUnf_missOut", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+        h->hUnf_fakeNoMatch = new TH1D("hUnf_fakeNoMatch", ";p_{T,jet} (GeV)", nptdU, vptdU);
+        h->hUnf_fakeOut = new TH1D("hUnf_fakeOut", ";p_{T,jet} (GeV)", nptdU, vptdU);
+        h->h2Unf_RM = new TH2D("h2Unf_RM", ";p_{T,gen};p_{T,jet} (GeV);" "N_{events}", nptgendU, vptgendU, nptdU, vptdU);
+      }
       
 
     } // isMC && doMCtruth
@@ -3255,6 +3292,14 @@ if (isMG)
           h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
           h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
         }
+	if (doUnfolding && isMC) {
+	  h->TUrec = new TUnfoldBinning("recIncl_1");
+          h->TUrec->AddAxis("p_{T}",nptdU,vptdU, false, false); //To increase the dimension
+          //h->TUrec->AddAxis("|#eta|",netadU,vetadU, false, false); //To increase the dimension
+          h->hRec = h->TUrec->CreateHistogram("rec", false, 0, "detector level"); 
+          h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
+          h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
+	}
 	
         for (int iy = 0; iy != h->ny; ++iy)
         {
@@ -4144,7 +4189,8 @@ if (isMG)
     //fjv = new TFile("rootfiles/jetveto2024BCD_V3M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCDE.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCDE_V6M.root", "READ");
-    fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
+    //fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
+    fjv = new TFile("rootfiles/jetvetoReReco2024_V9M.root");
   if (TString(dataset.c_str()).Contains("2024F") || //dataset == "2024F_ZB" || 
       TString(dataset.c_str()).Contains("2024G") ||
       TString(dataset.c_str()).Contains("2024H") ||
@@ -4160,7 +4206,8 @@ if (isMG)
       TString(dataset.c_str()).Contains("2025"))
     //fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
-    fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
+    //fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
+    fjv = new TFile("rootfiles/jetvetoReReco2024_V9M.root");
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -4427,9 +4474,9 @@ if (isMG)
       }
       // Separate 2024E reprocessing for 2024Ev1 and 2024Ev2
       //if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run >= 381384) {
-      if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run < 381384) {
-      	continue;
-      }
+      //if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run < 381384) {
+      	//continue;
+      //}
     } // doJSON
 
     
@@ -4663,7 +4710,8 @@ if (isMG)
 
 
     
-    
+    double w_gen = w;
+    double w_reco = 1.; 
     if (isMC && reweightPU && !doPU_per_trigger)
     {
       assert(pileupRatio);
@@ -4729,6 +4777,7 @@ if (isMG)
           else if (!useJERSFvsPt && jersf)
           {
             SF = jersf->getScaleFactor({{JME::Binning::JetEta, jEta}, {JME::Binning::Rho, rho}}, Variation::NOMINAL);
+	    //cout << "JER SF from jersf path" << endl;
           }
           else
           {
@@ -4807,8 +4856,15 @@ if (isMG)
           dR = p4g.DeltaR(p4);
           Jet_genDR[i] = dR;
         }
-        else
+        else {
           p4.SetPtEtaPhiM(0, 0, 0, 0);
+	  if (p4g.Eta() >= 2.0)
+	    continue;
+	  if (p4g.Pt() < 74.0 || p4g.Pt() > 3832.0)
+	    continue;
+	  h->hUnf_gen->Fill(p4g.Pt(), w);
+	  h->hUnf_missNoMatch->Fill(p4g.Pt(), w);
+        }
 
 	if (i<3)
         {
@@ -4825,6 +4881,7 @@ if (isMG)
         bool hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
         bool hasMatchJet = (dR < 0.2 && p4g.Pt() > 0 && p4.Pt() > 0);
 	bool hasMatchJet_dR4 = (dR < 0.4 && p4g.Pt() > 0 && p4.Pt() > 0);
+
         if (hasMatchVtx && hasMatchJet)
         {
           h->h2pteta->Fill(fabs(p4.Eta()), p4g.Pt(), w);
@@ -4837,6 +4894,31 @@ if (isMG)
 	  h->p2r->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
 	  h->p2r_gEta->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w); // p4g.Eta
           h->p2r_raw->Fill(fabs(p4.Eta()), p4g.Pt(), Jet_pt[i] * (1.0 - Jet_rawFactor[i]) / p4g.Pt(), w);
+
+	  // For Unfolding
+	  bool LowGenPt  = p4g.Pt() < 74.0,
+               HighGenPt = p4g.Pt() >= 3832.0,
+               HighGenY  = p4g.Eta() >= 2.0;
+          bool goodGen = (!LowGenPt) && (!HighGenPt) && (!HighGenY);
+
+	  if (goodGen) 
+	    h->hUnf_gen->Fill(p4g.Pt(), w);
+
+	  bool LowRecPt  = p4.Pt() < 74.0,
+               HighRecPt = p4.Pt() >= 3832.0,
+               HighRecY  =  p4.Eta() >= 2.0;
+          bool goodRec = (!LowRecPt) && (!HighRecPt) && (!HighRecY);
+
+          if ( goodRec &&  goodGen) {    
+	    h->h2Unf_RM->Fill(p4g.Pt(), p4.Pt(), w * 1);
+	    h->hUnf_missNoMatch->Fill(p4g.Pt(), w * (1 - 1));
+	  }
+          else if (!goodRec &&  goodGen) 
+	    h->hUnf_missOut->Fill(p4g.Pt() ,w);
+          else if ( goodRec && !goodGen)
+	    h->hUnf_fakeOut->Fill(p4.Pt(), w * 1);
+	  //h->hUnf_fakeNoMatch
+	  //
 	  if(doEtaPhi)
 	  { 
 	    if (p4.Pt() >= 30 && p4.Pt() < 60){
@@ -4924,6 +5006,11 @@ if (isMG)
         bool hasMatchJet = (Jet_genDR[i] < 0.2);
         if (hasMatchVtx)
           h->p2pur->Fill(fabs(Jet_eta[i]), Jet_pt[i], hasMatchJet ? 1 : 0);
+	  if (p4.Eta() >= 2.0)
+            continue;
+          if (p4.Pt() < 74.0 || p4.Pt() > 3832.0)
+            continue;
+	  h->hUnf_fakeNoMatch->Fill(p4.Pt(), 1);
       } // for i
 
     } // isMC && doMCtruth
@@ -5209,7 +5296,7 @@ if (isMG)
             } // dohtp05
 
 	    // Unfolding
-            if (doUnfolding && !isMC)
+	    if (doUnfolding && !isMC) // cov matrix for DATA (2D, pT and eta)
             {
               if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
                   fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax && p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.5)// 1D matrix ->fabs(p4.Eta()) < 2.0)
@@ -5226,17 +5313,28 @@ if (isMG)
 
                 h->hRec->Fill(iRec, w);
                 h->htmp->Fill(iRec, w);
-                /*
-                for (auto x : binIDs) {
-                  for (auto y : binIDs) {
-                    double cCov = unf->h2Cov->GetBinContent(x, y);
-                    double cTmp = unf->htmp->GetBinContent(x) * unf->htmp->GetBinContent(y);
-                    unf->h2Cov->SetBinContent(x, y, cCov + cTmp);
-                  }
-                }
-                */
               } // Event selection
-            } // doUnfolding
+            } // doUnfolding DATA
+
+	    if (doUnfolding && isMC) // cov matrix for MC (1D, pT)
+            {
+              if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
+                  fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax && p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.5)// 1D matrix ->fabs(p4.Eta()) < 2.0)
+              {
+                auto iRec = h->TUrec->GetGlobalBinNumber(p4.Pt());
+
+                // Access binIDs for this trigger
+                auto &binIDs = binIDsMap[itrg];
+
+                if (find(binIDs.begin(), binIDs.end(), iRec) == binIDs.end())
+                {
+                  binIDs.push_back(iRec);
+                }
+
+                h->hRec->Fill(iRec, w);
+                h->htmp->Fill(iRec, w);
+              } // Event selection
+            } // doUnfolding MC
 
           }   // JetID+METfilter
         }     // for itrg
@@ -5295,7 +5393,8 @@ if (isMG)
 
     //Unfolding 
     // After njets
-    if (doUnfolding && !isMC)
+    //if (doUnfolding && !isMC)
+    if (doUnfolding) // to include cov matrix for MC
     {
       for(int itrg = 0; itrg != ntrg; ++itrg)
       {
