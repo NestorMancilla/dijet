@@ -47,7 +47,7 @@ std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = false;
+bool reweightPU = true;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
@@ -138,7 +138,7 @@ constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392542_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392669_DIALS.csv";
-constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392751_DIALS.csv";
+constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_17jun2025_DIALS.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 130> lumifiles = {{
     {"2022C", lumibyls2022C},
@@ -748,54 +748,55 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
+	string JSON_version = "Collisions2025_17jun2025"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392751_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392669_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392542_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392526_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392382_DIALS"; //2025B
 	//string JSON_version = "Collisions2025_391658_392221_DIALS"; //2025B
-	string JSON_version = "Collisions2024_378981_386951_Golden"; // 2024 full year
+	//string JSON_version = "Collisions2024_378981_386951_Golden"; // 2024 full year
 	//string JSON_version = "Collisions2023_366442_370790_Golden";
 	//string JSON_version = "Collisions2022_355100_362760_Golden";
 	//string era_year_path = "luminosityscripts/csvfiles/"
 	// List of filenames
 	vector<string> filenames = {
-		"luminosityscripts/csvfiles/lumi_HLT_ZeroBias_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJet500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
+		"luminosityscripts/csvfiles/2025/lumi_HLT_ZeroBias_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
 	};
 
 	for (size_t idx = 0; idx < vtrg.size(); ++idx) {
@@ -1968,18 +1969,16 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
     TString(dataset.c_str()).Contains("Winter25MC") || TString(dataset.c_str()).Contains("Summer24MC"))
 {
 	jec = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			//"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
-			//"Winter24Run3_V3_MC_L2Relative_AK4PUPPI", // Test for Summer24_V2 format
+			//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
 	//jerpathsf = "";
-	jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi.txt";
-	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024I_JRV7M_MC_SF_AK4PFPuppi.txt";
-	//jersfvspt = getFJC("", "ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "", "");
+	jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
+	jersfvspt = getFJC("", "ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "", "");
 	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
 	//jerpath = "";
-	useJERSFvsPt = false; //Nestor, Sep20, 2024.
+	useJERSFvsPt = true; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
 
            	
 	   if (reweightPU && !doPU_per_trigger)
@@ -2063,7 +2062,7 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 	}
 	else {
 		jec = getFJC("",
-				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 				//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
 				//"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
 				//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
@@ -2073,8 +2072,8 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 				//"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
 		    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
-				//"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024C_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024C_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 }
 
@@ -2090,7 +2089,7 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
         }
 	else {
 	        jec = getFJC("",
-                        "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                         //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
                         //"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
                         //"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V2
@@ -2100,8 +2099,8 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
                         //"Prompt24_Run2024BCD_V4M_DATA_L2L3Residual_AK4PFPuppi");
                         //"Prompt24_Run2024BCD_V5M_DATA_L2L3Residual_AK4PFPuppi");
                         //"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
-                        //"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
-                        "Prompt24_Run2024D_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+                        "Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt24_Run2024D_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 }
 
@@ -2142,7 +2141,7 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
        	else 
 	{
 	        jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024E_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 
@@ -2190,7 +2189,7 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
         } else
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024F_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
 }
@@ -2229,27 +2228,28 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 
 if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || dataset == "2024H_Skim")
 {
-	
+
+	/*	
         jec = getFJC("",
 			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                         //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 			"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
 	
-	/*
         if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_NT"))
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
-	*/
+	
 }
 
 if (TString(dataset.c_str()).Contains("2024I"))
@@ -2272,7 +2272,7 @@ if (TString(dataset.c_str()).Contains("2024I"))
         } else
         {
                 jec = getFJC("",
-                                "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+                                "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
 }
@@ -2745,7 +2745,8 @@ if (isMG)
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392526_DIALS.json");
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392542_DIALS.json");
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392669_DIALS.json");
-      LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392751_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392751_DIALS.json");
+      LoadJSON("rootfiles/2025/Collisions25_13p6TeV_17jun2025.json");
 
   }
   int _nbadevts_json(0);
@@ -3011,29 +3012,6 @@ if (isMG)
 
     } // isMC && doMCtruth
 
-    /*
-    if(isMC && doUnfolding && vtrg[itrg] == "HLT_MC") {
-      if (debug)
-        cout << "Setup MC Unfold" << endl
-             << flush;
-
-      dout->mkdir("MCUnfold");
-      dout->cd("MCUnfold");
-
-      mctruthHistos *h = new mctruthHistos();
-
-      string &t = vtrg[itrg];
-      mhmc[t] = h;
-
-      h->hUnf_gen = new TH1D("hUnf_gen", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
-      h->hUnf_missNoMatch = new TH1D("hUnf_missNoMatch", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
-      h->hUnf_missOut = new TH1D("hUnf_missOut", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
-      h->hUnf_fakeNoMatch = new TH1D("hUnf_fakeNoMatch", ";p_{T,jet} (GeV)", nptdU, vptdU);
-      h->hUnf_fakeOut = new TH1D("hUnf_fakeOut", ";p_{T,jet} (GeV)", nptdU, vptdU);
-      h->hUnf_RM = new TH1D("hUnf_RM", ";p_{T,jet} (GeV)", nptdU, vptdU);
-
-    } // isMC && doUnfolding
-    */
 
     if (do_PUProfiles)
     {
