@@ -4809,11 +4809,13 @@ if (isMG)
       // First, map reco->gen so can quickly invert gen->reco
       // Also reset dR
       map<int, int> genToReco;
+      map<int, bool> recoMatched;
       for (int i = 0; i != njet; ++i)
       {
         if (Jet_genJetIdx[i] >= 0)
         {
           genToReco[Jet_genJetIdx[i]] = i;
+	  recoMatched[i] = false;
         }
         Jet_genDR[i] = 999.;
         h->h2pteta_rec->Fill(fabs(Jet_eta[i]), Jet_pt[i], w);
@@ -4833,15 +4835,6 @@ if (isMG)
           p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
           dR = p4g.DeltaR(p4);
           Jet_genDR[i] = dR;
-        }
-        else {
-          p4.SetPtEtaPhiM(0, 0, 0, 0);
-	  if (p4g.Eta() >= 2.0)
-	    continue;
-	  if (p4g.Pt() < 74.0 || p4g.Pt() > 3832.0)
-	    continue;
-	  h->hUnf_gen->Fill(p4g.Pt(), w);
-	  h->hUnf_missNoMatch->Fill(p4g.Pt(), w);
         }
 
 	if (i<3)
@@ -4895,8 +4888,8 @@ if (isMG)
 	    h->hUnf_missOut->Fill(p4g.Pt() ,w);
           else if ( goodRec && !goodGen)
 	    h->hUnf_fakeOut->Fill(p4.Pt(), w * 1);
-	  //h->hUnf_fakeNoMatch
-	  //
+	  // end match unfolding
+
 	  if(doEtaPhi)
 	  { 
 	    if (p4.Pt() >= 30 && p4.Pt() < 60){
@@ -4910,6 +4903,20 @@ if (isMG)
 	    }
 	  }
         }
+
+        // Not matchet jets (no matched radious or not z selection)
+	else {
+	  bool LowGenPt  = p4g.Pt() < 74.0,
+               HighGenPt = p4g.Pt() >= 3832.0,
+               HighGenY  = p4g.Eta() >= 2.0;
+          bool goodGen = (!LowGenPt) && (!HighGenPt) && (!HighGenY);
+
+          if (goodGen){
+            h->hUnf_gen->Fill(p4g.Pt(), w);
+            h->hUnf_missNoMatch->Fill(p4g.Pt(), w);
+	  }
+        }
+	//
 	
 	h->h2pteta_gEtaNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
 	h->p2r_gEtaNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
@@ -4984,10 +4991,12 @@ if (isMG)
         bool hasMatchJet = (Jet_genDR[i] < 0.2);
         if (hasMatchVtx)
           h->p2pur->Fill(fabs(Jet_eta[i]), Jet_pt[i], hasMatchJet ? 1 : 0);
+	  
 	  if (p4.Eta() >= 2.0)
             continue;
           if (p4.Pt() < 74.0 || p4.Pt() > 3832.0)
             continue;
+	  if (!hasMatchJet)
 	  h->hUnf_fakeNoMatch->Fill(p4.Pt(), 1);
       } // for i
 
