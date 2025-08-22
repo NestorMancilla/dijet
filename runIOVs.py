@@ -58,7 +58,7 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     'Summer24MC_SingleNeutrino',
     'Winter24MGV14_1', 'Winter24MGV14_2', 'Winter24MGV14_3', 'Winter24MGV14_4', 'Winter24MGV14_5', 'Winter24MGV14_OneHTFile',
     'QCDFlatECAL_1Sig', 'QCDFlatECAL_2Sig', 'QCDFlatECAL_3Sig', 'QCDFlatECAL_4Sig', 'QCDFlatECAL_Baseline', 'QCDFlatECAL_Zero',
-    '2025B', '2025B_ZB', '2025C', '2025C_ZB',
+    '2025B', '2025B_ZB', '2025Cv1', '2025Cv1_ZB', '2025Cv2', '2025Cv2_ZB', '2025D', '2025D_ZB',
     'Winter25MG_1', 'Winter25MG_2', 'Winter25MG_3', 'Winter25MG_4', 'Winter25MG_5'
 ]
 
@@ -68,7 +68,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v137'
+version = 'v137_v2'
 #version = 'v120'
 
 IOV_input = []

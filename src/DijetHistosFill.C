@@ -138,9 +138,11 @@ constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392542_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392669_DIALS.csv";
-constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_17jun2025_DIALS.csv";
+//constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_17jun2025_DIALS.csv";
+//constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_Collisions2025_391658_393461_Golden.csv";
+constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_1Aug2025_DIALS.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 130> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 134> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -267,10 +269,14 @@ constexpr std::array<std::pair<const char*, const char*>, 130> lumifiles = {{
     {"2024I_ZB_HCPF5x", lumibyls2024BCDEFG},
     {"2024I_ZB_HCPFSpecial", lumibyls2024BCDEFG},
     {"2024I_ZB_Special", lumibyls2024BCDEFG},
-    {"2025B", lumibyls2025BC},
-    {"2025B_ZB", lumibyls2025BC},
-    {"2025C", lumibyls2025BC},
-    {"2025C_ZB", lumibyls2025BC}
+    {"2025B", lumibyls2025BCD},
+    {"2025B_ZB", lumibyls2025BCD},
+    {"2025Cv1", lumibyls2025BCD},
+    {"2025Cv1_ZB", lumibyls2025BCD},
+    {"2025Cv2", lumibyls2025BCD},
+    {"2025Cv2_ZB", lumibyls2025BCD},
+    {"2025D", lumibyls2025BCD},
+    {"2025D_ZB", lumibyls2025BCD}
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -748,7 +754,9 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
-	string JSON_version = "Collisions2025_17jun2025"; //2025BC
+	string JSON_version = "Collisions25_13p6TeV_391658_395239_DIALS"; // August 1st.
+	//string JSON_version = "Collisions2025_391658_393461_Golden"; //2025BC
+	//string JSON_version = "Collisions2025_17jun2025"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392751_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392669_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392542_DIALS"; //2025BC
@@ -2302,7 +2310,8 @@ if (TString(dataset.c_str()).Contains("Winter25MG"))
            }
 }
 
-if (TString(dataset.c_str()).Contains("2025B") || TString(dataset.c_str()).Contains("2025C"))
+if (TString(dataset.c_str()).Contains("2025B") || TString(dataset.c_str()).Contains("2025C") ||
+    TString(dataset.c_str()).Contains("2025D"))
 {
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2746,7 +2755,9 @@ if (isMG)
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392542_DIALS.json");
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392669_DIALS.json");
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392751_DIALS.json");
-      LoadJSON("rootfiles/2025/Collisions25_13p6TeV_17jun2025.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_17jun2025.json");
+      //LoadJSON("rootfiles/2025/Cert_Collisions2025_391658_393461_Golden.json");
+      LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_395239_DIALS.json");
 
   }
   int _nbadevts_json(0);
@@ -4882,7 +4893,7 @@ if (isMG)
 
           if ( goodRec &&  goodGen) {    
 	    h->h2Unf_RM->Fill(p4g.Pt(), p4.Pt(), w * 1);
-	    h->hUnf_missNoMatch->Fill(p4g.Pt(), w * (1 - 1));
+	    h->hUnf_missNoMatch->Fill(p4g.Pt(), w * (1 - 1)); // w * (1 - 1) -> 0
 	  }
           else if (!goodRec &&  goodGen) 
 	    h->hUnf_missOut->Fill(p4g.Pt() ,w);
@@ -4982,7 +4993,7 @@ if (isMG)
 	  }
 	}
 
-      } // for j
+      } // for j, end of the loop over genjets and also update dr
 
       // Finally check fake rates
       for (int i = 0; i != njet; ++i)
