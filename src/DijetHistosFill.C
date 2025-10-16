@@ -40,14 +40,14 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = true;
+bool smearJets = false;
 bool useJERSFvsPt = false; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
 std::mt19937 _mersennetwister;
 
 // Do PU reweighting and studies
-bool reweightPU = true;
+bool reweightPU = false;
 bool doPU_per_trigger = false;
 bool do_PUProfiles = true;
 
@@ -140,9 +140,13 @@ constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392669_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_17jun2025_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_Collisions2025_391658_393461_Golden.csv";
-constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_1Aug2025_DIALS.csv";
+//constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_1Aug2025_DIALS.csv";
+//constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_396965_DIALS.csv";
+//constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_397106_DIALS.csv";
+constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391668_398088_Hybrid.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 134> lumifiles = {{
+
+constexpr std::array<std::pair<const char*, const char*>, 155> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -276,7 +280,28 @@ constexpr std::array<std::pair<const char*, const char*>, 134> lumifiles = {{
     {"2025Cv2", lumibyls2025BCD},
     {"2025Cv2_ZB", lumibyls2025BCD},
     {"2025D", lumibyls2025BCD},
-    {"2025D_ZB", lumibyls2025BCD}
+    {"2025D_ZB", lumibyls2025BCD},
+    {"2025D_1", lumibyls2025BCD},
+    {"2025D_1_ZB", lumibyls2025BCD},
+    {"2025D_2", lumibyls2025BCD},
+    {"2025D_2_ZB", lumibyls2025BCD},
+    {"2025E", lumibyls2025BCD},
+    {"2025E_ZB", lumibyls2025BCD},
+    {"2025E_1", lumibyls2025BCD},
+    {"2025E_2", lumibyls2025BCD},
+    {"2025F", lumibyls2025BCD},
+    {"2025F_ZB", lumibyls2025BCD},
+    {"2025Fv1_1", lumibyls2025BCD},
+    {"2025Fv1_2", lumibyls2025BCD},
+    {"2025Fv1_ZB", lumibyls2025BCD},
+    {"2025Fv2_1", lumibyls2025BCD},
+    {"2025Fv2_2", lumibyls2025BCD},
+    {"2025Fv2_ZB", lumibyls2025BCD},
+    {"2025G_1", lumibyls2025BCD},
+    {"2025G_2", lumibyls2025BCD},
+    {"2025G_ZB", lumibyls2025BCD},
+    {"2025C_Trk", lumibyls2025BCD},
+    {"2025C_Trk_ZB", lumibyls2025BCD},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -402,7 +427,7 @@ public:
   TH2D *h2pteta_adall, *h2pteta_adsel;
   TH2D *h2pteta_tcall, *h2pteta_tcsel;
   TH2D *h2pteta_pfall, *h2pteta_pfsel;
-  TProfile2D *p2resab, *p2resad, *p2restc, *p2respf; // JEC L2L3Res for undoing
+  TProfile2D *p2resab, *p2resad, *p2restc, *p2respf, *p2res; // JEC L2L3Res for undoing
   TProfile2D *p2m0, *p2m0x, *p2m2, *p2m2x;           // JER MPFX, DBX methods
   TProfile2D *p2m0ab, *p2m2ab, *p2mnab, *p2muab;     // pT,avp (bisector)
   TProfile2D *p2m0ad, *p2m2ad, *p2mnad, *p2muad;     // pT,ave (dijet axis)
@@ -754,7 +779,10 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
-	string JSON_version = "Collisions25_13p6TeV_391658_395239_DIALS"; // August 1st.
+	string JSON_version = "Collisions2025_391668_398088_Hybrid";
+	//string JSON_version = "Collisions2025_391658_397106_DIALS";
+	//string JSON_version = "Collisions2025_391658_396965_DIALS";
+	//string JSON_version = "Collisions25_13p6TeV_391658_395239_DIALS"; // August 1st.
 	//string JSON_version = "Collisions2025_391658_393461_Golden"; //2025BC
 	//string JSON_version = "Collisions2025_17jun2025"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392751_DIALS"; //2025BC
@@ -2290,11 +2318,12 @@ if (TString(dataset.c_str()).Contains("Winter25MG"))
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         "");
-        //jerpathsf = "";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV1M_MC_SF_AK4PFPuppi.txt";
-        jersfvspt = getFJC("", "Prompt25_2025C_JRV1M_MC_SF_AK4PFPuppi", "");
+        jerpathsf = "";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
+        jersfvspt = getFJC("", "Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi", "");
+	//jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
         jerpath = "";
-        useJERSFvsPt = false; 
+        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty 
 
            if (reweightPU && !doPU_per_trigger)
            {
@@ -2310,13 +2339,43 @@ if (TString(dataset.c_str()).Contains("Winter25MG"))
            }
 }
 
-if (TString(dataset.c_str()).Contains("2025B") || TString(dataset.c_str()).Contains("2025C") ||
-    TString(dataset.c_str()).Contains("2025D"))
+if (TString(dataset.c_str()).Contains("2025B"))
 {
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025C_V1M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025C_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	                "Prompt25_Run2025C_V2M_DATA_L2L3Residual_AK4PFPuppi");
+}
+
+if (TString(dataset.c_str()).Contains("2025C")) {
+        jec = getFJC("",
+                        "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "Prompt25_Run2025C_V2M_DATA_L2L3Residual_AK4PFPuppi");
+}
+
+if (TString(dataset.c_str()).Contains("2025D")) {
+        jec = getFJC("",
+                        "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "Prompt25_Run2025D_V2M_DATA_L2L3Residual_AK4PFPuppi");
+}
+
+if (TString(dataset.c_str()).Contains("2025E")) {
+        jec = getFJC("",
+                        "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
+}
+
+if (TString(dataset.c_str()).Contains("2025F")) {
+        jec = getFJC("",
+                        "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
+}
+
+if (TString(dataset.c_str()).Contains("2025G")) {
+        jec = getFJC("",
+                        "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+                        "Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
@@ -2757,7 +2816,10 @@ if (isMG)
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_392751_DIALS.json");
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_17jun2025.json");
       //LoadJSON("rootfiles/2025/Cert_Collisions2025_391658_393461_Golden.json");
-      LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_395239_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_395239_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_396965_DIALS.json");
+      //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_397106_DIALS.json");
+      LoadJSON("rootfiles/2025/CombinedJSON_GoldenRuns_391668to397595_DCSRuns_397596to398088.json");
 
   }
   int _nbadevts_json(0);
@@ -3359,6 +3421,12 @@ if (isMG)
       h->hetatag = new TH1D("hetatag", "",nx, vx);
 
 
+      //
+      h->p2res = new TProfile2D("p2res", ";#eta;p_{T,avp} (GeV);" // L2Res binning
+                                         "JES(probe)/JES(tag)",
+                                nx, vx, nptd, vptd);
+      //
+
       // Counting of events, and JEC L2L3Res for undoing
       h->h2pteta_aball = new TH2D("h2pteta_aball", ";#eta;p_{T,avp} (GeV);"
                                                    "N_{events}",
@@ -3368,17 +3436,17 @@ if (isMG)
                                   nx, vx, npt, vpt);
       h->p2resab = new TProfile2D("p2resab", ";#eta;p_{T,avp} (GeV);"
                                              "JES(probe)/JES(tag)",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
 
       // MPF decomposition for HDM method
       h->p2m0ab = new TProfile2D("p2m0ab", ";#eta;p_{T,avp} (GeV);MPF0",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2m2ab = new TProfile2D("p2m2ab", ";#eta;p_{T,avp} (GeV);MPF2",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2mnab = new TProfile2D("p2mnab", ";#eta;p_{T,avp} (GeV);MPFn",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2muab = new TProfile2D("p2muab", ";#eta;p_{T,avp} (GeV);MPFu",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
 
       // Variants with different binnings and with error on the mean
       h->h2pteta_adall = new TH2D("h2pteta_adall", ";#eta;p_{T,ave} (GeV);"
@@ -3389,17 +3457,17 @@ if (isMG)
                                   nx, vx, npt, vpt);
       h->p2resad = new TProfile2D("p2resad", ";#eta;p_{T,ave} (GeV);"
                                              "JES(probe)/JES(tag)",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
 
       // MPF decomposition for HDM method
       h->p2m0ad = new TProfile2D("p2m0ad", ";#eta;p_{T,ave} (GeV);MPF0",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2m2ad = new TProfile2D("p2m2ad", ";#eta;p_{T,ave} (GeV);MPF2",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2mnad = new TProfile2D("p2mnad", ";#eta;p_{T,ave} (GeV);MPFn",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2muad = new TProfile2D("p2muad", ";#eta;p_{T,ave} (GeV);MPFu",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
 
       h->h2pteta_tcall = new TH2D("h2pteta_tcall", ";#eta;p_{T,ave} (GeV);"
                                                    "N_{events}",
@@ -3407,18 +3475,18 @@ if (isMG)
       h->h2pteta_tcsel = new TH2D("h2pteta_tcsel", ";#eta;p_{T,ave} (GeV);"
                                                    "N_{events}",
                                   nx, vx, npt, vpt);
-      h->p2restc = new TProfile2D("p2restc", ";#eta;p_{T,ave} (GeV);"
+      h->p2restc = new TProfile2D("p2restc", ";#eta;p_{T,ave} (GeV);" //L2Res binning
                                              "JES(probe)/JES(tag)",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
 
-      h->p2m0tc = new TProfile2D("p2m0tc", ";#eta;p_{T,tag} (GeV);MPF0",
-                                 nx, vx, npt, vpt);
+      h->p2m0tc = new TProfile2D("p2m0tc", ";#eta;p_{T,tag} (GeV);MPF0", //L2Res binning
+                                 nx, vx, nptd, vptd);
       h->p2m2tc = new TProfile2D("p2m2tc", ";#eta;p_{T,tag} (GeV);MPF2",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2mntc = new TProfile2D("p2mntc", ";#eta;p_{T,tag} (GeV);MPFn",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2mutc = new TProfile2D("p2mutc", ";#eta;p_{T,tag} (GeV);MPFu",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
 
       h->h2pteta_pfall = new TH2D("h2pteta_pfall", ";#eta;p_{T,ave} (GeV);"
                                                    "N_{events}",
@@ -3426,18 +3494,18 @@ if (isMG)
       h->h2pteta_pfsel = new TH2D("h2pteta_pfsel", ";#eta;p_{T,ave} (GeV);"
                                                    "N_{events}",
                                   nx, vx, npt, vpt);
-      h->p2respf = new TProfile2D("p2respf", ";#eta;p_{T,ave} (GeV);"
+      h->p2respf = new TProfile2D("p2respf", ";#eta;p_{T,ave} (GeV);" //L2Res binning
                                              "JES(probe)/JES(tag)",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
 
-      h->p2m0pf = new TProfile2D("p2m0pf", ";#eta;p_{T,probe} (GeV);MPF0",
-                                 nx, vx, npt, vpt);
+      h->p2m0pf = new TProfile2D("p2m0pf", ";#eta;p_{T,probe} (GeV);MPF0", //L2Res binning
+                                 nx, vx, nptd, vptd);
       h->p2m2pf = new TProfile2D("p2m2pf", ";#eta;p_{T,probe} (GeV);MPF2",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2mnpf = new TProfile2D("p2mnpf", ";#eta;p_{T,probe} (GeV);MPFn",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
       h->p2mupf = new TProfile2D("p2mupf", ";#eta;p_{T,probe} (GeV);MPFu",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
 
       if (doDijetJER)
       {
@@ -3445,18 +3513,18 @@ if (isMG)
         dout->cd("Dijet/JER");
 
         // Basic profiles with RMS as error ("S") for JER studies
-        h->p2m0 = new TProfile2D("p2m0", ";#eta;p_{T,avp} (GeV);"
+        h->p2m0 = new TProfile2D("p2m0", ";#eta;p_{T,avp} (GeV);" //L2Res binning
                                          "MPF0 (MPF)",
-                                 nx, vx, npt, vpt, "S");
-        h->p2m0x = new TProfile2D("p2m0x", ";#eta;p_{T,avp} (GeV);"
+                                 nx, vx, nptd, vptd, "S");
+        h->p2m0x = new TProfile2D("p2m0x", ";#eta;p_{T,avp} (GeV);" //L2Res binning
                                            "MPFX0 (MPFX)",
-                                  nx, vx, npt, vpt, "S");
+                                  nx, vx, nptd, vptd, "S");
         h->p2m2 = new TProfile2D("p2m2", ";#eta;p_{T,avp} (GeV);"
                                          "MPF2 (DB)",
-                                 nx, vx, npt, vpt, "S");
+                                 nx, vx, nptd, vptd, "S");
         h->p2m2x = new TProfile2D("p2m2x", ";#eta;p_{T,avp} (GeV);"
                                            "MPF2 (DBX)",
-                                  nx, vx, npt, vpt, "S");
+                                  nx, vx, nptd, vptd, "S");
       }
 
       if (doPFComposition)
@@ -3467,25 +3535,25 @@ if (isMG)
 
         h->p2pt = new TProfile2D("p2pt", ";#eta;p_{T,avp} (GeV);"
                                          "p_{T,probe}",
-                                 nx, vx, npt, vpt);
+                                 nx, vx, nptd, vptd);
         h->p2rho = new TProfile2D("p2rho", ";#eta;p_{T,avp} (GeV);"
                                            "#rho",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
         h->p2chf = new TProfile2D("p2chf", ";#eta;p_{T,avp} (GeV);"
                                            "CHF",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
         h->p2nhf = new TProfile2D("p2nhf", ";#eta;p_{T,avp} (GeV);"
                                            "NHF",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
         h->p2nef = new TProfile2D("p2nef", ";#eta;p_{T,avp} (GeV);"
                                            "NEF",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
         h->p2cef = new TProfile2D("p2cef", ";#eta;p_{T,avp} (GeV);"
                                            "CEF",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
         h->p2muf = new TProfile2D("p2muf", ";#eta;p_{T,avp} (GeV);"
                                            "MUF",
-                                  nx, vx, npt, vpt);
+                                  nx, vx, nptd, vptd);
 
         h->ppt13 = new TProfile("ppt13", ";#eta;p_{T,avp} (GeV);"
                                          "p_{T,tag}",
@@ -4186,17 +4254,19 @@ if (isMG)
       TString(dataset.c_str()).Contains("2024I") ||
       //dataset == "2024G_ZB" || 
       TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") ||
-      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25") ||
+      TString(dataset.c_str()).Contains("QCDFlatECAL") || //TString(dataset.c_str()).Contains("Winter25") ||
       TString(dataset.c_str()).Contains("Summer24MC") ||
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" ||
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
-      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim" ||
-      TString(dataset.c_str()).Contains("2025"))
+      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim") // ||
+      //TString(dataset.c_str()).Contains("2025"))
     //fjv = new TFile("rootfiles/jetveto2024F.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
     fjv = new TFile("rootfiles/jetvetoReReco2024_V9M.root");
+  if (TString(dataset.c_str()).Contains("2025") || TString(dataset.c_str()).Contains("Winter25"))
+    fjv = new TFile("rootfiles/jetveto2025CDE_V2M.root");
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -4263,7 +4333,7 @@ if (isMG)
       //dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || 
       TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG") ||
-      TString(dataset.c_str()).Contains("QCDFlatECAL") || TString(dataset.c_str()).Contains("Winter25") ||
+      TString(dataset.c_str()).Contains("QCDFlatECAL") || //TString(dataset.c_str()).Contains("Winter25") ||
       TString(dataset.c_str()).Contains("Summer24MC"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   if (TString(dataset.c_str()).Contains("2024F") || //dataset == "2024F_ZB" || 
@@ -4273,8 +4343,10 @@ if (isMG)
       //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" || 
       //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
       //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
-      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim" ||
-      TString(dataset.c_str()).Contains("2025"))
+      dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim") // ||
+      //TString(dataset.c_str()).Contains("2025"))
+    h2jv = (TH2D *)fjv->Get("jetvetomap_all");
+  if (TString(dataset.c_str()).Contains("2025") || TString(dataset.c_str()).Contains("Winter25"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
@@ -4847,12 +4919,14 @@ if (isMG)
           dR = p4g.DeltaR(p4);
           Jet_genDR[i] = dR;
         }
+        else
+          p4.SetPtEtaPhiM(0, 0, 0, 0);
 
 	if (i<3)
         {
           h->ptreco_ptgen->Fill(p4.Pt()/p4g.Pt(), w);
 	  h->h2res_ptgen->Fill(p4g.Pt(), p4.Pt()/p4g.Pt(), w);
-	  h->h2_btagUpar->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
+	  h->h2_btagUpar->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w); //Update tagger
 	  h->h2res_etagen->Fill(p4g.Eta(), p4.Pt()/p4g.Pt(), w);
 	  h->h3res->Fill(p4g.Eta(), p4g.Pt(), p4.Pt()/p4g.Pt(), w);
 	  h->p2r_NoMatch->Fill(fabs(p4.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
@@ -4931,12 +5005,10 @@ if (isMG)
 	
 	h->h2pteta_gEtaNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
 	h->p2r_gEtaNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
-	
-
         h->p2effz->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchVtx ? 1 : 0, w);
+
         if (hasMatchVtx){
           h->p2eff->Fill(fabs(p4g.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w);
-          //h->p2eff_recEta->Fill(fabs(p4.Eta()), p4g.Pt(), hasMatchJet ? 1 : 0, w); // p4.Eta
           h->p2eff_recEta->Fill(fabs(hasMatchJet_dR4 ? p4.Eta() : p4g.Eta()), p4g.Pt(), hasMatchJet_dR4 ? 1 : 0, w);
 	}
 
@@ -5003,6 +5075,7 @@ if (isMG)
         if (hasMatchVtx)
           h->p2pur->Fill(fabs(Jet_eta[i]), Jet_pt[i], hasMatchJet ? 1 : 0);
 	  
+	  //Unfolding
 	  if (p4.Eta() >= 2.0)
             continue;
           if (p4.Pt() < 74.0 || p4.Pt() > 3832.0)
@@ -5744,7 +5817,7 @@ if (isMG)
             dijetHistos *h = mhdj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
 
-
+	    h->p2res->Fill(eta, ptavp2, res, w);
 
 	    h->h2pteta_aball->Fill(eta, ptavp2, w);
             h->h2pteta_adall->Fill(eta, ptave, w);

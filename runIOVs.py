@@ -58,7 +58,10 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     'Summer24MC_SingleNeutrino',
     'Winter24MGV14_1', 'Winter24MGV14_2', 'Winter24MGV14_3', 'Winter24MGV14_4', 'Winter24MGV14_5', 'Winter24MGV14_OneHTFile',
     'QCDFlatECAL_1Sig', 'QCDFlatECAL_2Sig', 'QCDFlatECAL_3Sig', 'QCDFlatECAL_4Sig', 'QCDFlatECAL_Baseline', 'QCDFlatECAL_Zero',
-    '2025B', '2025B_ZB', '2025Cv1', '2025Cv1_ZB', '2025Cv2', '2025Cv2_ZB', '2025D', '2025D_ZB',
+    '2025B', '2025B_ZB', '2025Cv1', '2025Cv1_ZB', '2025Cv2', '2025Cv2_ZB', '2025D', '2025D_ZB', '2025E', '2025E_ZB', '2025F', '2025F_ZB',
+    '2025D_1', '2025D_1_ZB', '2025D_2', '2025D_2_ZB', '2025E_1', '2025E_2', '2025Fv1_1', '2025Fv1_2', '2025Fv1_ZB', '2025Fv2_1', '2025Fv2_2', '2025Fv2_ZB',
+    '2025G_1', '2025G_2', '2025G_ZB',
+    '2025C_Trk', '2025C_Trk_ZB',
     'Winter25MG_1', 'Winter25MG_2', 'Winter25MG_3', 'Winter25MG_4', 'Winter25MG_5'
 ]
 
@@ -68,7 +71,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v137_v2'
+version = 'v147'
 #version = 'v120'
 
 IOV_input = []
@@ -129,8 +132,12 @@ for iov in IOV_input:
     # os.system(f"ls -ltrh rootfiles/jmenano_data_out_{iov}_{version}.root")
     # os.system(f"ls -ltrh logs/log_{iov}_{version}.txt")
     #os.system(f"nohup root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
-    os.system(f"nohup time root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
     print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
+    #os.system(f"root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > /afs/cern.ch/user/n/nmancill/Helsinki/dijet/logs/{version}/log_{iov}_{version}.txt")
+    os.system(f"root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})'")
+    #print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
+    #os.system(f"nohup time root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
+    #print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
 
 #    os.system("fs flush")
 #    wait()

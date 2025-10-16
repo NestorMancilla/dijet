@@ -139,7 +139,10 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
   "2024F_ECAL2_1", "2024F_ECAL2_2", "2024F_ECAL2_3", "2024F_ECAL2_4",
   "2024I_ZB_HCPF1x", "2024I_ZB_HCPF2x", "2024I_ZB_HCPF3x", "2024I_ZB_HCPF4x", "2024I_ZB_HCPF5x", "2024I_ZB_HCPFSpecial", "2024I_ZB_Special",
-  "2024_skim", "2025B", "2025B_ZB", "2025C", "2025C_ZB"
+  "2024_skim", "2025B", "2025B_ZB", "2025Cv1", "2025Cv1_ZB", "2025Cv2", "2025Cv2_ZB", "2025D", "2025D_ZB", "2025E", "2025E_ZB", "2025F", "2025F_ZB",
+  "2025D_1", "2025D_1_ZB", "2025D_2", "2025D_2_ZB", "2025E_1", "2025E_2", "2025Fv1_1", "2025Fv1_2", "2025Fv1_ZB", "2025Fv2_1", "2025Fv2_2", "2025Fv2_ZB",
+  "2025G_1", "2025G_2", "2025G_ZB",
+  "2025C_Trk", "2025C_Trk_ZB"
   };
 
   // Check if dataset is supported
@@ -206,14 +209,15 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   if (!runLocal) assert(runGPU);
   
   if (addData) {
-    ifstream fin(runLocal ? Form("input_files/dataFiles_local_%s.txt",dataset.c_str()) : 
-		 Form("input_files/dataFiles_%s.txt",dataset.c_str()), ios::in);
+    ifstream fin(runLocal ? Form("input_files_lxplus/dataFiles_local_%s.txt",dataset.c_str()) : 
+		 Form("input_files_lxplus/dataFiles_%s.txt",dataset.c_str()), ios::in);
     string filename;
     cout << "Chaining data files:" << endl << flush;
     int nFiles(0);
     while (fin >> filename && nFiles<nFilesMax) {
       ++nFiles;
-      c->AddFile(filename.c_str());
+      c->AddFile(("root://cms-xrd-global.cern.ch/"+filename).c_str());
+      //c->AddFile(filename.c_str());
     }
     cout << "Chained " << nFiles <<  " files" << endl << flush;
 
@@ -226,14 +230,15 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   }
   
   if (addMC) {
-    ifstream fin(runLocal ? Form("input_files/mcFiles_local_%s.txt",dataset.c_str()) :
-		 Form("input_files/mcFiles_%s.txt",dataset.c_str()), ios::in);
+    ifstream fin(runLocal ? Form("input_files_lxplus/mcFiles_local_%s.txt",dataset.c_str()) :
+		 Form("input_files_lxplus/mcFiles_%s.txt",dataset.c_str()), ios::in);
     string filename;
     cout << "Chaining MC files:" << endl << flush;
     int nFiles(0);
     while (fin >> filename && nFiles<nFilesMax) {
       ++nFiles;
-      c->AddFile(filename.c_str());
+      c->AddFile(("root://cms-xrd-global.cern.ch/"+filename).c_str());
+      //c->AddFile(filename.c_str());
     }
     cout << "Chained " << nFiles <<  " files" << endl << flush;
 
