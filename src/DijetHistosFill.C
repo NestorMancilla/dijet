@@ -12,6 +12,7 @@
 #include "TH3D.h"
 #include "TProfile.h"
 #include "TProfile2D.h"
+#include "TProfile3D.h"
 #include "TStopwatch.h"
 
 #include <vector>
@@ -58,7 +59,7 @@ bool doUnfolding = true;
 bool doQvsG = true;
 bool doIncjet = true;   // inclusive jets
 bool doDijet = true;    // dijet selection
-bool doGluonJets = false; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
+bool doGluonJets = true; //  MPF/DB calculations for dijet using Jet_btagPNetQvG per workingpoint
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
 bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
@@ -131,9 +132,11 @@ constexpr const char lumibyls2023C123[] = "luminosityscripts/csvfiles/lumibyls20
 constexpr const char lumibyls2023ABC[] = "luminosityscripts/csvfiles/lumibyls2023ABC.csv";
 constexpr const char lumibyls2023D[] = "luminosityscripts/csvfiles/lumibyls2023D.csv";
 constexpr const char lumibyls2023BCD[] = "luminosityscripts/csvfiles/lumibyls2023_366442_370790_Golden.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumibyls2024_378981_386951_Golden.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/lumibyls2024_378981_386951_Golden.csv";
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias.csv";
 //constexpr const char lumibyls2025B[] = "luminosityscripts/csvfiles/2025/lumi_391658_392221_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392382_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
@@ -154,7 +157,7 @@ constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_3
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTZeroBias.csv";
 
 
-constexpr std::array<std::pair<const char*, const char*>, 175> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 206> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -235,8 +238,36 @@ constexpr std::array<std::pair<const char*, const char*>, 175> lumifiles = {{
     {"2024Iv2_ZB", lumibyls2024BCDEFG},
     {"2024F_TeVJet", lumibyls2024BCDEFG},
     {"2024F_JetHT", lumibyls2024BCDEFG},
-    {"2024H_Skim", lumibyls2024BCDEFG},
-    {"2024I_Skim", lumibyls2024BCDEFG},
+    {"2024C_Rp_Skim_0", lumibyls2024BCDEFG}, // here skim 2024
+    {"2024C_Rp_Skim_1", lumibyls2024BCDEFG},
+    {"2024C_Rp_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024D_Rp_Skim_0", lumibyls2024BCDEFG},
+    {"2024D_Rp_Skim_1", lumibyls2024BCDEFG},
+    {"2024D_Rp_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024E_Rp_Skim_0", lumibyls2024BCDEFG},
+    {"2024E_Rp_Skim_1", lumibyls2024BCDEFG},
+    {"2024E_Rp_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024F_nib1_Skim_0", lumibyls2024BCDEFG},
+    {"2024F_nib1_Skim_1", lumibyls2024BCDEFG},
+    {"2024F_nib1_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024F_nib2_Skim_0", lumibyls2024BCDEFG},
+    {"2024F_nib2_Skim_1", lumibyls2024BCDEFG},
+    {"2024F_nib2_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024F_nib3_Skim_0", lumibyls2024BCDEFG},
+    {"2024F_nib3_Skim_1", lumibyls2024BCDEFG},
+    {"2024F_nib3_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024G_nib1_Skim_0", lumibyls2024BCDEFG},
+    {"2024G_nib1_Skim_1", lumibyls2024BCDEFG},
+    {"2024G_nib1_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024G_nib2_Skim_0", lumibyls2024BCDEFG},
+    {"2024G_nib2_Skim_1", lumibyls2024BCDEFG},
+    {"2024G_nib2_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024H_Skim_0", lumibyls2024BCDEFG},
+    {"2024H_Skim_1", lumibyls2024BCDEFG},
+    {"2024H_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024I_Skim_0", lumibyls2024BCDEFG},
+    {"2024I_Skim_1", lumibyls2024BCDEFG},
+    {"2024I_Skim_ZB", lumibyls2024BCDEFG},
     {"2024F_ECAL_CC_1", lumibyls2024BCDEFG},
     {"2024F_ECAL_CC_2", lumibyls2024BCDEFG},
     {"2024F_ECAL_CC_3", lumibyls2024BCDEFG},
@@ -285,6 +316,9 @@ constexpr std::array<std::pair<const char*, const char*>, 175> lumifiles = {{
     {"2025B_ZB", lumibyls2025BCD},
     {"2025Cv1", lumibyls2025BCD},
     {"2025Cv1_ZB", lumibyls2025BCD},
+    {"2025Cv1_Skim_1", lumibyls2025BCD},
+    {"2025Cv1_Skim_2", lumibyls2025BCD},
+    {"2025Cv1_Skim_ZB", lumibyls2025BCD},
     {"2025Cv2", lumibyls2025BCD},
     {"2025Cv2_ZB", lumibyls2025BCD},
     {"2025D", lumibyls2025BCD},
@@ -364,6 +398,7 @@ std::map<std::string, struct range> md2pf;
 std::map<std::string, struct range> mj;
 
 std::map<int, std::vector<int>> binIDsMap;
+std::map<int, std::vector<int>> binIDsMap_v2;
 
 // CLASS DEFINITIONS
 class mctruthHistos
@@ -371,6 +406,7 @@ class mctruthHistos
 public:
   TH1D *ptreco_ptgen, *hpt_gen, *hpt_reco; //, *h1res_bar;
   TH1D *ptreco_ptgen_Athens, *hpt_gen_Athens, *hpt_reco_Athens; // LeadinJet folder
+  // The next histograms were moved to the incjet directory to match the selection.
   TH1D *hUnf_gen, *hUnf_missNoMatch, *hUnf_missOut, *hUnf_fakeNoMatch, *hUnf_fakeOut; // For MCUnfold
   TH2D *h2Unf_RM; // For MCUnfold
   // UParT studies
@@ -455,6 +491,11 @@ public:
   TUnfoldBinning *TUrec;
   TH2 *h2Cov;
   TH1 *hRec, *htmp;
+  TH1D *hRec_v2, *htmp_v2;
+  TH2D *h2cov_v2;
+  //
+  //TH1D *hUnf_gen, *hUnf_missNoMatch, *hUnf_missOut, *hUnf_fakeNoMatch, *hUnf_fakeOut; // For MCUnfold
+  //TH2D *h2Unf_RM; // For MCUnfold
 };
 
 class dijetHistos
@@ -471,12 +512,24 @@ public:
   TH2D *h2pteta_adall, *h2pteta_adsel;
   TH2D *h2pteta_tcall, *h2pteta_tcsel;
   TH2D *h2pteta_pfall, *h2pteta_pfsel;
+  TH3D *h3ptetanhftc;
   TProfile2D *p2resab, *p2resad, *p2restc, *p2respf, *p2res; // JEC L2L3Res for undoing
   TProfile2D *p2m0, *p2m0x, *p2m2, *p2m2x;           // JER MPFX, DBX methods
   TProfile2D *p2m0ab, *p2m2ab, *p2mnab, *p2muab;     // pT,avp (bisector)
   TProfile2D *p2m0ad, *p2m2ad, *p2mnad, *p2muad;     // pT,ave (dijet axis)
   TProfile2D *p2m0tc, *p2m2tc, *p2mntc, *p2mutc;     // pT,tag (central)
   TProfile2D *p2m0pf, *p2m2pf, *p2mnpf, *p2mupf;     // pt,probe (forward)
+  TProfile3D *p3m0nhftc, *p3m2nhftc;
+
+  //  |eta|<1.3; EC1: 1.3<|eta|<2.5; EC2: 2.5<|eta|<3.0; HF: |eta|>3
+  TProfile2D *p2m0ab_mu_13, *p2m0ab_rho_13, *p2m0ab_NPV_13; // pt_avp (bisector)
+  TProfile2D *p2m0ab_mu_25, *p2m0ab_rho_25, *p2m0ab_NPV_25; // pt_avp (bisector)
+  TProfile2D *p2m0ab_mu_3, *p2m0ab_rho_3, *p2m0ab_NPV_3; // pt_avp (bisector)
+  TProfile2D *p2m0ab_mu_3plus, *p2m0ab_rho_3plus, *p2m0ab_NPV_3plus; // pt_avp (bisector)
+  //TProfile3D *p3m0ad_mu, *p3m0ad_rho, *p3m0ad_NPV; // pT,ave (dijet axis)
+  //TProfile2D *p2m0ad_mu, *p2m0ad_rho, *p2m0ad_NPV;
+  //TProfile2D *p2m0tc_mu, *p2m0tc_rho, *p2m0tc_NPV;
+  //TProfile2D *p2m0pf_mu; *p2m0pf_rho, *p2m0pf_NPV;
 
   // (Optional) composition plots
   TProfile2D *p2pt, *p2rho, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;      // probe,avp
@@ -491,23 +544,38 @@ public:
   int trgpt;
   double ptmin, ptmax, absetamin, absetamax;
 
-  TProfile2D *p2m0_t, *p2m0x_t, *p2m2_t, *p2m2x_t;           // JER MPFX, DBX methods
-  TProfile2D *p2m0ab_t, *p2m2ab_t, *p2mnab_t, *p2muab_t;     // pT,avp (bisector)
-  TProfile2D *p2m0ad_t, *p2m2ad_t, *p2mnad_t, *p2muad_t;     // pT,ave (dijet axis)
-  TProfile2D *p2m0tc_t, *p2m2tc_t, *p2mntc_t, *p2mutc_t;     // pT,tag (central)
-  TProfile2D *p2m0pf_t, *p2m2pf_t, *p2mnpf_t, *p2mupf_t;     // pt,probe (forward)
+  //both tag and probe quarks
+  TProfile2D *p2m0_qq, *p2m0x_qq, *p2m2_qq, *p2m2x_qq;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_qq, *p2m2ab_qq, *p2mnab_qq, *p2muab_qq;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_qq, *p2m2ad_qq, *p2mnad_qq, *p2muad_qq;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_qq, *p2m2tc_qq, *p2mntc_qq, *p2mutc_qq;     // pT,tag (central)
+  TProfile2D *p2m0pf_qq, *p2m2pf_qq, *p2mnpf_qq, *p2mupf_qq;     // pt,probe (forward)
 
-  TProfile2D *p2m0_m, *p2m0x_m, *p2m2_m, *p2m2x_m;           // JER MPFX, DBX methods
-  TProfile2D *p2m0ab_m, *p2m2ab_m, *p2mnab_m, *p2muab_m;     // pT,avp (bisector)
-  TProfile2D *p2m0ad_m, *p2m2ad_m, *p2mnad_m, *p2muad_m;     // pT,ave (dijet axis)
-  TProfile2D *p2m0tc_m, *p2m2tc_m, *p2mntc_m, *p2mutc_m;     // pT,tag (central)
-  TProfile2D *p2m0pf_m, *p2m2pf_m, *p2mnpf_m, *p2mupf_m; 
+  //tag quark and probe gluon
+  TProfile2D *p2m0_qg, *p2m0x_qg, *p2m2_qg, *p2m2x_qg;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_qg, *p2m2ab_qg, *p2mnab_qg, *p2muab_qg;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_qg, *p2m2ad_qg, *p2mnad_qg, *p2muad_qg;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_qg, *p2m2tc_qg, *p2mntc_qg, *p2mutc_qg;     // pT,tag (central)
+  TProfile2D *p2m0pf_qg, *p2m2pf_qg, *p2mnpf_qg, *p2mupf_qg; 
 
-  TProfile2D *p2m0_l, *p2m0x_l, *p2m2_l, *p2m2x_l;           // JER MPFX, DBX methods
-  TProfile2D *p2m0ab_l, *p2m2ab_l, *p2mnab_l, *p2muab_l;     // pT,avp (bisector)
-  TProfile2D *p2m0ad_l, *p2m2ad_l, *p2mnad_l, *p2muad_l;     // pT,ave (dijet axis)
-  TProfile2D *p2m0tc_l, *p2m2tc_l, *p2mntc_l, *p2mutc_l;     // pT,tag (central)
-  TProfile2D *p2m0pf_l, *p2m2pf_l, *p2mnpf_l, *p2mupf_l; 
+  //both tag and probe gluons
+  TProfile2D *p2m0_gg, *p2m0x_gg, *p2m2_gg, *p2m2x_gg;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_gg, *p2m2ab_gg, *p2mnab_gg, *p2muab_gg;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_gg, *p2m2ad_gg, *p2mnad_gg, *p2muad_gg;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_gg, *p2m2tc_gg, *p2mntc_gg, *p2mutc_gg;     // pT,tag (central)
+  TProfile2D *p2m0pf_gg, *p2m2pf_gg, *p2mnpf_gg, *p2mupf_gg; 
+  
+  //tag gluon and probe quark
+  TProfile2D *p2m0_gq, *p2m0x_gq, *p2m2_gq, *p2m2x_gq;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_gq, *p2m2ab_gq, *p2mnab_gq, *p2muab_gq;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_gq, *p2m2ad_gq, *p2mnad_gq, *p2muad_gq;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_gq, *p2m2tc_gq, *p2mntc_gq, *p2mutc_gq;     // pT,tag (central)
+  TProfile2D *p2m0pf_gq, *p2m2pf_gq, *p2mnpf_gq, *p2mupf_gq;
+
+  TH1D *h_tagprobeab_qq, *h_tagprobeab_qg, *h_tagprobeab_gq, *h_tagprobeab_gg;
+  TH1D *h_tagprobead_qq, *h_tagprobead_qg, *h_tagprobead_gq, *h_tagprobead_gg;
+  TH1D *h_tagprobetc_qq, *h_tagprobetc_qg, *h_tagprobetc_gq, *h_tagprobetc_gg;
+  TH1D *h_tagprobepf_qq, *h_tagprobepf_qg, *h_tagprobepf_gq, *h_tagprobepf_gg;
 
 };
 
@@ -522,7 +590,8 @@ public:
   TH2D *h2pteta;
   TProfile2D *p2res, *p2m0, *p2m2, *p2mn, *p2mu;
   TProfile2D *p2m0x, *p2m2x;
-  TH3D *h3m0, *h3m2;
+  TH3D *h3m0, *h3m2, *h3ptetanhftc;
+  TProfile3D *p3m0nhftc, *p3m2nhftc;
 
   // Extra for FSR studies
   TProfile2D *p2mnu, *p2mnx, *p2mux, *p2mnux;
@@ -825,7 +894,7 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
-	string JSON_version = "Collisions2025_391658_398860_Golden";
+	string JSON_version = "Collisions2025_391658_398860_Golden"; // 2025 full year
 	//string JSON_version = "Collisions2025_391658_398903_daily_dials";
 	//string JSON_version = "Collisions2025_391658_398860_daily_dials";
 	//string JSON_version = "Collisions2025_391668_398395_Hybrid";
@@ -975,9 +1044,9 @@ bool DijetHistosFill::LoadLumi()
 	} else if (lumifile_str.Contains("2022")) {
                 expectedTag = "#Data tag : 23v1 , Norm tag: None";
                 expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source";
-	} else if (lumifile_str.Contains("lumibyls2024_378981_386951_Golden")) {
-		expectedTag = "#Data tag : online , Norm tag: None";
-                expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
+	//} else if (lumifile_str.Contains("lumibyls2024_378981_386951_Golden")) {
+	//	expectedTag = "#Data tag : online , Norm tag: None";
+          //      expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
 	} else if (lumifile_str.Contains("lumibyls2023_366442_370790_Golden")) {
 		expectedTag = "#Data tag : 24v2 , Norm tag: None";
                 expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
@@ -989,10 +1058,14 @@ bool DijetHistosFill::LoadLumi()
 		expectedTag = "#Data tag : online , Norm tag: None";
 		expectedHeader = "#run:fill,ls,time,beamstatus,E(GeV),delivered(/fb),recorded(/fb),avgpu,source";
 	*/
-	} else if (lumifile_str.Contains("HLT")) {
-		expectedTag = "#Data tag : online , Norm tag: None";
+	} else if (lumifile_str.Contains("lumi_378981_386951_Golden")) {
+		expectedTag = "#Data tag : 24v2 , Norm tag: None";
 		expectedHeader = "#run:fill,ls,time,hltpath,delivered(/fb),recorded(/fb),avgpu,source";
 	
+	} else if (lumifile_str.Contains("HLT")) {
+                expectedTag = "#Data tag : online , Norm tag: None";
+                expectedHeader = "#run:fill,ls,time,hltpath,delivered(/fb),recorded(/fb),avgpu,source";
+
 	} else if (lumifile_str.Contains("2025")){
 		expectedTag = "#Data tag : online , Norm tag: None";
 	        expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
@@ -1363,6 +1436,9 @@ void DijetHistosFill::Loop()
 
 	// Listing of available triggers
 	vector<string> vtrg = {
+		//"HLT_ZeroBias",
+		//"HLT_ZeroBias_FirstCollisionInTrain",
+		//"HLT_ZeroBias_LastCollisionInTrain",
 		"HLT_PFJet40",
 		"HLT_PFJet60",
 		"HLT_PFJet80",
@@ -1401,6 +1477,8 @@ void DijetHistosFill::Loop()
 
 	if (isZB)
 		vtrg.insert(vtrg.begin(), "HLT_ZeroBias");
+		//vtrg.insert(vtrg.begin(), "HLT_ZeroBias_FirstCollisionInTrain");
+		//vtrg.insert(vtrg.begin(), "HLT_ZeroBias_LastCollisionInTrain");
 
 	if (isRun2 > 2)
 		vtrg.push_back("HLT_PFJet550");
@@ -1430,13 +1508,23 @@ if (doMCtrigOnly && isMC) //Set doMCtrigOnly = true and comment vtrg.clear(); to
 	vtrg.push_back("HLT_MC");
 }
 
+if (doMCtrigOnly && isMC && TString(dataset.c_str()).Contains("SingleNeutrino"))
+{
+  vtrg.push_back("HLT_ZeroBias");
+}
+
+
 if (isZB && !isMC)
 {
 	vtrg.clear(); // no jet triggers from ZeroBias PD
 	vtrg.push_back("HLT_ZeroBias");
+	//vtrg.push_back("HLT_ZeroBias_FirstCollisionInTrain");
+	//vtrg.push_back("HLT_ZeroBias_LastCollisionInTrain");
 }
 
+
 int ntrg = vtrg.size();
+
 
 for (int i = 0; i != ntrg; ++i)
 {
@@ -1450,9 +1538,83 @@ for (int i = 0; i != ntrg; ++i)
 	assert(mtrg[vtrg[i]] != 0);
 }
 
+
+/*
+std::vector<std::string> clean;
+
+for (const auto& trg : vtrg)
+{
+    auto it = mtrg.find(trg);
+
+    if (it == mtrg.end())
+    {
+        std::cerr << "Removing trigger (not in map): " << trg << std::endl;
+        continue;
+    }
+
+    if (it->second == nullptr)
+    {
+        std::cerr << "Removing trigger (null pointer): " << trg << std::endl;
+        continue;
+    }
+
+    clean.push_back(trg);
+}
+
+vtrg.swap(clean);
+ntrg = vtrg.size();
+
+std::cerr << "Active triggers after cleanup: " << ntrg << std::endl;
+
+
+for (int i = 0; i != ntrg; ++i)
+{
+    const std::string& trg = vtrg[i];
+
+    if (trg != "HLT_MC")
+        fChain->SetBranchStatus(trg.c_str(), 1);
+
+    auto it = mtrg.find(trg);
+
+    if (it == mtrg.end())
+    {
+        std::cerr
+            << "ERROR: trigger key missing from map\n"
+            << "  trigger: " << trg << "\n"
+            << "  file: " << fChain->GetCurrentFile()->GetName() << "\n"
+            << "  run: " << run
+            << "  lumi: " << luminosityBlock
+            << "  event: " << event
+            << "\n";
+
+        TBranch* br = fChain->GetBranch(trg.c_str());
+        std::cerr << "  branch exists in tree? "
+                  << (br ? "YES" : "NO") << "\n";
+
+        continue;
+    }
+
+    if (it->second == nullptr)
+    {
+        std::cerr
+            << "ERROR: trigger pointer is null\n"
+            << "  trigger: " << trg << "\n"
+            << "  file: " << fChain->GetCurrentFile()->GetName() << "\n"
+            << "  run: " << run
+            << "  lumi: " << luminosityBlock
+            << "  event: " << event
+            << "\n";
+        continue;
+    }
+}
+*/
+
+
 fChain->SetBranchStatus("nJet", 1);
 fChain->SetBranchStatus("Jet_btagPNetQvG", 1);
 fChain->SetBranchStatus("Jet_btagUParTAK4QvG", 1);
+fChain->SetBranchStatus("Jet_btagUParTAK4B", 1);
+fChain->SetBranchStatus("Jet_btagUParTAK4CvL", 1);
 fChain->SetBranchStatus("Jet_pt", 1);
 fChain->SetBranchStatus("Jet_eta", 1);
 fChain->SetBranchStatus("Jet_phi", 1);
@@ -1530,6 +1692,8 @@ if (doTriggerMatch)
 //mt["HLT_MC"] = range{10, 3000, 0, 5.2};
 mt["HLT_MC"] = range{0, 3000, 0, 5.2}; // Low pT winter25 studies
 mt["HLT_ZeroBias"] = range{10, 3000, 0, 5.2};
+//mt["HLT_ZeroBias_FirstCollisionInTrain"] = range{10, 3000, 0, 5.2};
+//mt["HLT_ZeroBias_LastCollisionInTrain"] = range{10, 3000, 0, 5.2};
 
 mt["HLT_DiPFJetAve40"] = range{40, 85, 0, 5.2};
 mt["HLT_DiPFJetAve60"] = range{85, 100, 0, 5.2};
@@ -1584,6 +1748,8 @@ mt["HLT_PFJetFwd500"] = range{600, 6500, fwdeta0, 5.2};
 
 // For jetrate vs runs
 mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
+//mi["HLT_ZeroBias_FirstCollisionInTrain"] = range{10,  49,  0, 5.2};
+//mi["HLT_ZeroBias_LastCollisionInTrain"] = range{10,  49,  0, 5.2};
 //mi["HLT_MC"]       = range{15,6500,  0, 5.2};
 mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
 mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
@@ -1613,6 +1779,8 @@ mi["HLT_PFJetFwd500"] = range{686,6500, fwdeta0, 5.2}; // 18
 // Triggers from the DijetHistosCombine.C 
 // dijet 
 md["HLT_ZeroBias"]      = range{15,  40,  0, 5.2};
+//md["HLT_ZeroBias_FirstCollisionInTrain"]      = range{15,  40,  0, 5.2};
+//md["HLT_ZeroBias_LastCollisionInTrain"]      = range{15,  40,  0, 5.2};
 md["HLT_DiPFJetAve40"]  = range{40,  85,  0, 5.2};
 md["HLT_DiPFJetAve60"]  = range{85,  100, 0, fwdeta};
 md["HLT_DiPFJetAve80"]  = range{100, 155, 0, fwdeta};
@@ -1632,6 +1800,8 @@ md["HLT_DiPFJetAve300_HFJEC"] = range{350,3000, fwdeta0, 5.2};
 
 // dijet2
 md2["HLT_ZeroBias"]      = range{15,  59,  0, 5.2};
+//md2["HLT_ZeroBias_FirstCollisionInTrain"]      = range{15,  59,  0, 5.2};
+//md2["HLT_ZeroBias_LastCollisionInTrain"]      = range{15,  59,  0, 5.2};
 md2["HLT_DiPFJetAve40"]  = range{59,  86,  0, 5.2};
 md2["HLT_DiPFJetAve60"]  = range{86,  110, 0, fwdetad};
 md2["HLT_DiPFJetAve80"]  = range{110, 170, 0, fwdetad};
@@ -1651,6 +1821,8 @@ md2["HLT_DiPFJetAve300_HFJEC"] = range{373,3000, fwdetad, 5.2};
 
 // dijet2 -> probe binning
 md2pf["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
+//md2pf["HLT_ZeroBias_FirstCollisionInTrain"] = range{15,  59,  0, 5.2};
+//md2pf["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
 md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
@@ -1674,6 +1846,8 @@ md2pf["HLT_PFJetFwd500"] = range{686,6500, fwdetad, 5.2};   //
 
 // dijet2 -> tag binning
 md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
+//md2tc["HLT_ZeroBias_FirstCollisionInTrain"] = range{15,  59,  0, 5.2};
+//md2tc["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
 md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
 md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
@@ -1954,7 +2128,7 @@ if (dataset == "Summer22EE" ||
             cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
         }
 }
-if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MG"))
+if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MG") || TString(dataset.c_str()).Contains("Summer23MC"))
 		//dataset == "Summer23" ||
 {
 	if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPixFlat") || TString(dataset.c_str()).Contains("Summer23MCBPix")) {
@@ -2344,11 +2518,13 @@ if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || d
 			"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
 	
-        if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_NT"))
+        if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_NT") ||
+	     TString(dataset.c_str()).Contains("2024H_Skim"))
         {
                 jec = getFJC("",
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
-                                "Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+                                //"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+				"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -2368,7 +2544,7 @@ if (TString(dataset.c_str()).Contains("2024I"))
 			"Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
         if (TString(dataset.c_str()).Contains("2024Iv1_nib1") || TString(dataset.c_str()).Contains("2024Iv2_nib1") ||
-	    TString(dataset.c_str()).Contains("2024I_ZB_HCPF"))
+	    TString(dataset.c_str()).Contains("2024I_ZB_HCPF") || TString(dataset.c_str()).Contains("2024I_Skim"))
         {
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
@@ -2398,8 +2574,8 @@ if (TString(dataset.c_str()).Contains("Winter25MG") || TString(dataset.c_str()).
 
            if (reweightPU && !doPU_per_trigger)
            {
-                 TFile f("luminosityscripts/PUWeights/69mb/PUWeight2024CDEFGHI/PUWeights_HLT_PFJet500_2024CDEFGHI.root");
-                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2024CDEFGHI");
+                 TFile f("luminosityscripts/PUWeights2025/75mb/PUWeight2025Cv1/PUWeights_HLT_PFJet500_2025Cv1.root");
+                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2025Cv1");
                  pileupRatio->SetDirectory(0);
                  // Print mean, min weight, max weight
                  cout << "PU weight file: " << f.GetName() << endl;
@@ -2666,6 +2842,10 @@ if (isMG)
        4.363, 4.538, 4.716, 4.889, 5.191};
 
   const int nxd = sizeof(vxd) / sizeof(vxd[0]) - 1;
+
+  // 10 bins for neHEF fraction
+  const int nNHFd = 10;
+  double vNHFd[nNHFd + 1] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
   //Unfolding pt binning
   //https://dasanalysissystem.docs.cern.ch/namespaceDAS_1_1Unfolding_1_1InclusiveJet.html#aec1e8e21b2f3158729572af0ee0d1cb3
@@ -2940,7 +3120,10 @@ if (isMG)
     int trgpt(-1), nfound(0);
     if (nfound != 1)
     {
+      //nfound = (vtrg[itrg] == "HLT_ZeroBias" || "HLT_ZeroBias_FirstCollisionInTrain" ||
+	//	              "HLT_ZeroBias_LastCollisionInTrain" || vtrg[itrg] == "HLT_MC" ? 1 : 0);
       nfound = (vtrg[itrg] == "HLT_ZeroBias" || vtrg[itrg] == "HLT_MC" ? 1 : 0);
+      //nfound =(vtrg[itrg] == "HLT_MC" ? 1 : 0);
       trgpt = 0;
     }
     if (nfound != 1)
@@ -3163,6 +3346,8 @@ if (isMG)
                                        nxd, vxd, 72, -TMath::Pi(), +TMath::Pi());
       }
 
+      
+      // This was moved to incjet directory.
       if (doUnfolding) {
 
         dout->mkdir("MCtruth/Unfolding");
@@ -3175,6 +3360,7 @@ if (isMG)
         h->hUnf_fakeOut = new TH1D("hUnf_fakeOut", ";p_{T,jet} (GeV)", nptdU, vptdU);
         h->h2Unf_RM = new TH2D("h2Unf_RM", ";p_{T,gen};p_{T,jet} (GeV);" "N_{events}", nptgendU, vptgendU, nptdU, vptdU);
       }
+      
 
       if (doQvsG) {
         dout->mkdir("MCtruth/QvsGstudies");
@@ -3542,6 +3728,29 @@ if (isMG)
                                      npti, vpti);
         } // for iy                      npti, vpti);
       }
+      
+      if (doUnfolding) {
+
+        dout->mkdir("Incjet/Unfolding_v2");
+        dout->cd("Incjet/Unfolding_v2");
+
+	// rec, tmp and cov for data
+	h->hRec_v2 = new TH1D("hRec_v2", "p_{T,jet} (GeV)", nptdU, vptdU);
+	h->htmp_v2 = new TH1D("htmp_v2", "p_{T,jet} (GeV)", nptdU, vptdU);
+	h->h2cov_v2 = new TH2D("h2cov_v2", "p_{T,jet} (GeV)", nptdU, vptdU, nptdU, vptdU);
+
+	/*
+	if (isMC) {
+        h->hUnf_gen = new TH1D("hUnf_gen", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+        h->hUnf_missNoMatch = new TH1D("hUnf_missNoMatch", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+        h->hUnf_missOut = new TH1D("hUnf_missOut", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+        h->hUnf_fakeNoMatch = new TH1D("hUnf_fakeNoMatch", ";p_{T,jet} (GeV)", nptdU, vptdU);
+        h->hUnf_fakeOut = new TH1D("hUnf_fakeOut", ";p_{T,jet} (GeV)", nptdU, vptdU);
+        h->h2Unf_RM = new TH2D("h2Unf_RM", ";p_{T,gen};p_{T,jet} (GeV);" "N_{events}", nptgendU, vptgendU, nptdU, vptdU);
+	}
+	*/
+      }
+      
       if (doJetId_variables)
       {
         dout->mkdir("Incjet/JetId_Var");
@@ -3627,6 +3836,46 @@ if (isMG)
                                  nx, vx, nptd, vptd);
       h->p2muab = new TProfile2D("p2muab", ";#eta;p_{T,avp} (GeV);MPFu",
                                  nx, vx, nptd, vptd);
+      //PUProfiles, MPF vs mu, rho, NPV for JES uncertainty. Bisector MPF
+      //Barrel abs eta < 1.3
+      h->p2m0ab_mu_13 = new TProfile2D("p2m0ab_mu_13", ";#mu;p_{T,avp} (GeV);MPF vs mu",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_rho_13 = new TProfile2D("p2m0ab_rho_13", ";#rho;p_{T,avp} (GeV);MPF vs rho",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_NPV_13 = new TProfile2D("p2m0ab_NPV_13", ";NPV;p_{T,avp} (GeV);MPF vs NPV",
+                                 119, 0, 120, nptd, vptd);
+      // 1.3 < abs eta < 2.5
+      h->p2m0ab_mu_25 = new TProfile2D("p2m0ab_mu_25", ";#mu;p_{T,avp} (GeV);MPF vs mu",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_rho_25 = new TProfile2D("p2m0ab_rho_25", ";#rho;p_{T,avp} (GeV);MPF vs rho",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_NPV_25 = new TProfile2D("p2m0ab_NPV_25", ";NPV;p_{T,avp} (GeV);MPF vs NPV",
+                                 119, 0, 120, nptd, vptd);
+      // 2.5 < abs eta < 3 
+      h->p2m0ab_mu_3 = new TProfile2D("p2m0ab_mu_3", ";#mu;p_{T,avp} (GeV);MPF vs mu",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_rho_3 = new TProfile2D("p2m0ab_rho_3", ";#rho;p_{T,avp} (GeV);MPF vs rho",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_NPV_3 = new TProfile2D("p2m0ab_NPV_3", ";NPV;p_{T,avp} (GeV);MPF vs NPV",
+                                 119, 0, 120, nptd, vptd);
+      // 3 < abs eta
+      h->p2m0ab_mu_3plus = new TProfile2D("p2m0ab_mu_3plus", ";#mu;p_{T,avp} (GeV);MPF vs mu",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_rho_3plus = new TProfile2D("p2m0ab_rho_3plus", ";#rho;p_{T,avp} (GeV);MPF vs rho",
+                                 119, 0, 120, nptd, vptd);
+      h->p2m0ab_NPV_3plus = new TProfile2D("p2m0ab_NPV_3plus", ";NPV;p_{T,avp} (GeV);MPF vs NPV",
+                                 119, 0, 120, nptd, vptd);
+
+      /*
+      // 3D responses dijet axis
+      h->p3m0ad_mu = new TProfile3D("p3m0ad_mu", ";#mu;p_{T,ave} (GeV);#eta;MPF0 vs mu",
+                                 119, 0, 120, nptd, vptd, nx, vx);
+      h->p3m0ad_rho = new TProfile3D("p3m0ad_rho", ";#rho;p_{T,ave} (GeV);#eta;MPF0 vs rho",
+                                 119, 0, 120, nptd, vptd, nx, vx);
+      h->p3m0ad_NPV = new TProfile3D("p3m0ad_NPV", ";NPV;p_{T,ave} (GeV);#eta;MPF0 vs NPV",
+                                 119, 0, 120, nptd, vptd, nx, vx);
+      */
+      //
 
       // Variants with different binnings and with error on the mean
       h->h2pteta_adall = new TH2D("h2pteta_adall", ";#eta;p_{T,ave} (GeV);"
@@ -3756,6 +4005,14 @@ if (isMG)
         h->pmuf13 = new TProfile("pmuf13", ";#eta;p_{T,avp} (GeV);"
                                            "MUF",
                                  npt, vpt);
+	h->h3ptetanhftc = new TH3D ("h3ptetanhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;neHEF",
+                                 nx, vx, nptd, vptd, nNHFd, vNHFd);
+
+        h->p3m0nhftc = new TProfile3D("p3m0nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF0",
+                                 nx, vx, nptd, vptd, nNHFd, vNHFd);
+
+        h->p3m2nhftc = new TProfile3D("p3m2nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF2",
+                                 nx, vx, nptd, vptd, nNHFd, vNHFd);
       }
 
     } // doDijet
@@ -3787,185 +4044,266 @@ if (isMG)
       if (bool doWP_t = true){
         dout->mkdir("GluonJets/tight");
         dout->cd("GluonJets/tight");
-      
+     
+        // Both tag and probe quarks	
         // MPF decomposition for HDM method
-        h->p2m0ab_t = new TProfile2D("p2m0ab_t", ";#eta;p_{T,avp} (GeV);MPF0",
+        h->p2m0ab_qq = new TProfile2D("p2m0ab_qq", ";#eta;p_{T,avp} (GeV);MPF0",
                                    nx, vx, npt, vpt);
-        h->p2m2ab_t = new TProfile2D("p2m2ab_t", ";#eta;p_{T,avp} (GeV);MPF2",
+        h->p2m2ab_qq = new TProfile2D("p2m2ab_qq", ";#eta;p_{T,avp} (GeV);MPF2",
                                    nx, vx, npt, vpt);
-        h->p2mnab_t = new TProfile2D("p2mnab_t", ";#eta;p_{T,avp} (GeV);MPFn",
+        h->p2mnab_qq = new TProfile2D("p2mnab_qq", ";#eta;p_{T,avp} (GeV);MPFn",
                                    nx, vx, npt, vpt);
-        h->p2muab_t = new TProfile2D("p2muab_t", ";#eta;p_{T,avp} (GeV);MPFu",
+        h->p2muab_qq = new TProfile2D("p2muab_qq", ";#eta;p_{T,avp} (GeV);MPFu",
                                    nx, vx, npt, vpt);
 
 
         // MPF decomposition for HDM method
-        h->p2m0ad_t = new TProfile2D("p2m0ad_t", ";#eta;p_{T,ave} (GeV);MPF0",
+        h->p2m0ad_qq = new TProfile2D("p2m0ad_qq", ";#eta;p_{T,ave} (GeV);MPF0",
                                    nx, vx, npt, vpt);
-        h->p2m2ad_t = new TProfile2D("p2m2ad_t", ";#eta;p_{T,ave} (GeV);MPF2",
+        h->p2m2ad_qq = new TProfile2D("p2m2ad_qq", ";#eta;p_{T,ave} (GeV);MPF2",
                                    nx, vx, npt, vpt);
-        h->p2mnad_t = new TProfile2D("p2mnad_t", ";#eta;p_{T,ave} (GeV);MPFn",
+        h->p2mnad_qq = new TProfile2D("p2mnad_qq", ";#eta;p_{T,ave} (GeV);MPFn",
                                    nx, vx, npt, vpt);
-        h->p2muad_t = new TProfile2D("p2muad_t", ";#eta;p_{T,ave} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-
-
-        h->p2m0tc_t = new TProfile2D("p2m0tc_t", ";#eta;p_{T,tag} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2tc_t = new TProfile2D("p2m2tc_t", ";#eta;p_{T,tag} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mntc_t = new TProfile2D("p2mntc_t", ";#eta;p_{T,tag} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2mutc_t = new TProfile2D("p2mutc_t", ";#eta;p_{T,tag} (GeV);MPFu",
+        h->p2muad_qq = new TProfile2D("p2muad_qq", ";#eta;p_{T,ave} (GeV);MPFu",
                                    nx, vx, npt, vpt);
 
 
-        h->p2m0pf_t = new TProfile2D("p2m0pf_t", ";#eta;p_{T,probe} (GeV);MPF0",
+        h->p2m0tc_qq = new TProfile2D("p2m0tc_qq", ";#eta;p_{T,tag} (GeV);MPF0",
                                    nx, vx, npt, vpt);
-        h->p2m2pf_t = new TProfile2D("p2m2pf_t", ";#eta;p_{T,probe} (GeV);MPF2",
+        h->p2m2tc_qq = new TProfile2D("p2m2tc_qq", ";#eta;p_{T,tag} (GeV);MPF2",
                                    nx, vx, npt, vpt);
-        h->p2mnpf_t = new TProfile2D("p2mnpf_t", ";#eta;p_{T,probe} (GeV);MPFn",
+        h->p2mntc_qq = new TProfile2D("p2mntc_qq", ";#eta;p_{T,tag} (GeV);MPFn",
                                    nx, vx, npt, vpt);
-        h->p2mupf_t = new TProfile2D("p2mupf_t", ";#eta;p_{T,probe} (GeV);MPFu",
+        h->p2mutc_qq = new TProfile2D("p2mutc_qq", ";#eta;p_{T,tag} (GeV);MPFu",
                                    nx, vx, npt, vpt);
+
+
+        h->p2m0pf_qq = new TProfile2D("p2m0pf_qq", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_qq = new TProfile2D("p2m2pf_qq", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_qq = new TProfile2D("p2mnpf_qq", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_qq = new TProfile2D("p2mupf_qq", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // Tag quark and probe gluon    
+        // MPF decomposition for HDM method
+        h->p2m0ab_qg = new TProfile2D("p2m0ab_qg", ";#eta;p_{T,avp} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ab_qg = new TProfile2D("p2m2ab_qg", ";#eta;p_{T,avp} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnab_qg = new TProfile2D("p2mnab_qg", ";#eta;p_{T,avp} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muab_qg = new TProfile2D("p2muab_qg", ";#eta;p_{T,avp} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // MPF decomposition for HDM method
+        h->p2m0ad_qg = new TProfile2D("p2m0ad_qg", ";#eta;p_{T,ave} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ad_qg = new TProfile2D("p2m2ad_qg", ";#eta;p_{T,ave} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnad_qg = new TProfile2D("p2mnad_qg", ";#eta;p_{T,ave} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muad_qg = new TProfile2D("p2muad_qg", ";#eta;p_{T,ave} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0tc_qg = new TProfile2D("p2m0tc_qg", ";#eta;p_{T,tag} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2tc_qg = new TProfile2D("p2m2tc_qg", ";#eta;p_{T,tag} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mntc_qg = new TProfile2D("p2mntc_qg", ";#eta;p_{T,tag} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mutc_qg = new TProfile2D("p2mutc_qg", ";#eta;p_{T,tag} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0pf_qg = new TProfile2D("p2m0pf_qg", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_qg = new TProfile2D("p2m2pf_qg", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_qg = new TProfile2D("p2mnpf_qg", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_qg = new TProfile2D("p2mupf_qg", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+        
+	
+	// Both tag and probe gluons 
+        // MPF decomposition for HDM method
+        h->p2m0ab_gg = new TProfile2D("p2m0ab_gg", ";#eta;p_{T,avp} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ab_gg = new TProfile2D("p2m2ab_gg", ";#eta;p_{T,avp} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnab_gg = new TProfile2D("p2mnab_gg", ";#eta;p_{T,avp} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muab_gg = new TProfile2D("p2muab_gg", ";#eta;p_{T,avp} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // MPF decomposition for HDM method
+        h->p2m0ad_gg = new TProfile2D("p2m0ad_gg", ";#eta;p_{T,ave} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ad_gg = new TProfile2D("p2m2ad_gg", ";#eta;p_{T,ave} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnad_gg = new TProfile2D("p2mnad_gg", ";#eta;p_{T,ave} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muad_gg = new TProfile2D("p2muad_gg", ";#eta;p_{T,ave} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0tc_gg = new TProfile2D("p2m0tc_gg", ";#eta;p_{T,tag} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2tc_gg = new TProfile2D("p2m2tc_gg", ";#eta;p_{T,tag} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mntc_gg = new TProfile2D("p2mntc_gg", ";#eta;p_{T,tag} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mutc_gg = new TProfile2D("p2mutc_gg", ";#eta;p_{T,tag} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0pf_gg = new TProfile2D("p2m0pf_gg", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_gg = new TProfile2D("p2m2pf_gg", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_gg = new TProfile2D("p2mnpf_gg", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_gg = new TProfile2D("p2mupf_gg", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+        
+	
+	// tag gluon and probe quark    
+        // MPF decomposition for HDM method
+        h->p2m0ab_gq = new TProfile2D("p2m0ab_gq", ";#eta;p_{T,avp} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ab_gq = new TProfile2D("p2m2ab_gq", ";#eta;p_{T,avp} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnab_gq = new TProfile2D("p2mnab_gq", ";#eta;p_{T,avp} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muab_gq = new TProfile2D("p2muab_gq", ";#eta;p_{T,avp} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // MPF decomposition for HDM method
+        h->p2m0ad_gq = new TProfile2D("p2m0ad_gq", ";#eta;p_{T,ave} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ad_gq = new TProfile2D("p2m2ad_gq", ";#eta;p_{T,ave} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnad_gq = new TProfile2D("p2mnad_gq", ";#eta;p_{T,ave} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muad_gq = new TProfile2D("p2muad_gq", ";#eta;p_{T,ave} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0tc_gq = new TProfile2D("p2m0tc_gq", ";#eta;p_{T,tag} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2tc_gq = new TProfile2D("p2m2tc_gq", ";#eta;p_{T,tag} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mntc_gq = new TProfile2D("p2mntc_gq", ";#eta;p_{T,tag} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mutc_gq = new TProfile2D("p2mutc_gq", ";#eta;p_{T,tag} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0pf_gq = new TProfile2D("p2m0pf_gq", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_gq = new TProfile2D("p2m2pf_gq", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_gq = new TProfile2D("p2mnpf_gq", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_gq = new TProfile2D("p2mupf_gq", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+	// tagger score
+	h->h_tagprobeab_qq = new TH1D("h_tagprobeab_qq", ";p_{T,avp} (GeV);tag score;score quark-quark",npt, vpt);
+	h->h_tagprobeab_qg = new TH1D("h_tagprobeab_qg", ";p_{T,avp} (GeV);tag score;score quark-gluon",npt, vpt);
+	h->h_tagprobeab_gq = new TH1D("h_tagprobeab_gq", ";p_{T,avp} (GeV);tag score;score gluon-quark",npt, vpt);
+	h->h_tagprobeab_gg = new TH1D("h_tagprobeab_gg", ";p_{T,avp} (GeV);tag score;score gluon-gluon",npt, vpt);
+
+	h->h_tagprobead_qq = new TH1D("h_tagprobead_qq", ";p_{T,ave} (GeV);tag score;score quark-quark",npt, vpt);
+        h->h_tagprobead_qg = new TH1D("h_tagprobead_qg", ";p_{T,ave} (GeV);tag score;score quark-gluon",npt, vpt);
+        h->h_tagprobead_gq = new TH1D("h_tagprobead_gq", ";p_{T,ave} (GeV);tag score;score gluon-quark",npt, vpt);
+        h->h_tagprobead_gg = new TH1D("h_tagprobead_gg", ";p_{T,ave} (GeV);tag score;score gluon-gluon",npt, vpt);
+
+	h->h_tagprobetc_qq = new TH1D("h_tagprobetc_qq", ";p_{T,tag} (GeV);tag score;score quark-quark",npt, vpt);
+        h->h_tagprobetc_qg = new TH1D("h_tagprobetc_qg", ";p_{T,tag} (GeV);tag score;score quark-gluon",npt, vpt);
+        h->h_tagprobetc_gq = new TH1D("h_tagprobetc_gq", ";p_{T,tag} (GeV);tag score;score gluon-quark",npt, vpt);
+        h->h_tagprobetc_gg = new TH1D("h_tagprobetc_gg", ";p_{T,tag} (GeV);tag score;score gluon-gluon",npt, vpt);
+	
+	h->h_tagprobepf_qq = new TH1D("h_tagprobepf_qq", ";p_{T,probe} (GeV);tag score;score quark-quark",npt, vpt);
+        h->h_tagprobepf_qg = new TH1D("h_tagprobepf_qg", ";p_{T,probe} (GeV);tag score;score quark-gluon",npt, vpt);
+        h->h_tagprobepf_gq = new TH1D("h_tagprobepf_gq", ";p_{T,probe} (GeV);tag score;score gluon-quark",npt, vpt);
+        h->h_tagprobepf_gg = new TH1D("h_tagprobepf_gg", ";p_{T,probe} (GeV);tag score;score gluon-gluon",npt, vpt);
       }
 
-      if (bool doWP_m = true){
-        dout->mkdir("GluonJets/medium");
-        dout->cd("GluonJets/medium");
-        // MPF decomposition for HDM method
-        h->p2m0ab_m = new TProfile2D("p2m0ab_m", ";#eta;p_{T,avp} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2ab_m = new TProfile2D("p2m2ab_m", ";#eta;p_{T,avp} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mnab_m = new TProfile2D("p2mnab_m", ";#eta;p_{T,avp} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2muab_m = new TProfile2D("p2muab_m", ";#eta;p_{T,avp} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
 
-
-        // MPF decomposition for HDM method
-        h->p2m0ad_m = new TProfile2D("p2m0ad_m", ";#eta;p_{T,ave} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2ad_m = new TProfile2D("p2m2ad_m", ";#eta;p_{T,ave} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mnad_m = new TProfile2D("p2mnad_m", ";#eta;p_{T,ave} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2muad_m = new TProfile2D("p2muad_m", ";#eta;p_{T,ave} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-
-
-        h->p2m0tc_m = new TProfile2D("p2m0tc_m", ";#eta;p_{T,tag} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2tc_m = new TProfile2D("p2m2tc_m", ";#eta;p_{T,tag} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mntc_m = new TProfile2D("p2mntc_m", ";#eta;p_{T,tag} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2mutc_m = new TProfile2D("p2mutc_m", ";#eta;p_{T,tag} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-
-
-        h->p2m0pf_m = new TProfile2D("p2m0pf_m", ";#eta;p_{T,probe} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2pf_m = new TProfile2D("p2m2pf_m", ";#eta;p_{T,probe} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mnpf_m = new TProfile2D("p2mnpf_m", ";#eta;p_{T,probe} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2mupf_m = new TProfile2D("p2mupf_m", ";#eta;p_{T,probe} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-      }
-
-      if (bool doWP_l = true){
-        dout->mkdir("GluonJets/loose");
-        dout->cd("GluonJets/loose");
-        // MPF decomposition for HDM method
-        h->p2m0ab_l = new TProfile2D("p2m0ab_l", ";#eta;p_{T,avp} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2ab_l = new TProfile2D("p2m2ab_l", ";#eta;p_{T,avp} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mnab_l = new TProfile2D("p2mnab_l", ";#eta;p_{T,avp} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2muab_l = new TProfile2D("p2muab_l", ";#eta;p_{T,avp} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-
-
-        // MPF decomposition for HDM method
-        h->p2m0ad_l = new TProfile2D("p2m0ad_l", ";#eta;p_{T,ave} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2ad_l = new TProfile2D("p2m2ad_l", ";#eta;p_{T,ave} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mnad_l = new TProfile2D("p2mnad_l", ";#eta;p_{T,ave} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2muad_l = new TProfile2D("p2muad_l", ";#eta;p_{T,ave} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-
-
-        h->p2m0tc_l = new TProfile2D("p2m0tc_l", ";#eta;p_{T,tag} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2tc_l = new TProfile2D("p2m2tc_l", ";#eta;p_{T,tag} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mntc_l = new TProfile2D("p2mntc_l", ";#eta;p_{T,tag} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2mutc_l = new TProfile2D("p2mutc_l", ";#eta;p_{T,tag} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-
-
-        h->p2m0pf_l = new TProfile2D("p2m0pf_l", ";#eta;p_{T,probe} (GeV);MPF0",
-                                   nx, vx, npt, vpt);
-        h->p2m2pf_l = new TProfile2D("p2m2pf_l", ";#eta;p_{T,probe} (GeV);MPF2",
-                                   nx, vx, npt, vpt);
-        h->p2mnpf_l = new TProfile2D("p2mnpf_l", ";#eta;p_{T,probe} (GeV);MPFn",
-                                   nx, vx, npt, vpt);
-        h->p2mupf_l = new TProfile2D("p2mupf_l", ";#eta;p_{T,probe} (GeV);MPFu",
-                                   nx, vx, npt, vpt);
-      }
-
-      if (doDijetJER)
+      if (doGluonJets && doDijetJER)
       {
         dout->mkdir("GluonJets/JER");
         dout->cd("GluonJets/JER");
 
+	// Both tag and probe quarks
         // Basic profiles with RMS as error ("S") for JER studies
-        h->p2m0_t = new TProfile2D("p2m0_t", ";#eta;p_{T,avp} (GeV);"
+        h->p2m0_qq = new TProfile2D("p2m0_qq", ";#eta;p_{T,avp} (GeV);"
                                          "MPF0 (MPF)",
                                  nx, vx, npt, vpt, "S");
-        h->p2m0x_t = new TProfile2D("p2m0x_t", ";#eta;p_{T,avp} (GeV);"
+        h->p2m0x_qq = new TProfile2D("p2m0x_qq", ";#eta;p_{T,avp} (GeV);"
                                            "MPFX0 (MPFX)",
                                   nx, vx, npt, vpt, "S");
-        h->p2m2_t = new TProfile2D("p2m2_t", ";#eta;p_{T,avp} (GeV);"
+        h->p2m2_qq = new TProfile2D("p2m2_qq", ";#eta;p_{T,avp} (GeV);"
                                          "MPF2 (DB)",
                                  nx, vx, npt, vpt, "S");
-        h->p2m2x_t = new TProfile2D("p2m2x_t", ";#eta;p_{T,avp} (GeV);"
+        h->p2m2x_qq = new TProfile2D("p2m2x_qq", ";#eta;p_{T,avp} (GeV);"
                                            "MPF2 (DBX)",
                                   nx, vx, npt, vpt, "S");
 
-        // Basic profiles with RMS as error ("S") for JER studies
-        h->p2m0_m = new TProfile2D("p2m0_m", ";#eta;p_{T,avp} (GeV);"
+	//tag quark and probe gluon
+	// Basic profiles with RMS as error ("S") for JER studies
+        h->p2m0_qg = new TProfile2D("p2m0_qg", ";#eta;p_{T,avp} (GeV);"
                                          "MPF0 (MPF)",
                                  nx, vx, npt, vpt, "S");
-        h->p2m0x_m = new TProfile2D("p2m0x_m", ";#eta;p_{T,avp} (GeV);"
+        h->p2m0x_qg = new TProfile2D("p2m0x_qg", ";#eta;p_{T,avp} (GeV);"
                                            "MPFX0 (MPFX)",
                                   nx, vx, npt, vpt, "S");
-        h->p2m2_m = new TProfile2D("p2m2_m", ";#eta;p_{T,avp} (GeV);"
+        h->p2m2_qg = new TProfile2D("p2m2_qg", ";#eta;p_{T,avp} (GeV);"
                                          "MPF2 (DB)",
                                  nx, vx, npt, vpt, "S");
-        h->p2m2x_m = new TProfile2D("p2m2x_m", ";#eta;p_{T,avp} (GeV);"
+        h->p2m2x_qg = new TProfile2D("p2m2x_qg", ";#eta;p_{T,avp} (GeV);"
                                            "MPF2 (DBX)",
                                   nx, vx, npt, vpt, "S");
 
-        // Basic profiles with RMS as error ("S") for JER studies
-        h->p2m0_l = new TProfile2D("p2m0_l", ";#eta;p_{T,avp} (GeV);"
+	//Both tag and proble gluons
+	// Basic profiles with RMS as error ("S") for JER studies
+        h->p2m0_gg = new TProfile2D("p2m0_gg", ";#eta;p_{T,avp} (GeV);"
                                          "MPF0 (MPF)",
                                  nx, vx, npt, vpt, "S");
-        h->p2m0x_l = new TProfile2D("p2m0x_l", ";#eta;p_{T,avp} (GeV);"
+        h->p2m0x_gg = new TProfile2D("p2m0x_gg", ";#eta;p_{T,avp} (GeV);"
                                            "MPFX0 (MPFX)",
                                   nx, vx, npt, vpt, "S");
-        h->p2m2_l = new TProfile2D("p2m2_l", ";#eta;p_{T,avp} (GeV);"
+        h->p2m2_gg = new TProfile2D("p2m2_gg", ";#eta;p_{T,avp} (GeV);"
                                          "MPF2 (DB)",
                                  nx, vx, npt, vpt, "S");
-        h->p2m2x_l = new TProfile2D("p2m2x_l", ";#eta;p_{T,avp} (GeV);"
+        h->p2m2x_gg = new TProfile2D("p2m2x_gg", ";#eta;p_{T,avp} (GeV);"
                                            "MPF2 (DBX)",
                                   nx, vx, npt, vpt, "S");
+
+	//tag gluon and probe quark
+	// Basic profiles with RMS as error ("S") for JER studies
+        h->p2m0_gq = new TProfile2D("p2m0_gq", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF0 (MPF)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m0x_gq = new TProfile2D("p2m0x_gq", ";#eta;p_{T,avp} (GeV);"
+                                           "MPFX0 (MPFX)",
+                                  nx, vx, npt, vpt, "S");
+        h->p2m2_gq = new TProfile2D("p2m2_gq", ";#eta;p_{T,avp} (GeV);"
+                                         "MPF2 (DB)",
+                                 nx, vx, npt, vpt, "S");
+        h->p2m2x_gq = new TProfile2D("p2m2x_gq", ";#eta;p_{T,avp} (GeV);"
+                                           "MPF2 (DBX)",
+                                  nx, vx, npt, vpt, "S");
+	
 
       }
 
@@ -4151,6 +4489,15 @@ if (isMG)
         h->pmuf13 = new TProfile("pmuf13", ";#eta;p_{T,avp} (GeV);"
                                            "MUF",
                                  npt, vpt);
+	h->h3ptetanhftc = new TH3D ("h3ptetanhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;neHEF",
+				 nxd, vxd, nptd, vptd, nNHFd, vNHFd);
+
+	h->p3m0nhftc = new TProfile3D("p3m0nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF0",
+				 nxd, vxd, nptd, vptd, nNHFd, vNHFd);
+
+	h->p3m2nhftc = new TProfile3D("p3m2nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF2",
+				 nxd, vxd, nptd, vptd, nNHFd, vNHFd);
+
       }
     } // doDijet2
 
@@ -4821,7 +5168,9 @@ if (isMG)
       for (int i = 0; i != ntrg; ++i)
       {
         fired = (fired || (*mtrg[vtrg[i]]));
+	//fired = (fired || (mtrg[vtrg[i]]));
         if (*mtrg[vtrg[i]])
+	//if (mtrg[vtrg[i]])
           htrg->Fill(i);
       }
       if (!fired)
@@ -5424,6 +5773,7 @@ if (isMG)
 
     // Unfolding
     vector<int> binIDs;
+    vector<int> binIDs_v2;
 
     
     if (doIncjet)
@@ -5480,7 +5830,49 @@ if (isMG)
 
         for (int itrg = 0; itrg != ntrg; ++itrg)
         {
+	  // Make sure vtrg is valid
+    	  /*
+	  if (itrg >= (int)vtrg.size()) {
+            cerr << "FATAL: itrg=" << itrg << " >= vtrg.size()=" << vtrg.size() << endl;
+            cout << "DEBUG: itrg = " << itrg << endl;
+            cout << "DEBUG: vtrg.size() = " << vtrg.size() << endl;
+            cout << "DEBUG: ntrg = " << ntrg << endl;
+            continue;
+    	  }
+	  */
+          //if (mtrg.find(trg) == mtrg.end()) {
+          //  cout << "ERROR: Trigger '" << trg << "' not found in mtrg map!" << endl;
+          //  continue;
+          //}
+
           string &trg = vtrg[itrg];
+	  /*
+	  // DEBUG: Print to catch corruption before the crash
+	  // cout << "Checking trigger: " << trg << endl;
+
+	  // Use .find() instead of []
+	  auto it = mtrg.find(trg);
+
+	  // Check if trigger exists in the map
+	  if (it == mtrg.end()) {
+    	  //Optional: Print error only once per unknown trigger to avoid spam
+    	    cerr << "Warning: Trigger " << trg << " not found in map!" << endl;
+    	    continue;
+	  }
+
+	  // Check the pointer value (the boolean branch address)
+	  if (it->second == nullptr) {
+   	    // Branch address was never set
+	    cerr << "Warning: Branch address was never set" << endl;
+   	    continue;
+	  }
+
+	  // Check the value of the boolean
+	  if (!(*(it->second))) {
+	    //cerr << "Warning: the value of the boolean" << endl;
+    	    continue;
+	  }
+	  */
           if (!(*mtrg[trg]))
             continue;
 
@@ -5519,6 +5911,7 @@ if (isMG)
         {
           string &trg = vtrg[itrg];
           if (!(*mtrg[trg]))
+	  //if (!(mtrg[trg]))
             continue;
           PUHistos *h = mhPU[trg];
           assert(h);
@@ -5568,6 +5961,7 @@ if (isMG)
 
           string &trg = vtrg[itrg];
           if (!(*mtrg[trg]))
+	  //if (!(mtrg[trg]))
             continue;
 
           incjetHistos *h = mhij[trg];
@@ -5742,6 +6136,43 @@ if (isMG)
               } // Event selection
             } // doUnfolding MC
 
+	    if (doUnfolding) {
+	      
+	      if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax && fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax &&
+	          p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.0) {
+	        // Fill the data/MC histograms: rec histos
+		auto irecbin = h->hRec_v2->FindBin(p4.Pt());
+		auto &binIDs_v2 = binIDsMap_v2[itrg];
+		if (find(binIDs_v2.begin(), binIDs_v2.end(), irecbin) == binIDs_v2.end()) 
+		  binIDs_v2.push_back(irecbin);
+                h->hRec_v2->Fill(p4.Pt(), w);
+	        h->htmp_v2->Fill(p4.Pt(), w);
+              }
+	        /*	
+		if (isMC)
+		{
+		  for ()
+		  {
+		    
+		  } // loop over gen jets?
+
+		  // Finally check fake rates
+                  for (int i = 0; i != njet; ++i)
+                  {
+                    bool hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
+                    bool hasMatchJet = (Jet_genDR[i] < 0.2);
+                    //Unfolding
+                    if (p4.Eta() >= 2.0)
+                      continue;
+                    if (p4.Pt() < 74.0 || p4.Pt() > 3832.0)
+                      continue;
+                    if (!hasMatchJet)
+                      h->hUnf_fakeNoMatch->Fill(p4.Pt(), 1);
+                  } // for i
+	        }
+		*/
+	    } // do unfolding v2 that matches data and MC selection
+
           }   // JetID+METfilter
         }     // for itrg
       }       // doIncJet
@@ -5832,10 +6263,21 @@ if (isMG)
             h->h2Cov->SetBinContent(x, y, cCov + cTmp);
           }
         }
+	// for the v2
+	auto &binIDs_v2 = binIDsMap_v2[itrg];
+        for (auto x : binIDs_v2) {
+          for (auto y : binIDs_v2) {
+            double cCov_v2 = h->h2cov_v2->GetBinContent(x, y);
+            double cTmp_v2 = h->htmp_v2->GetBinContent(x) * h->htmp_v2->GetBinContent(y);
+            h->h2cov_v2->SetBinContent(x, y, cCov_v2 + cTmp_v2);
+          }
+        }
 
         // Only reset after all binIDs have been processed
         h->htmp->Reset();
-        binIDs.clear();              
+	h->htmp_v2->Reset();
+        binIDs.clear();
+        binIDs_v2.clear();	
       
       } // End Unfolding Cov matrix
     }
@@ -5921,6 +6363,7 @@ if (isMG)
 
               string &trg = vtrg[itrg];
               if (!(*mtrg[trg]))
+	      //if (!(mtrg[trg]))
                 continue;
 
               multijetHistos *h = mhmj[trg];
@@ -6100,6 +6543,7 @@ if (isMG)
 
           string &trg = vtrg[itrg];
           if (!(*mtrg[trg]))
+	  //if (!(mtrg[trg]))
             continue;
 
 // Plot without jet veto test (to be approved, Nestor)
@@ -6174,6 +6618,11 @@ if (isMG)
           if (doDijet && isdijet)
           {
 
+            double trpu;
+            if (isMC){
+              trpu = Pileup_nTrue;
+            } else trpu = _avgpu[run][luminosityBlock];//trpu_JSON;
+
             dijetHistos *h = mhdj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
 
@@ -6221,6 +6670,10 @@ if (isMG)
                 h->pnef13->Fill(ptavp2, Jet_neEmEF[itag], w);
                 h->pcef13->Fill(ptavp2, Jet_chEmEF[itag], w);
                 h->pmuf13->Fill(ptavp2, Jet_muEF[itag], w);
+
+		h->h3ptetanhftc->Fill(eta, pttag, Jet_neHEF[iprobe], w);
+                h->p3m0nhftc->Fill(eta, pttag, Jet_neHEF[iprobe], m0c, w);
+                h->p3m2nhftc->Fill(eta, pttag, Jet_neHEF[iprobe], m2c, w);
               }
 
               h->p2resab->Fill(eta, ptavp2, res, w);
@@ -6228,6 +6681,36 @@ if (isMG)
               h->p2m2ab->Fill(eta, ptavp2, m2b, w);
               h->p2mnab->Fill(eta, ptavp2, mnb, w);
               h->p2muab->Fill(eta, ptavp2, mub, w);
+
+              if (fabs(eta)<1.3) {	      
+	      h->p2m0ab_mu_13->Fill(trpu, ptavp2, m0b, w);
+	      h->p2m0ab_rho_13->Fill(rho, ptavp2, m0b, w);
+	      h->p2m0ab_NPV_13->Fill(NPV, ptavp2, m0b, w);
+	      }
+
+	      if (1.3 <= fabs(eta) && fabs(eta) < 2.5) {
+              h->p2m0ab_mu_25->Fill(trpu, ptavp2, m0b, w);
+              h->p2m0ab_rho_25->Fill(rho, ptavp2, m0b, w);
+              h->p2m0ab_NPV_25->Fill(NPV, ptavp2, m0b, w);
+              }
+
+	      if (2.5 <= fabs(eta) && fabs(eta) < 3.0) {
+              h->p2m0ab_mu_3->Fill(trpu, ptavp2, m0b, w);
+              h->p2m0ab_rho_3->Fill(rho, ptavp2, m0b, w);
+              h->p2m0ab_NPV_3->Fill(NPV, ptavp2, m0b, w);
+              }
+
+	      if (3.0 <= fabs(eta) ) {
+              h->p2m0ab_mu_3plus->Fill(trpu, ptavp2, m0b, w);
+              h->p2m0ab_rho_3plus->Fill(rho, ptavp2, m0b, w);
+              h->p2m0ab_NPV_3plus->Fill(NPV, ptavp2, m0b, w);
+              }
+
+	      /*
+	      h->p3m0ad_mu->Fill(trpu, ptave, eta, m0d, w);
+              h->p3m0ad_rho->Fill(rho, ptave, eta, m0d, w);
+              h->p3m0ad_NPV->Fill(NPV, ptave, eta, m0d, w);
+	      */
             }
             // Dijet axis
             if (ptave >= h->ptmin && ptave < h->ptmax &&
@@ -6270,129 +6753,199 @@ if (isMG)
             }
           } // doDijet
 
+	  
           if (doGluonJets && isdijet)
           {
             
             gluonHistos *h = mhgj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
-	    for (int i = 0; i != njet; ++i){
-	      if (Jet_btagPNetQvG[i] < WP_t){
-	        //std::cout << "We pass the WP that is: " << Jet_btagPNetQvG[i] << std::endl;
+	    if (Jet_btagUParTAK4B[itag] <= 0.4648 && Jet_btagUParTAK4CvL[itag] <= 0.421 &&
+	        0. <= Jet_btagPNetQvG[itag] && 0.45 <= Jet_btagPNetQvG[itag]) 
+	    {
+	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
+                  0. <= Jet_btagPNetQvG[iprobe] && 0.45 <= Jet_btagPNetQvG[iprobe] && fabs(eta)<1.3)
+	      {
+                h->h_tagprobeab_qq->Fill(ptavp2, w);
+                h->h_tagprobead_qq->Fill(ptave, w);
+                h->h_tagprobetc_qq->Fill(pttag, w);
+                h->h_tagprobepf_qq->Fill(ptprobe, w);
+
                 { // Bisector (proper) WP_t
-                  if (doDijetJER)
+                  if (doGluonJets && doDijetJER)
 		  {
-                    h->p2m0_t->Fill(eta, ptavp2, m0b, w);
-                    h->p2m0x_t->Fill(eta, ptavp2, m0bx, w);
-                    h->p2m2_t->Fill(eta, ptavp2, m2b, w);
-                    h->p2m2x_t->Fill(eta, ptavp2, m2bx, w);
+                    h->p2m0_qq->Fill(eta, ptavp2, m0b, w);
+                    h->p2m0x_qq->Fill(eta, ptavp2, m0bx, w);
+                    h->p2m2_qq->Fill(eta, ptavp2, m2b, w);
+                    h->p2m2x_qq->Fill(eta, ptavp2, m2bx, w);
                   }
 
-                  h->p2m0ab_t->Fill(eta, ptavp2, m0b, w);
-                  h->p2m2ab_t->Fill(eta, ptavp2, m2b, w);
-                  h->p2mnab_t->Fill(eta, ptavp2, mnb, w);
-                  h->p2muab_t->Fill(eta, ptavp2, mub, w);
+                  h->p2m0ab_qq->Fill(eta, ptavp2, m0b, w);
+                  h->p2m2ab_qq->Fill(eta, ptavp2, m2b, w);
+                  h->p2mnab_qq->Fill(eta, ptavp2, mnb, w);
+                  h->p2muab_qq->Fill(eta, ptavp2, mub, w);
                 }
                 { // Dijet axis
-                  h->p2m0ad_t->Fill(eta, ptave, m0d, w);
-                  h->p2m2ad_t->Fill(eta, ptave, m2d, w);
-                  h->p2mnad_t->Fill(eta, ptave, mnd, w);
-                  h->p2muad_t->Fill(eta, ptave, mud, w);
+                  h->p2m0ad_qq->Fill(eta, ptave, m0d, w);
+                  h->p2m2ad_qq->Fill(eta, ptave, m2d, w);
+                  h->p2mnad_qq->Fill(eta, ptave, mnd, w);
+                  h->p2muad_qq->Fill(eta, ptave, mud, w);
                 }
                 // Tag jet axis
                 {
-                  h->p2m0tc_t->Fill(eta, pttag, m0c, w);
-                  h->p2m2tc_t->Fill(eta, pttag, m2c, w);
-                  h->p2mntc_t->Fill(eta, pttag, mnc, w);
-                  h->p2mutc_t->Fill(eta, pttag, muc, w);
+                  h->p2m0tc_qq->Fill(eta, pttag, m0c, w);
+                  h->p2m2tc_qq->Fill(eta, pttag, m2c, w);
+                  h->p2mntc_qq->Fill(eta, pttag, mnc, w);
+                  h->p2mutc_qq->Fill(eta, pttag, muc, w);
                 }
                 // Probe jet axis
                 {
-                 h->p2m0pf_t->Fill(eta, ptprobe, m0f, w);
-                 h->p2m2pf_t->Fill(eta, ptprobe, m2f, w);
-                 h->p2mnpf_t->Fill(eta, ptprobe, mnf, w);
-                 h->p2mupf_t->Fill(eta, ptprobe, muf, w);
+                 h->p2m0pf_qq->Fill(eta, ptprobe, m0f, w);
+                 h->p2m2pf_qq->Fill(eta, ptprobe, m2f, w);
+                 h->p2mnpf_qq->Fill(eta, ptprobe, mnf, w);
+                 h->p2mupf_qq->Fill(eta, ptprobe, muf, w);
                 }
-	      } //WP_t
+	      } // tag quark and probe quark
 
-              if (Jet_btagPNetQvG[i] < WP_m){
-                //std::cout << "We pass the WP that is: " << Jet_btagPNetQvG[i] << std::endl;
-                { // Bisector (proper) WP_t
-                  if (doDijetJER)
+	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
+                  0. <= Jet_btagPNetQvG[iprobe] && Jet_btagPNetQvG[iprobe] < 0.45 && fabs(eta)<1.3)
+              {
+	        h->h_tagprobeab_qg->Fill(ptavp2, w);
+                h->h_tagprobead_qg->Fill(ptave, w);
+                h->h_tagprobetc_qg->Fill(pttag, w);
+                h->h_tagprobepf_qg->Fill(ptprobe, w);
+
+	        { // Bisector (proper) WP_t
+                  if (doGluonJets && doDijetJER)
                   {
-                    h->p2m0_m->Fill(eta, ptavp2, m0b, w);
-                    h->p2m0x_m->Fill(eta, ptavp2, m0bx, w);
-                    h->p2m2_m->Fill(eta, ptavp2, m2b, w);
-                    h->p2m2x_m->Fill(eta, ptavp2, m2bx, w);
+                    h->p2m0_qg->Fill(eta, ptavp2, m0b, w);
+                    h->p2m0x_qg->Fill(eta, ptavp2, m0bx, w);
+                    h->p2m2_qg->Fill(eta, ptavp2, m2b, w);
+                    h->p2m2x_qg->Fill(eta, ptavp2, m2bx, w);
                   }
 
-                  h->p2m0ab_m->Fill(eta, ptavp2, m0b, w);
-                  h->p2m2ab_m->Fill(eta, ptavp2, m2b, w);
-                  h->p2mnab_m->Fill(eta, ptavp2, mnb, w);
-                  h->p2muab_m->Fill(eta, ptavp2, mub, w);
+                  h->p2m0ab_qg->Fill(eta, ptavp2, m0b, w);
+                  h->p2m2ab_qg->Fill(eta, ptavp2, m2b, w);
+                  h->p2mnab_qg->Fill(eta, ptavp2, mnb, w);
+                  h->p2muab_qg->Fill(eta, ptavp2, mub, w);
                 }
                 { // Dijet axis
-                  h->p2m0ad_m->Fill(eta, ptave, m0d, w);
-                  h->p2m2ad_m->Fill(eta, ptave, m2d, w);
-                  h->p2mnad_m->Fill(eta, ptave, mnd, w);
-                  h->p2muad_m->Fill(eta, ptave, mud, w);
+                  h->p2m0ad_qg->Fill(eta, ptave, m0d, w);
+                  h->p2m2ad_qg->Fill(eta, ptave, m2d, w);
+                  h->p2mnad_qg->Fill(eta, ptave, mnd, w);
+                  h->p2muad_qg->Fill(eta, ptave, mud, w);
                 }
                 // Tag jet axis
                 {
-                  h->p2m0tc_m->Fill(eta, pttag, m0c, w);
-                  h->p2m2tc_m->Fill(eta, pttag, m2c, w);
-                  h->p2mntc_m->Fill(eta, pttag, mnc, w);
-                  h->p2mutc_m->Fill(eta, pttag, muc, w);
+                  h->p2m0tc_qg->Fill(eta, pttag, m0c, w);
+                  h->p2m2tc_qg->Fill(eta, pttag, m2c, w);
+                  h->p2mntc_qg->Fill(eta, pttag, mnc, w);
+                  h->p2mutc_qg->Fill(eta, pttag, muc, w);
                 }
                 // Probe jet axis
                 {
-                 h->p2m0pf_m->Fill(eta, ptprobe, m0f, w);
-                 h->p2m2pf_m->Fill(eta, ptprobe, m2f, w);
-                 h->p2mnpf_m->Fill(eta, ptprobe, mnf, w);
-                 h->p2mupf_m->Fill(eta, ptprobe, muf, w);
+                 h->p2m0pf_qg->Fill(eta, ptprobe, m0f, w);
+                 h->p2m2pf_qg->Fill(eta, ptprobe, m2f, w);
+                 h->p2mnpf_qg->Fill(eta, ptprobe, mnf, w);
+                 h->p2mupf_qg->Fill(eta, ptprobe, muf, w);
                 }
-              } // WP_m
+	      } //tag quark and probe gluon
+	    } // WP tight tag quark
 
-              if (Jet_btagPNetQvG[i] < WP_l){
-                //std::cout << "We pass the WP that is: " << Jet_btagPNetQvG[i] << std::endl;
+            if (Jet_btagUParTAK4B[itag] <= 0.4648 && Jet_btagUParTAK4CvL[itag] <= 0.421 &&
+                0. <= Jet_btagPNetQvG[itag] && Jet_btagPNetQvG[itag] < 0.45 )
+            {
+              if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
+                  0. <= Jet_btagPNetQvG[iprobe] && 0.45 <= Jet_btagPNetQvG[iprobe] && fabs(eta)<1.3)
+              {
+	       
+	        h->h_tagprobeab_gq->Fill(ptavp2, w);
+                h->h_tagprobead_gq->Fill(ptave, w);
+                h->h_tagprobetc_gq->Fill(pttag, w);
+                h->h_tagprobepf_gq->Fill(ptprobe, w);
+
                 { // Bisector (proper) WP_t
-                  if (doDijetJER)
+                  if (doGluonJets && doDijetJER)
                   {
-                    h->p2m0_l->Fill(eta, ptavp2, m0b, w);
-                    h->p2m0x_l->Fill(eta, ptavp2, m0bx, w);
-                    h->p2m2_l->Fill(eta, ptavp2, m2b, w);
-                    h->p2m2x_l->Fill(eta, ptavp2, m2bx, w);
+                    h->p2m0_gq->Fill(eta, ptavp2, m0b, w);
+                    h->p2m0x_gq->Fill(eta, ptavp2, m0bx, w);
+                    h->p2m2_gq->Fill(eta, ptavp2, m2b, w);
+                    h->p2m2x_gq->Fill(eta, ptavp2, m2bx, w);
                   }
 
-                  h->p2m0ab_l->Fill(eta, ptavp2, m0b, w);
-                  h->p2m2ab_l->Fill(eta, ptavp2, m2b, w);
-                  h->p2mnab_l->Fill(eta, ptavp2, mnb, w);
-                  h->p2muab_l->Fill(eta, ptavp2, mub, w);
+                  h->p2m0ab_gq->Fill(eta, ptavp2, m0b, w);
+                  h->p2m2ab_gq->Fill(eta, ptavp2, m2b, w);
+                  h->p2mnab_gq->Fill(eta, ptavp2, mnb, w);
+                  h->p2muab_gq->Fill(eta, ptavp2, mub, w);
                 }
                 { // Dijet axis
-                  h->p2m0ad_l->Fill(eta, ptave, m0d, w);
-                  h->p2m2ad_l->Fill(eta, ptave, m2d, w);
-                  h->p2mnad_l->Fill(eta, ptave, mnd, w);
-                  h->p2muad_l->Fill(eta, ptave, mud, w);
+                  h->p2m0ad_gq->Fill(eta, ptave, m0d, w);
+                  h->p2m2ad_gq->Fill(eta, ptave, m2d, w);
+                  h->p2mnad_gq->Fill(eta, ptave, mnd, w);
+                  h->p2muad_gq->Fill(eta, ptave, mud, w);
                 }
                 // Tag jet axis
                 {
-                  h->p2m0tc_l->Fill(eta, pttag, m0c, w);
-                  h->p2m2tc_l->Fill(eta, pttag, m2c, w);
-                  h->p2mntc_l->Fill(eta, pttag, mnc, w);
-                  h->p2mutc_l->Fill(eta, pttag, muc, w);
+                  h->p2m0tc_gq->Fill(eta, pttag, m0c, w);
+                  h->p2m2tc_gq->Fill(eta, pttag, m2c, w);
+                  h->p2mntc_gq->Fill(eta, pttag, mnc, w);
+                  h->p2mutc_gq->Fill(eta, pttag, muc, w);
                 }
                 // Probe jet axis
                 {
-                 h->p2m0pf_l->Fill(eta, ptprobe, m0f, w);
-                 h->p2m2pf_l->Fill(eta, ptprobe, m2f, w);
-                 h->p2mnpf_l->Fill(eta, ptprobe, mnf, w);
-                 h->p2mupf_l->Fill(eta, ptprobe, muf, w);
+                 h->p2m0pf_gq->Fill(eta, ptprobe, m0f, w);
+                 h->p2m2pf_gq->Fill(eta, ptprobe, m2f, w);
+                 h->p2mnpf_gq->Fill(eta, ptprobe, mnf, w);
+                 h->p2mupf_gq->Fill(eta, ptprobe, muf, w);
                 }
-              } // WP_l
+              } // tag gluon and probe quark
 
-	    } //njets 
-          
+              if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
+                  0. <= Jet_btagPNetQvG[iprobe] && Jet_btagPNetQvG[iprobe] < 0.45 && fabs(eta)<1.3)
+              {
+	        h->h_tagprobeab_gg->Fill(ptavp2, w);
+                h->h_tagprobead_gg->Fill(ptave, w);
+                h->h_tagprobetc_gg->Fill(pttag, w);
+                h->h_tagprobepf_gg->Fill(ptprobe, w);
+
+                { // Bisector (proper) WP_t
+                  if (doGluonJets && doDijetJER)
+                  {
+                    h->p2m0_gg->Fill(eta, ptavp2, m0b, w);
+                    h->p2m0x_gg->Fill(eta, ptavp2, m0bx, w);
+                    h->p2m2_gg->Fill(eta, ptavp2, m2b, w);
+                    h->p2m2x_gg->Fill(eta, ptavp2, m2bx, w);
+                  }
+
+                  h->p2m0ab_gg->Fill(eta, ptavp2, m0b, w);
+                  h->p2m2ab_gg->Fill(eta, ptavp2, m2b, w);
+                  h->p2mnab_gg->Fill(eta, ptavp2, mnb, w);
+                  h->p2muab_gg->Fill(eta, ptavp2, mub, w);
+                }
+                { // Dijet axis
+                  h->p2m0ad_gg->Fill(eta, ptave, m0d, w);
+                  h->p2m2ad_gg->Fill(eta, ptave, m2d, w);
+                  h->p2mnad_gg->Fill(eta, ptave, mnd, w);
+                  h->p2muad_gg->Fill(eta, ptave, mud, w);
+                }
+                // Tag jet axis
+                {
+                  h->p2m0tc_gg->Fill(eta, pttag, m0c, w);
+                  h->p2m2tc_gg->Fill(eta, pttag, m2c, w);
+                  h->p2mntc_gg->Fill(eta, pttag, mnc, w);
+                  h->p2mutc_gg->Fill(eta, pttag, muc, w);
+                }
+                // Probe jet axis
+                {
+                 h->p2m0pf_gg->Fill(eta, ptprobe, m0f, w);
+                 h->p2m2pf_gg->Fill(eta, ptprobe, m2f, w);
+                 h->p2mnpf_gg->Fill(eta, ptprobe, mnf, w);
+                 h->p2mupf_gg->Fill(eta, ptprobe, muf, w);
+                }
+              } //tag gluon and probe gluon
+            } // WP tight tag gluon
+
           } // doGluonJets
+	  
           
 
 
@@ -6475,6 +7028,10 @@ if (isMG)
                 h->pnef13->Fill(ptavp2, Jet_neEmEF[itag], w);
                 h->pcef13->Fill(ptavp2, Jet_chEmEF[itag], w);
                 h->pmuf13->Fill(ptavp2, Jet_muEF[itag], w);
+
+		h->h3ptetanhftc->Fill(abseta, pttag, Jet_neHEF[iprobe], w);
+		h->p3m0nhftc->Fill(abseta, pttag, Jet_neHEF[iprobe], m0c, w);
+		h->p3m2nhftc->Fill(abseta, pttag, Jet_neHEF[iprobe], m2c, w);
               }
             }
 
@@ -6580,6 +7137,7 @@ if (isMG)
 
         string &trg = vtrg[itrg];
         if (!(*mtrg[trg]))
+	//if (!(mtrg[trg]))
           continue;
 
         multijetHistos *h = mhmj[trg];
@@ -6716,6 +7274,7 @@ if (isMG)
         string &trg = vtrg[itrg];
         //std::cout << "Trigger: " << trg << std::endl;
         if (!(*mtrg[trg]))
+	//if (!(mtrg[trg]))
           continue;
         jetsperRuns *h = mjet[trg];
         //const range &r = mt[trg];
