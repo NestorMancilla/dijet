@@ -41,8 +41,8 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = false;
-bool useJERSFvsPt = false; // new file format
+bool smearJets = true;
+bool useJERSFvsPt = true; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
 std::mt19937 _mersennetwister;
@@ -63,6 +63,7 @@ bool doGluonJets = true; //  MPF/DB calculations for dijet using Jet_btagPNetQvG
 bool doDijet2 = true;   // dijet selection (DESY style)
 bool doMultijet = true; // multijet selection
 bool doJetsperRuns = true; // Jets rate per runs normalized by the luminosity
+bool doPurity = false;
 
 // Core additions
 bool doPFComposition = true; // jetveto / incjet / dijet / multijet
@@ -136,7 +137,9 @@ constexpr const char lumibyls2023BCD[] = "luminosityscripts/csvfiles/lumibyls202
 constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500_v2.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias_v2.csv";
 //constexpr const char lumibyls2025B[] = "luminosityscripts/csvfiles/2025/lumi_391658_392221_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392382_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
@@ -155,9 +158,17 @@ constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lum
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398903_daily_dials_HLTZeroBias.csv";
 constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTPFJet500.csv";
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTZeroBias.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401844_DCS_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401844_DCS_HLTZeroBias.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401951_DCS_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401951_DCS_HLTZeroBias.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401624to402040_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401624to402040_HLTZeroBias.csv";
+constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTZeroBias.csv";
 
 
-constexpr std::array<std::pair<const char*, const char*>, 206> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 248> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -364,6 +375,48 @@ constexpr std::array<std::pair<const char*, const char*>, 206> lumifiles = {{
     {"2025G_ZB", lumibyls2025BCD},
     {"2025C_Trk", lumibyls2025BCD},
     {"2025C_Trk_ZB", lumibyls2025BCD},
+    {"2026A_0", lumibyls2026BCD},
+    {"2026A_1", lumibyls2026BCD},
+    {"2026A_ZB", lumibyls2026BCD},
+    {"2026Bnib1_0", lumibyls2026BCD},
+    {"2026Bnib1_1", lumibyls2026BCD},
+    {"2026Bnib2_0", lumibyls2026BCD},
+    {"2026Bnib2_1", lumibyls2026BCD},
+    {"2026Bnib1_ZB", lumibyls2026BCD},
+    {"2026Bnib2_ZB", lumibyls2026BCD},
+    {"2026Bnib2_01", lumibyls2026BCD},
+    {"2026Bnib2_02", lumibyls2026BCD},
+    {"2026Bnib2_03", lumibyls2026BCD},
+    {"2026Bnib2_11", lumibyls2026BCD},
+    {"2026Bnib2_12", lumibyls2026BCD},
+    {"2026Bnib2_13", lumibyls2026BCD},
+    {"2026Bnib2_14", lumibyls2026BCD},
+    {"2026Bnib2_ZB_16", lumibyls2026BCD},
+    {"2026Bnib2_ZB_15", lumibyls2026BCD},
+    {"2026Bnib2_ZB_14", lumibyls2026BCD},
+    {"2026Bnib2_ZB_13", lumibyls2026BCD},
+    {"2026Bnib2_ZB_12", lumibyls2026BCD},
+    {"2026Bnib2_ZB_11", lumibyls2026BCD},
+    {"2026Bnib2_121", lumibyls2026BCD},
+    {"2026Bnib2_122", lumibyls2026BCD},
+    {"2026B_0_part_00", lumibyls2026BCD},
+    {"2026B_0_part_01", lumibyls2026BCD},
+    {"2026B_0_part_02", lumibyls2026BCD},
+    {"2026B_0_part_03", lumibyls2026BCD},
+    {"2026B_0_part_04", lumibyls2026BCD},
+    {"2026B_0_part_05", lumibyls2026BCD},
+    {"2026B_1_part_00", lumibyls2026BCD},
+    {"2026B_1_part_01", lumibyls2026BCD},
+    {"2026B_1_part_02", lumibyls2026BCD},
+    {"2026B_1_part_03", lumibyls2026BCD},
+    {"2026B_1_part_04", lumibyls2026BCD},
+    {"2026B_1_part_05", lumibyls2026BCD},
+    {"2026B_ZB_part_00", lumibyls2026BCD},
+    {"2026B_ZB_part_01", lumibyls2026BCD},
+    {"2026B_ZB_part_02", lumibyls2026BCD},
+    {"2026B_ZB_part_03", lumibyls2026BCD},
+    {"2026B_ZB_part_04", lumibyls2026BCD},
+    {"2026B_ZB_part_05", lumibyls2026BCD}
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -428,6 +481,7 @@ public:
   TH2D *h2pteta, *h2pteta_gen, *h2pteta_gen_NoVtx, *h2pteta_rec, *h2res_ptgen, *h2res_etagen, *h2_btagUpar;//, *h2res_bar;
   TH2D *h2pteta_gEta, *h2pteta_gEtaNoVtx, *h2pteta_gEtaIDNoVtx, *h2pteta_gEtaIDVtx; //JetID Eff
   TH2D *h2pteta_Athens, *h2pteta_gen_Athens, *h2res_ptgen_Athens, *h2res_etagen_Athens, *h2_btagUpar_Athens; // LeadinJet folder
+  TH2D *h2Purity_loose, *h2Purity_medium, *h2Purity_tight;
   TH3D *h3res, *h3res_Match, *h3res_raw;
   TH3D *h3res_Athens, *h3res_Match_Athens, *h3res_raw_Athens; // LeadinJet folder
   TProfile2D *p2jes, *p2jsf, *p2r, *p2r_NoMatch, *p2r_raw, *p2effz, *p2eff_noVtx, *p2eff, *p2pur_noVtx, *p2pur, *p2eff_recEta, *p2eff_recEta_noVtx;
@@ -519,7 +573,7 @@ public:
   TProfile2D *p2m0ad, *p2m2ad, *p2mnad, *p2muad;     // pT,ave (dijet axis)
   TProfile2D *p2m0tc, *p2m2tc, *p2mntc, *p2mutc;     // pT,tag (central)
   TProfile2D *p2m0pf, *p2m2pf, *p2mnpf, *p2mupf;     // pt,probe (forward)
-  TProfile3D *p3m0nhftc, *p3m2nhftc;
+  TProfile3D *p3m0nhftc, *p3m2nhftc; // This are the good ones
 
   //  |eta|<1.3; EC1: 1.3<|eta|<2.5; EC2: 2.5<|eta|<3.0; HF: |eta|>3
   TProfile2D *p2m0ab_mu_13, *p2m0ab_rho_13, *p2m0ab_NPV_13; // pt_avp (bisector)
@@ -752,7 +806,8 @@ void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
     }
     std::vector<std::string> vtrg = {
 	"HLT_ZeroBias",
-        "HLT_PFJet40", "HLT_PFJet60", "HLT_PFJet80", "HLT_PFJet140", "HLT_PFJet200",
+        "HLT_PFJet40", "HLT_PFJet60", "HLT_PFJet80", "HLT_PFJet110",
+        "HLT_PFJet140", "HLT_PFJet200",
         "HLT_PFJet260", "HLT_PFJet320", "HLT_PFJet400", "HLT_PFJet450", "HLT_PFJet500",
         "HLT_PFJetFwd40", "HLT_PFJetFwd60", "HLT_PFJetFwd80", "HLT_PFJetFwd140", "HLT_PFJetFwd200",
         "HLT_PFJetFwd260", "HLT_PFJetFwd320", "HLT_PFJetFwd400", "HLT_PFJetFwd450", "HLT_PFJetFwd500",
@@ -861,6 +916,7 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_PFJet40",
 		"HLT_PFJet60",
 		"HLT_PFJet80",
+		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
 		"HLT_PFJet260",
@@ -894,7 +950,19 @@ bool DijetHistosFill::LoadLumi()
 		"HLT_DiPFJetAve220_HFJEC",
 		"HLT_DiPFJetAve300_HFJEC"};
 
-	string JSON_version = "Collisions2025_391658_398860_Golden"; // 2025 full year
+	string data_year;
+	string JSON_version;
+	if (TString(dataset.c_str()).Contains("2026")){
+	  JSON_version = "Collisions26_401630to402244";
+	  //JSON_version = "Collisions26_401624to402040";
+	  //JSON_version = "Collisions26_401623_401951_DCSOnly";
+	  data_year = "2026";
+	//string JSON_version = "Collisions26_401623_401844_DCSOnly";
+	}
+	if (TString(dataset.c_str()).Contains("2025")){
+	  JSON_version = "Collisions2025_391658_398860_Golden"; // 2025 full year
+	  data_year = "2025";
+	}
 	//string JSON_version = "Collisions2025_391658_398903_daily_dials";
 	//string JSON_version = "Collisions2025_391658_398860_daily_dials";
 	//string JSON_version = "Collisions2025_391668_398395_Hybrid";
@@ -910,48 +978,52 @@ bool DijetHistosFill::LoadLumi()
 	//string JSON_version = "Collisions2025_391658_392526_DIALS"; //2025BC
 	//string JSON_version = "Collisions2025_391658_392382_DIALS"; //2025B
 	//string JSON_version = "Collisions2025_391658_392221_DIALS"; //2025B
-	//string JSON_version = "Collisions2024_378981_386951_Golden"; // 2024 full year
+	if (TString(dataset.c_str()).Contains("2024")){
+	  JSON_version = "Collisions2024_378981_386951_Golden"; // 2024 full year
+	  data_year = "2024";
+	}
 	//string JSON_version = "Collisions2023_366442_370790_Golden";
 	//string JSON_version = "Collisions2022_355100_362760_Golden";
 	//string era_year_path = "luminosityscripts/csvfiles/"
 	// List of filenames
 	vector<string> filenames = {
-		"luminosityscripts/csvfiles/2025/lumi_HLT_ZeroBias_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJet500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/2025/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_ZeroBias_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet110_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd450_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJetFwd500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve60_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve140_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve200_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve260_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve320_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve400_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve500_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve60_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve80_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve100_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve160_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve220_HFJEC_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_DiPFJetAve300_HFJEC_"+JSON_version+".csv"
 	};
 
 	for (size_t idx = 0; idx < vtrg.size(); ++idx) {
@@ -1066,7 +1138,7 @@ bool DijetHistosFill::LoadLumi()
                 expectedTag = "#Data tag : online , Norm tag: None";
                 expectedHeader = "#run:fill,ls,time,hltpath,delivered(/fb),recorded(/fb),avgpu,source";
 
-	} else if (lumifile_str.Contains("2025")){
+	} else if (lumifile_str.Contains("2025") || lumifile_str.Contains("2026")){
 		expectedTag = "#Data tag : online , Norm tag: None";
 	        expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
 	} else {
@@ -1442,6 +1514,7 @@ void DijetHistosFill::Loop()
 		"HLT_PFJet40",
 		"HLT_PFJet60",
 		"HLT_PFJet80",
+		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
 		"HLT_PFJet260",
@@ -1724,8 +1797,12 @@ mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
 //mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
 mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
 mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
-mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
+//mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
+mt["HLT_PFJet80"]  = range{114, 155, 0, 3.0};
+//mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
+mt["HLT_PFJet110"] = range{155, 196, 0, 3.0};
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
+//mt["HLT_PFJet110"] = range{155, 272, 0, 3.0};
 mt["HLT_PFJet200"] = range{272, 330, 0, 3.0};
 mt["HLT_PFJet260"] = range{330, 395, 0, 3.0};
 mt["HLT_PFJet320"] = range{395, 468, 0, 3.0};
@@ -1753,8 +1830,12 @@ mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
 //mi["HLT_MC"]       = range{15,6500,  0, 5.2};
 mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
 mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
-mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
-mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
+//mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
+mi["HLT_PFJet80"]  = range{114, 155, 0, fwdeta};  // Upper bound hands off to 110
+mi["HLT_PFJet110"] = range{155, 196, 0, fwdeta};  // Bridges the gap between 80 and 140
+mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
+//mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
+//mi["HLT_PFJet110"] = range{155, 272, 0, fwdeta};
 mi["HLT_PFJet200"] = range{272, 330, 0, fwdeta0}; // 4
 mi["HLT_PFJet260"] = range{330, 395, 0, fwdeta0}; // 5
 mi["HLT_PFJet320"] = range{395, 468, 0, fwdeta0}; // 6
@@ -1825,8 +1906,13 @@ md2pf["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 //md2pf["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
 md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
+//md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
+//md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
+//md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
+//md2pf["HLT_PFJet110"] = range{140, 236, 0, 5.2};
+md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
+md2pf["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
+md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2pf["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
 md2pf["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
 md2pf["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
@@ -1851,8 +1937,13 @@ md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
 md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
 md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
-md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
+//md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
+//md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
+//md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
+//md2tc["HLT_PFJet110"] = range{140, 236, 0, 5.2};
+md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
+md2tc["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
+md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2tc["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
 md2tc["HLT_PFJet260"] = range{302, 373, 0, 5.2};//fwdetad};
 md2tc["HLT_PFJet320"] = range{373, 460, 0, 5.2};//fwdetad};
@@ -2250,15 +2341,20 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 {
 	jec = getFJC("",
 			//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+			//"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
 			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
-	jerpathsf = "";
+	//jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jersfvspt = getFJC("", "ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "", "");
-	//jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	jerpath = "";
-	useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+	jersfvspt = getFJC("", "Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "", "");
+	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+	//jerpath = "";
+	useJERSFvsPt = true; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
 
            	
 	   if (reweightPU && !doPU_per_trigger)
@@ -2629,6 +2725,41 @@ if (TString(dataset.c_str()).Contains("2025G")) {
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
+}
+
+if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Contains("2026B")) {
+        jec = getFJC("",
+			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+                        //"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			//"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt26_Run2026B_V0M_DATA_L2L3Residual_AK4PFPuppi");
+}
+
+if (TString(dataset.c_str()).Contains("Winter26MG") || TString(dataset.c_str()).Contains("Winter26MC"))
+{
+        jec = getFJC("",
+                        "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+                        "");
+        jerpathsf = "";
+        //jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
+        //jersfvspt = getFJC("", "Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi", "");
+        jersfvspt = getFJC("", "", "");
+        //jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+        jerpath = "";
+        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+
+           if (reweightPU && !doPU_per_trigger)
+           {
+                 TFile f("luminosityscripts/PUWeights2025/75mb/PUWeight2025Cv1/PUWeights_HLT_PFJet500_2025Cv1.root");
+                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2025Cv1");
+                 pileupRatio->SetDirectory(0);
+                 // Print mean, min weight, max weight
+                 cout << "PU weight file: " << f.GetName() << endl;
+                 cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+                 cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+                 cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+
+           }
 }
 
 if ((isRun2 && (!jec || !jecl1rc)) || (isRun3 && !jec))
@@ -3081,6 +3212,11 @@ if (isMG)
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_398860_daily_dials.json");
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_398903_daily_dials.json");
       LoadJSON("rootfiles/2025/Cert_Collisions2025_391658_398860_Golden.json");
+    if (TString(dataset.c_str()).Contains("2026"))
+      //LoadJSON("rootfiles/2026/Collisions26_13p6TeV_401623_401844_DCSOnly_TkPx.json");
+      //LoadJSON("rootfiles/2026/Collisions26_13p6TeV_401623_401951_DCSOnly_TkPx.json");
+      //LoadJSON("rootfiles/2026/CombinedJSONS_DCSCMLE_Runs_401624to402040.json");
+      LoadJSON("rootfiles/2026/CombinedJSONS_MLJSONRuns_401630to402172_DCSRuns_402173to402244.json");
 
   }
   int _nbadevts_json(0);
@@ -3092,7 +3228,8 @@ if (isMG)
 
   // Listing of runs and LS
   int nrun(0), nls(0), nevt(0);
-  map<int, map<int, int>> mrunls;
+  map<int, map<int, int>> mrunls; // broken version, ot it was at least
+  //map<int, set<int>> mrunls;
 
   map<string, mctruthHistos *> mhmc;
   map<string, jetvetoHistos *> mhjv;
@@ -3430,6 +3567,12 @@ if (isMG)
 	h->h2PNetQvG_G25_60 = new TH2D("h2PNetQvG_G25_60", ";p_{T,gen};PNetQvG;N_{events}", nptd, vptd, 100, 0.0, 1.0);
 	h->h2PNetQvG_G25_80 = new TH2D("h2PNetQvG_G25_80", ";p_{T,gen};PNetQvG;N_{events}", nptd, vptd, 100, 0.0, 1.0);
       }
+
+      if (doPurity){
+        h->h2Purity_loose = new TH2D("h2Purity_loose", ";|#eta_{jet}|;p_{T,gen};N_{events}", nxd, vxd, nptd, vptd);
+	h->h2Purity_medium = new TH2D("h2Purity_medium", ";|#eta_{jet}|;p_{T,gen};N_{events}", nxd, vxd, nptd, vptd);
+	h->h2Purity_tight = new TH2D("h2Purity_tight", ";|#eta_{jet}|;p_{T,gen};N_{events}", nxd, vxd, nptd, vptd);
+      } // doPurity
       
 
     } // isMC && doMCtruth
@@ -4008,11 +4151,13 @@ if (isMG)
 	h->h3ptetanhftc = new TH3D ("h3ptetanhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;neHEF",
                                  nx, vx, nptd, vptd, nNHFd, vNHFd);
 
+	
         h->p3m0nhftc = new TProfile3D("p3m0nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF0",
                                  nx, vx, nptd, vptd, nNHFd, vNHFd);
 
         h->p3m2nhftc = new TProfile3D("p3m2nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF2",
                                  nx, vx, nptd, vptd, nNHFd, vNHFd);
+	
       }
 
     } // doDijet
@@ -4492,11 +4637,13 @@ if (isMG)
 	h->h3ptetanhftc = new TH3D ("h3ptetanhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;neHEF",
 				 nxd, vxd, nptd, vptd, nNHFd, vNHFd);
 
+	
 	h->p3m0nhftc = new TProfile3D("p3m0nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF0",
 				 nxd, vxd, nptd, vptd, nNHFd, vNHFd);
 
 	h->p3m2nhftc = new TProfile3D("p3m2nhftc", ";#eta;p_{T,tag} (GeV);Jet neHEF;MPF2",
 				 nxd, vxd, nptd, vptd, nNHFd, vNHFd);
+	
 
       }
     } // doDijet2
@@ -4792,9 +4939,12 @@ if (isMG)
     //fjv = new TFile("rootfiles/jetveto2024FG_FPix_V6M.root", "READ");
     //fjv = new TFile("rootfiles/jetveto2024BCDEFGHI.root", "READ");
     fjv = new TFile("rootfiles/jetvetoReReco2024_V9M.root");
-  if (TString(dataset.c_str()).Contains("2025") || TString(dataset.c_str()).Contains("Winter25"))
+  if (TString(dataset.c_str()).Contains("2025") || 
+      TString(dataset.c_str()).Contains("Winter25"))
     //fjv = new TFile("rootfiles/jetveto2025CDE_V2M.root");
     fjv = new TFile("rootfiles/jetveto2025CDEFG_V3M.root");
+  if (TString(dataset.c_str()).Contains("2026"))                   
+    fjv = new TFile("rootfiles/jetveto2026B_V0M.root");
   assert(fjv);
 
   // Veto lists for different years (NB: extra MC map for UL16):
@@ -4848,17 +4998,10 @@ if (isMG)
       TString(dataset.c_str()).Contains("2023D") ||
       TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPix"))
     h2jv = (TH2D *)fjv->Get("jetvetomap");
-  //if (TString(dataset.c_str()).Contains("2024")  || TString(dataset.c_str()).Contains("Winter24MCFlat") || TString(dataset.c_str()).Contains("Winter24MG"))
-    //h2jv = (TH2D *)fjv->Get("jetvetomap");
-    //h2jvBPix = (TH2D *)fjv->Get("jetvetomap_bpix");
   if (TString(dataset.c_str()).Contains("2024B") ||
       TString(dataset.c_str()).Contains("2024C") ||
       TString(dataset.c_str()).Contains("2024D") ||
       TString(dataset.c_str()).Contains("2024E") ||
-      //dataset == "2024B" || dataset == "2024B_ZB" || dataset == "2024C" || dataset == "2024C_ZB" ||
-      //dataset == "2024D" || dataset == "2024D_ZB" || dataset == "2024Ev1" || dataset == "2024Ev1_ZB" ||
-      //dataset == "2024Ev2" || dataset == "2024Ev2_ZB" || dataset == "2024BR" || dataset == "2024CR" ||
-      //dataset == "2024CS" || dataset == "2024CT" ||
       TString(dataset.c_str()).Contains("Winter24MCFlat") || 
       TString(dataset.c_str()).Contains("Winter24MG")|| TString(dataset.c_str()).Contains("Summer24MG") ||
       TString(dataset.c_str()).Contains("QCDFlatECAL") || //TString(dataset.c_str()).Contains("Winter25") ||
@@ -4868,13 +5011,12 @@ if (isMG)
       TString(dataset.c_str()).Contains("2024G") || //dataset == "2024G_ZB" ||
       TString(dataset.c_str()).Contains("2024H") ||
       TString(dataset.c_str()).Contains("2024I") ||
-      //dataset == "2024H" || dataset == "2024H_ZB" || dataset == "2024H_Skim" || 
-      //dataset == "2024Iv1" || dataset == "2024Iv1_ZB" ||
-      //dataset == "2024Iv2" || dataset == "2024Iv2_ZB" ||
       dataset == "2024F_TeVJet" || dataset == "2024F_JetHT" || dataset == "2024I_Skim") // ||
-      //TString(dataset.c_str()).Contains("2025"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
-  if (TString(dataset.c_str()).Contains("2025") || TString(dataset.c_str()).Contains("Winter25"))
+  if (TString(dataset.c_str()).Contains("2025") ||
+      TString(dataset.c_str()).Contains("Winter25"))
+    h2jv = (TH2D *)fjv->Get("jetvetomap_all");
+  if (TString(dataset.c_str()).Contains("2026")) 
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
@@ -5013,7 +5155,19 @@ if (isMG)
       b_run->GetEntry(ientry);
       b_luminosityBlock->GetEntry(ientry);
  
-      
+      // Check and track runs and lumisections
+      if (mrunls.find(run) == mrunls.end()) {
+        ++nrun;
+      }
+    
+      // If the lumisection is not in the set for this run, add it and increment counter
+      if (mrunls[run].find(luminosityBlock) == mrunls[run].end()) {
+        ++nls;
+        //mrunls[run].insert(luminosityBlock); // <-- THIS is what was missing!
+	mrunls[run][luminosityBlock] = 1;
+      }
+      ++nevt;
+
       // Does the run/LS pass the latest JSON selection?
       if (_json[run][luminosityBlock] == 0)
       {
@@ -5060,10 +5214,16 @@ if (isMG)
         continue;
       }
       // Separate 2024E reprocessing for 2024Ev1 and 2024Ev2
-      //if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run >= 381384) {
+      //if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run >= 381384) { }
       //if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run < 381384) {
       	//continue;
       //}
+      if (TString(dataset.c_str()).Contains("2026Bnib1") && (run > 401848)) {
+        continue;
+      }
+      if (TString(dataset.c_str()).Contains("2026Bnib2") && (401848 >= run)) {
+        continue;
+      }
     } // doJSON
 
     
@@ -5135,11 +5295,15 @@ if (isMG)
       cout << "Keep track of run+LS" << endl
            << flush;
 
+    // commented, broken
+    /*
     if (mrunls.find(run) == mrunls.end())
       ++nrun;
     if (mrunls[run].find(luminosityBlock) == mrunls[run].end())
       ++nls;
     ++nevt;
+    */
+
     // THIS HAS BEEN MOVED TO LUMI CALCULATION
     // mrunls[run][luminosityBlock] = 1;
 
@@ -5569,7 +5733,21 @@ if (isMG)
               }
 	    }
 	  }
-        }
+        } //doQvsG
+
+	/*
+	// i<3
+	if (doPurity){
+	  if(0 < abs(GenJet_partonFlavour[j]) && abs(GenJet_partonFlavour[j]) < 4) { // 1, 2, 3 for quakrs
+            e
+	  }
+	  if (GenJet_partonFlavour[j] == 21) {
+	    e
+	  }
+
+	} // doPurity
+	*/
+
 	//
 
 	//To check Survival probability -> compare with h2pteta_gen
@@ -7029,9 +7207,11 @@ if (isMG)
                 h->pcef13->Fill(ptavp2, Jet_chEmEF[itag], w);
                 h->pmuf13->Fill(ptavp2, Jet_muEF[itag], w);
 
+		
 		h->h3ptetanhftc->Fill(abseta, pttag, Jet_neHEF[iprobe], w);
 		h->p3m0nhftc->Fill(abseta, pttag, Jet_neHEF[iprobe], m0c, w);
 		h->p3m2nhftc->Fill(abseta, pttag, Jet_neHEF[iprobe], m2c, w);
+		
               }
             }
 

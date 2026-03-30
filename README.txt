@@ -72,6 +72,28 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v158. Fixing JSON file to include run number and lumisections. Adding 2026 L2L3Residuals. Processing 2026B.
+//       Summer24MG v158 only with L2Rel Winter26.
+//       v158_v2 includes L2Rel Winter26 and JER SF.
+//       v158_v3 Process 2024 and 2025 to include the JSON files.
+//       v158_v4 MC with Summer24MG L2Relative and 2026 JER SF.
+//       v158_v5 MC with Summer24MG L2Relative and 2025 JER SF CDEFG.
+// v157. Process 2026A and 2026B with and without L2L3Res, both with Winter26 L2Rel.
+// v156. 2024 and 2025 data including the NHF TProfile3D histograms and the HLT_PFJet110 trigger.
+// Pending. Process Run2 using NanoAODV15 samples (From fikri first, later centraly produced samples) not done yet.
+// v155. Changes in the incl jets histograms in data to match the selection in MC. MPF response vs mu, NPV, rho.
+// v154. Modify the lumi histograms.
+// v153. V3M JECS. v153_v2 uses the variation for multijet, next versions does not include that.
+// v152. Process 2025 using the Golden JSON file 391658_398860. Include ZB selection or not. v2 also include SingleNeutrino.
+// v151. Adding avgpu to the lumi file (--byls --minBiasXsec 75300 added to the regular command). Producing rhovsmu histograms.
+//       Summer24MC_Flat2022 added: FlatPU0to120.
+// v150. Testing to process Summer24 sending condor jobs. v1 is for Condor, v2 is for local. v150 is the final version.
+//	 The problem was related to the JetID wrapper, considering only Winter25 and not Summer24 (V15 does not include JetID).
+//       v150_v1 and v150_v2 will be also used to test the time-stability plot for 2025 data. Final results in v150.
+// v149. Implementation of GenJet_partonFlavour and UParTAK4QvG for QG SF studies.
+// v148. Pure gen histograms without event/cut selection. hpt*_genMatch. Running QCD HTbin and Flat, Flat contains QvG taggers.
+// 	 v148_v4 NANOAODv15 for Flat and MG.
+// v147. 2025F v1 and v2. Nex iteration updates JSON file to include more data for 2025G.
 // v146. L2Res pT binning for L2Res histograms from Dijet directory.
 // v145. Test for Trk files (TrkRadDamage).
 // v144. Lxplus and skim files for MC.
