@@ -5542,8 +5542,8 @@ if (isMG)
           double CF = 1.;
           // We see if the gen jet meets our requirements
           bool condPt = (jPtGen > MIN_JET_ENERGY && dR < 0.2);
-          double relDPt = condPt ? (jPt - jPtGen) / jPt : 0.0;
-          bool condPtReso = fabs(relDPt) < 3 * Reso;
+          double relDPt = condPt ? (jPt - jPtGen) / jPtGen : 0.0; // Correction: (jPt - jPtGen) / jPtGen. Old version (jPt - jPtGen) / jPt
+          bool condPtReso = fabs((jPt - jPtGen) / jPt) < 3 * Reso; // Correction: fabs((jPt - jPtGen) / jPt) < 3 * Reso; Old version fabs(relDPt) < 3 * Reso;
           if (condPt and condPtReso)
           {
             // Case 1: we have a "good" gen jet matched to the reco jet (indicated by positive gen jet pt)

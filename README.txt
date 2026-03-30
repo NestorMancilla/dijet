@@ -78,6 +78,7 @@ Bugs:
 //       v158_v3 Process 2024 and 2025 to include the JSON files.
 //       v158_v4 MC with Summer24MG L2Relative and 2026 JER SF.
 //       v158_v5 MC with Summer24MG L2Relative and 2025 JER SF CDEFG.
+//       v158_v6 MC JER SF bug. Fix it and test for 2026 JER SF.
 // v157. Process 2026A and 2026B with and without L2L3Res, both with Winter26 L2Rel.
 // v156. 2024 and 2025 data including the NHF TProfile3D histograms and the HLT_PFJet110 trigger.
 // Pending. Process Run2 using NanoAODV15 samples (From fikri first, later centraly produced samples) not done yet.
