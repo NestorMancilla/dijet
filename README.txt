@@ -72,13 +72,17 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v159. Remove 398803 run from the 2025 Golden Json file and processing 2025G.
+//       v2 add the fix on JER SF. Running for Summer24 JME MG and Flat 2025 JERSF.
 // v158. Fixing JSON file to include run number and lumisections. Adding 2026 L2L3Residuals. Processing 2026B.
 //       Summer24MG v158 only with L2Rel Winter26.
 //       v158_v2 includes L2Rel Winter26 and JER SF.
 //       v158_v3 Process 2024 and 2025 to include the JSON files.
 //       v158_v4 MC with Summer24MG L2Relative and 2026 JER SF.
 //       v158_v5 MC with Summer24MG L2Relative and 2025 JER SF CDEFG.
-//       v158_v6 MC JER SF bug. Fix it and test for 2026 JER SF.
+//       v158_v6 MC JER SF bug. Fix it and test for 2026 JER SF using JMENANO samples, small test.
+//       v158_v7 Process Summer24MC Flat22 JMENANO sample to compare with v158_v6.
+//       v158_v8 Process Summer24MC Flat22 JMENANO sample with JERSF, BUT using the previous method, just to compare.
 // v157. Process 2026A and 2026B with and without L2L3Res, both with Winter26 L2Rel.
 // v156. 2024 and 2025 data including the NHF TProfile3D histograms and the HLT_PFJet110 trigger.
 // Pending. Process Run2 using NanoAODV15 samples (From fikri first, later centraly produced samples) not done yet.

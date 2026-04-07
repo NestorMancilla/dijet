@@ -138,8 +138,8 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500_v2.csv";
-//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias_v2.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500_v2.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias_v2.csv";
 //constexpr const char lumibyls2025B[] = "luminosityscripts/csvfiles/2025/lumi_391658_392221_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392382_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
@@ -156,8 +156,8 @@ constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lum
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398903_daily_dials.csv";
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398903_daily_dials_HLTPFJet500.csv";
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398903_daily_dials_HLTZeroBias.csv";
-constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTPFJet500.csv";
-//constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTZeroBias.csv";
+//constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTPFJet500.csv";
+constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401844_DCS_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401844_DCS_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401951_DCS_HLTPFJet500.csv";
@@ -2346,11 +2346,11 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 			"");
 	//jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi.txt";
-	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi.txt";
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jersfvspt = getFJC("", "ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi", "");
-	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi", "");
+	jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "", "");
 	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
 	//jerpath = "";
@@ -5218,10 +5218,15 @@ if (isMG)
       //if ((dataset == "2024E_Rp" || dataset == "2024E_Rp_ZB") && run < 381384) {
       	//continue;
       //}
+      /*
       if (TString(dataset.c_str()).Contains("2026Bnib1") && (run > 401848)) {
         continue;
       }
       if (TString(dataset.c_str()).Contains("2026Bnib2") && (401848 >= run)) {
+        continue;
+      }
+      */
+      if (TString(dataset.c_str()).Contains("2026B") && (run > 402513)){
         continue;
       }
     } // doJSON
@@ -5509,6 +5514,11 @@ if (isMG)
           // Set constants
           double MIN_JET_ENERGY = 0.01; // TBD
 
+	  bool condPt = (jPtGen > MIN_JET_ENERGY && dR < 0.2);
+
+	  // JER should use primarily genPt, secondary recoPt
+          double pt_for_reso = condPt ? jPtGen : jPt;
+
           // Some problems with the code below:
           // 1) JER should us primarily genPt, secondary recoPt
           // 2) relDpt  should evaluate vs genPt to avoid <1/x> != 1/<x> bias
@@ -5518,12 +5528,14 @@ if (isMG)
           // The method presented here can be found in https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution
           // and the corresponding code in https://github.com/cms-sw/cmssw/blob/CMSSW_8_0_25/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h
           assert(jer);
-          double Reso = jer->getResolution({{JME::Binning::JetPt, jPt}, {JME::Binning::JetEta, jEta}, {JME::Binning::Rho, rho}});
+          //double Reso = jer->getResolution({{JME::Binning::JetPt, jPt}, {JME::Binning::JetEta, jEta}, {JME::Binning::Rho, rho}});
+	  double Reso = jer->getResolution({{JME::Binning::JetPt, pt_for_reso}, {JME::Binning::JetEta, jEta}, {JME::Binning::Rho, rho}});
           double SF(1);
           if (useJERSFvsPt && jersfvspt)
           {
             jersfvspt->setJetEta(jEta);
-            jersfvspt->setJetPt(jPt);
+	    jersfvspt->setJetPt(pt_for_reso);
+            //jersfvspt->setJetPt(jPt);
             jersfvspt->setRho(rho);
             SF = jersfvspt->getCorrection();
           }
@@ -5541,9 +5553,10 @@ if (isMG)
           // Case 0: by default the JER correction factor is equal to 1
           double CF = 1.;
           // We see if the gen jet meets our requirements
-          bool condPt = (jPtGen > MIN_JET_ENERGY && dR < 0.2);
-          double relDPt = condPt ? (jPt - jPtGen) / jPtGen : 0.0; // Correction: (jPt - jPtGen) / jPtGen. Old version (jPt - jPtGen) / jPt
-          bool condPtReso = fabs((jPt - jPtGen) / jPt) < 3 * Reso; // Correction: fabs((jPt - jPtGen) / jPt) < 3 * Reso; Old version fabs(relDPt) < 3 * Reso;
+          //bool condPt = (jPtGen > MIN_JET_ENERGY && dR < 0.2);
+	  double relDPt = condPt ? (jPt - jPtGen) / jPt : 0.0;
+	  bool condPtReso = condPt && (fabs(jPt - jPtGen) < 3 * Reso * jPtGen);
+	  //bool condPtReso = fabs(relDPt) < 3 * Reso; // remember to remove this
           if (condPt and condPtReso)
           {
             // Case 1: we have a "good" gen jet matched to the reco jet (indicated by positive gen jet pt)
