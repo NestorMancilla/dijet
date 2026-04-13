@@ -72,8 +72,13 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v160. Process 2026C. v2 splits the datasets, but no other difference.
 // v159. Remove 398803 run from the 2025 Golden Json file and processing 2025G.
 //       v2 add the fix on JER SF. Running for Summer24 JME MG and Flat 2025 JERSF.
+//       v3 PSweights (baseline mu=0.25). PSWeight[0]. No smearing or JER SF.
+//       v4 PSWeight[1]. No smearing or JER SF.
+//       v5 PSWeight[2]. No smearing or JER SF.
+//       v6 PSWeight[3]. No smearing or JER SF.
 // v158. Fixing JSON file to include run number and lumisections. Adding 2026 L2L3Residuals. Processing 2026B.
 //       Summer24MG v158 only with L2Rel Winter26.
 //       v158_v2 includes L2Rel Winter26 and JER SF.

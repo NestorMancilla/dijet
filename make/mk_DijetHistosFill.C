@@ -100,11 +100,29 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Winter24MCFlat", "Winter24MCFlat_Sv10", "Winter24MCFlat_Sv9",
      "Winter24MG_1", "Winter24MG_2", "Winter24MG_3", "Winter24MG_4", "Winter24MG_5",
      "Summer24MG_1", "Summer24MG_2", "Summer24MG_3", "Summer24MG_4", "Summer24MG_5", "Summer24MG_oneHT", "Summer24MC_FlatJMEN",
+     "Summer24MG_6", "Summer24MG_7", "Summer24MG_8", "Summer24MG_9", "Summer24MG_10", "Summer24MC_Flat", "Summer24MG_11",
      "Winter25MC_Flat2022", "Summer24MC_NoPU", "Winter25MC_NoPU", "Summer24MC_NoPU_JME", "Winter25MC_JME",
-     "Summer24MC_SingleNeutrino",
+     "Summer24MC_SingleNeutrino", "Summer24MC_SingleNeutrino_FlatPU", "Summer24MC_SingleNeutrino_NoPU",
      "Winter24MGV14_1", "Winter24MGV14_2", "Winter24MGV14_3", "Winter24MGV14_4", "Winter24MGV14_5", "Winter24MGV14_OneHTFile",
      "QCDFlatECAL_1Sig", "QCDFlatECAL_2Sig", "QCDFlatECAL_3Sig", "QCDFlatECAL_4Sig", "QCDFlatECAL_Baseline", "QCDFlatECAL_Zero", //ECALPFT
-     "Winter25MG_1", "Winter25MG_2", "Winter25MG_3", "Winter25MG_4", "Winter25MG_5"
+     "Winter25MG_1", "Winter25MG_2", "Winter25MG_3", "Winter25MG_4", "Winter25MG_5", "Summer24MC_Flat2022",
+     "Winter25MC_Flat22", "Summer24MC_Flat22_NoDeepCore", "Summer24MC_Flat22_Base", "Winter25MC_Flat_EEZS9p5", "Summer24MC_Flat22_NoPU",
+     "Winter26MC_Flat22",
+     "Summer24MC_Flat22_Herwig", "Summer24MC_Flat22_JME",
+     "Summer22MC_Flat22_JME", "Summer23MC_Flat22_JME",
+     "Summer24MG_JME_1", "Summer24MG_JME_2", "Summer24MG_JME_3", "Summer24MG_JME_4", "Summer24MG_JME_5",
+     "Summer24MG_JME_6", "Summer24MG_JME_7", "Summer24MG_JME_8", "Summer24MG_JME_9", "Summer24MG_JME_10",
+     "Summer24MG_JME_11",
+     "Winter25MG_v15_1", "Winter25MG_v15_2", "Winter25MG_v15_3", "Winter25MG_v15_4", "Winter25MG_v15_5",
+     "Winter25MG_v15_6", "Winter25MG_v15_7", "Winter25MG_v15_8", "Winter25MG_v15_9", "Winter25MG_v15_10",
+     "Winter25MG_v15_11",
+     "Summer24MC_withNP", "Summer24MC_NPoff",
+     "Summer24MG_2026_1", "Summer24MG_2026_2", "Summer24MG_2026_3", "Summer24MG_2026_4",
+     "Summer24MG_2026_5", "Summer24MG_2026_6", "Summer24MG_2026_7", "Summer24MG_2026_8",
+     "Summer24MG_2026_9", "Summer24MG_2026_10", "Summer24MG_2026_11",
+     "Summer24MG_2025_1", "Summer24MG_2025_2", "Summer24MG_2025_3", "Summer24MG_2025_4", 
+     "Summer24MG_2025_5", "Summer24MG_2025_6", "Summer24MG_2025_7", "Summer24MG_2025_8",
+     "Summer24MG_2025_9", "Summer24MG_2025_10", "Summer24MG_2025_11"
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 
@@ -134,15 +152,42 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2024G_1", "2024G_2", "2024G_3", "2024G_4", "2024G_5",
   "2024H", "2024H_ZB", "2024Iv1", "2024Iv1_ZB", "2024Iv2", "2024Iv2_ZB",
   "2024F_TeVJet", "2024F_JetHT", "2024I_Skim", "2024H_Skim", "2024H_NT",
+  "2024C_Rp_Skim_0", "2024C_Rp_Skim_1", "2024C_Rp_Skim_ZB",
+  "2024D_Rp_Skim_0", "2024D_Rp_Skim_1", "2024D_Rp_Skim_ZB",
+  "2024E_Rp_Skim_0", "2024E_Rp_Skim_1", "2024E_Rp_Skim_ZB",
+  "2024H_Skim_0", "2024H_Skim_1", "2024H_Skim_ZB",
+  "2024I_Skim_0", "2024I_Skim_1", "2024I_Skim_ZB",
+  "2024F_nib1_Skim_0", "2024F_nib1_Skim_1", "2024F_nib1_Skim_ZB",
+  "2024F_nib2_Skim_0", "2024F_nib2_Skim_1", "2024F_nib2_Skim_ZB",
+  "2024F_nib3_Skim_0", "2024F_nib3_Skim_1", "2024F_nib3_Skim_ZB",
+  "2024G_nib1_Skim_0", "2024G_nib1_Skim_1", "2024G_nib1_Skim_ZB",
+  "2024G_nib2_Skim_0", "2024G_nib2_Skim_1", "2024G_nib2_Skim_ZB",
   "2024BR", "2024CR", "2024Ev2", "2024Crs", "2024CS", "2024CT",
   "2024C_Rp", "2024C_Rp_ZB", "2024D_Rp", "2024D_Rp_ZB", "2024E_Rp", "2024E_Rp_ZB",
   "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
   "2024F_ECAL2_1", "2024F_ECAL2_2", "2024F_ECAL2_3", "2024F_ECAL2_4",
   "2024I_ZB_HCPF1x", "2024I_ZB_HCPF2x", "2024I_ZB_HCPF3x", "2024I_ZB_HCPF4x", "2024I_ZB_HCPF5x", "2024I_ZB_HCPFSpecial", "2024I_ZB_Special",
   "2024_skim", "2025B", "2025B_ZB", "2025Cv1", "2025Cv1_ZB", "2025Cv2", "2025Cv2_ZB", "2025D", "2025D_ZB", "2025E", "2025E_ZB", "2025F", "2025F_ZB",
-  "2025D_1", "2025D_1_ZB", "2025D_2", "2025D_2_ZB", "2025E_1", "2025E_2", "2025Fv1_1", "2025Fv1_2", "2025Fv1_ZB", "2025Fv2_1", "2025Fv2_2", "2025Fv2_ZB",
-  "2025G_1", "2025G_2", "2025G_ZB",
-  "2025C_Trk", "2025C_Trk_ZB"
+  "2025D_1", "2025D_1_ZB", "2025D_2", "2025D_2_ZB", "2025E_1", "2025E_2", "2025Fv1_1", "2025Fv1_2", "2025Fv1_ZB", "2025Fv2_1", "2025Fv2_2", "2025Fv2_ZB", "2025Fv1_11", "2025Fv1_12", "2025Fv1_13", "2025Fv1_21", "2025Fv1_22", "2025Fv1_23",
+  "2025G_11", "2025G_12", "2025G_21", "2025G_22", "2025G_ZB", "2025D_11", "2025D_12", "2025D_21", "2025D_22",
+  "2025C_Trk", "2025C_Trk_ZB",
+  "2025Fv1_Skim_11", "2025Fv1_Skim_12", "2025Fv1_Skim_13", "2025Fv1_Skim_21", "2025Fv1_Skim_22", "2025Fv1_Skim_23",
+  "2025Fv2_Skim_1", "2025Fv2_Skim_2",
+  "2025Cv1_Skim_1", "2025Cv1_Skim_2", "2025Cv1_Skim_ZB",
+  "2026A_0", "2026A_1", "2026A_ZB", "2026Bnib1_0", "2026Bnib1_1", "2026Bnib2_0", "2026Bnib2_1",
+  "2026Bnib1_ZB", "2026Bnib2_ZB", "2026Bnib2_03", "2026Bnib2_02", "2026Bnib2_01",
+  "2026Bnib2_11", "2026Bnib2_12", "2026Bnib2_13", "2026Bnib2_14",
+  "2026Bnib2_121", "2026Bnib2_122",
+  "2026Bnib2_ZB_16", "2026Bnib2_ZB_15", "2026Bnib2_ZB_14", "2026Bnib2_ZB_13", "2026Bnib2_ZB_12",
+  "2026Bnib2_ZB_11",
+  "2026B_0_part_00", "2026B_0_part_01", "2026B_0_part_02", "2026B_0_part_03", 
+  "2026B_0_part_04", "2026B_0_part_05",
+  "2026B_1_part_00", "2026B_1_part_01", "2026B_1_part_02", "2026B_1_part_03",
+  "2026B_1_part_04", "2026B_1_part_05",
+  "2026B_ZB_part_00", "2026B_ZB_part_01", "2026B_ZB_part_02", "2026B_ZB_part_03",
+  "2026B_ZB_part_04", "2026B_ZB_part_05",
+  "2026C_0", "2026C_1", "2026C_2", "2026C_3", "2026C_4", "2026C_5", "2026C_ZB",
+  "2026C_01", "2026C_11", "2026C_21", "2026C_31", "2026C_41", "2026C_51", "2026C_ZB1"
   };
 
   // Check if dataset is supported
@@ -217,6 +262,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
     while (fin >> filename && nFiles<nFilesMax) {
       ++nFiles;
       c->AddFile(("root://cms-xrd-global.cern.ch/"+filename).c_str());
+      //c->AddFile(("root://hip-cms-se.csc.fi/"+filename).c_str());
       //c->AddFile(filename.c_str());
     }
     cout << "Chained " << nFiles <<  " files" << endl << flush;
@@ -238,6 +284,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
     while (fin >> filename && nFiles<nFilesMax) {
       ++nFiles;
       c->AddFile(("root://cms-xrd-global.cern.ch/"+filename).c_str());
+      //c->AddFile(("root://hip-cms-se.csc.fi/"+filename).c_str());
       //c->AddFile(filename.c_str());
     }
     cout << "Chained " << nFiles <<  " files" << endl << flush;

@@ -41,8 +41,8 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = true;
-bool useJERSFvsPt = true; // new file format
+bool smearJets = false;
+bool useJERSFvsPt = false; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
 std::mt19937 _mersennetwister;
@@ -79,6 +79,11 @@ bool doDijet2NM = false; // true;
 bool doJetID = false;    // add JetID class
 bool doLeadingJet = true; // To compare with Athens results
 bool doEtaPhi = true;
+bool doPSVar = false;
+bool doISRdown = false;
+bool doFSRdown = false;
+bool doISRup = false;
+bool doFSRup = true;
 
 bool doJetId_variables = true; // To compare Jet_jetId branch 
 bool debug = false;      // general debug
@@ -138,8 +143,8 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias.csv";
-//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500_v2.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias_v2.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500_v2.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias_v2.csv";
 //constexpr const char lumibyls2025B[] = "luminosityscripts/csvfiles/2025/lumi_391658_392221_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392382_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
@@ -156,19 +161,21 @@ constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lum
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398903_daily_dials.csv";
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398903_daily_dials_HLTPFJet500.csv";
 //constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398903_daily_dials_HLTZeroBias.csv";
-//constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTPFJet500.csv";
-constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTZeroBias.csv";
+constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTPFJet500.csv";
+//constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_391658_398860_Golden_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401844_DCS_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401844_DCS_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401951_DCS_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_401951_DCS_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401624to402040_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401624to402040_HLTZeroBias.csv";
-constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTZeroBias.csv";
+constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_402655_DCS_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_402655_DCS_HLTZeroBias.csv";
 
 
-constexpr std::array<std::pair<const char*, const char*>, 248> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 262> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -416,7 +423,21 @@ constexpr std::array<std::pair<const char*, const char*>, 248> lumifiles = {{
     {"2026B_ZB_part_02", lumibyls2026BCD},
     {"2026B_ZB_part_03", lumibyls2026BCD},
     {"2026B_ZB_part_04", lumibyls2026BCD},
-    {"2026B_ZB_part_05", lumibyls2026BCD}
+    {"2026B_ZB_part_05", lumibyls2026BCD},
+    {"2026C_0", lumibyls2026BCD},
+    {"2026C_1", lumibyls2026BCD},
+    {"2026C_2", lumibyls2026BCD},
+    {"2026C_3", lumibyls2026BCD},
+    {"2026C_4", lumibyls2026BCD},
+    {"2026C_5", lumibyls2026BCD},
+    {"2026C_ZB", lumibyls2026BCD},
+    {"2026C_01", lumibyls2026BCD},
+    {"2026C_11", lumibyls2026BCD},
+    {"2026C_21", lumibyls2026BCD},
+    {"2026C_31", lumibyls2026BCD},
+    {"2026C_41", lumibyls2026BCD},
+    {"2026C_51", lumibyls2026BCD},
+    {"2026C_ZB1", lumibyls2026BCD}
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -953,7 +974,8 @@ bool DijetHistosFill::LoadLumi()
 	string data_year;
 	string JSON_version;
 	if (TString(dataset.c_str()).Contains("2026")){
-	  JSON_version = "Collisions26_401630to402244";
+	  JSON_version = "Collisions26_401623_402655";
+	  //JSON_version = "Collisions26_401630to402244";
 	  //JSON_version = "Collisions26_401624to402040";
 	  //JSON_version = "Collisions26_401623_401951_DCSOnly";
 	  data_year = "2026";
@@ -1443,6 +1465,27 @@ void DijetHistosFill::Loop()
 
 	if (isMC)
 		fChain->SetBranchStatus("genWeight", 1);
+	if (isMC)
+	        fChain->SetBranchStatus("PSWeight", 1);
+
+        Float_t PSvariation;
+        if (doPSVar && doISRdown) {
+          PSvariation = PSWeight[0];
+	  cout << "PS variation True! The variation is doISRdown" << endl;
+	}
+	if (doPSVar && doFSRdown) {
+	  PSvariation = PSWeight[1];
+	  cout << "PS variation True! The variation is doFSRdown" << endl;
+	}
+	if (doPSVar && doISRup) {
+	  PSvariation = PSWeight[2];
+	  cout << "PS variation True! The variation is doISRup" << endl;
+	}
+	if (doPSVar && doFSRup) {
+	  PSvariation = PSWeight[3];
+	  cout << "PS variation True! The variation is doFSRup" << endl;
+	}
+
 	if (isMC)
 		fChain->SetBranchStatus("Generator_binvar", 1); // pThat in Pythia8
 	if (isMC && !(isMG && isRun3))
@@ -2341,20 +2384,19 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 {
 	jec = getFJC("",
 			//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			//"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
 			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
-	//jerpathsf = "";
+	jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi.txt";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jersfvspt = getFJC("", "ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
-	//jersfvspt = getFJC("", "", "");
-	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	//jerpath = "";
-	useJERSFvsPt = true; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
+	jersfvspt = getFJC("", "", "");
+	//jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+	jerpath = "";
+	useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
 
            	
 	   if (reweightPU && !doPU_per_trigger)
@@ -2727,7 +2769,8 @@ if (TString(dataset.c_str()).Contains("2025G")) {
 			"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
-if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Contains("2026B")) {
+if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Contains("2026B") ||
+    TString(dataset.c_str()).Contains("2026C")) {
         jec = getFJC("",
 			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         //"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3216,7 +3259,8 @@ if (isMG)
       //LoadJSON("rootfiles/2026/Collisions26_13p6TeV_401623_401844_DCSOnly_TkPx.json");
       //LoadJSON("rootfiles/2026/Collisions26_13p6TeV_401623_401951_DCSOnly_TkPx.json");
       //LoadJSON("rootfiles/2026/CombinedJSONS_DCSCMLE_Runs_401624to402040.json");
-      LoadJSON("rootfiles/2026/CombinedJSONS_MLJSONRuns_401630to402172_DCSRuns_402173to402244.json");
+      //LoadJSON("rootfiles/2026/CombinedJSONS_MLJSONRuns_401630to402172_DCSRuns_402173to402244.json");
+      LoadJSON("rootfiles/2026/CombinedJSONS_MLMRuns_401630to402604_DCSRuns_402605to402655.json");
 
   }
   int _nbadevts_json(0);
@@ -5041,7 +5085,8 @@ if (isMG)
         break;
       b_LHE_HT->GetEntry(ientry);    // read only this branch
       b_genWeight->GetEntry(ientry); // also this if MG
-      double w = genWeight;
+      //double w = genWeight;
+      double w = doPSVar ? genWeight * PSvariation : genWeight;
       double w_ptlead = genWeight;
       double w_ptavp3 = genWeight;
       double w_ptave = genWeight;
@@ -5242,7 +5287,8 @@ if (isMG)
     nbytes += nb;
     // if (Cut(ientry) < 0) continue;
 
-    double w = (isMC ? genWeight : 1.);
+    //double w = (isMC ? genWeight : 1.);
+    double w = (isMC ? (doPSVar ? genWeight * PSvariation : genWeight) : 1.);
     double w_ptlead = (isMC ? genWeight : 1.); // = w;
     double w_ptavp3 = (isMC ? genWeight : 1.);; // = w;
     double w_ptave = (isMC ? genWeight : 1.);; // = w;
@@ -7535,7 +7581,8 @@ if (isMG)
           if (Jet_jetId[i] >= 4 && !Jet_jetveto[i] && pass_METfilter > 0 ) //&& fabs(p4.Eta()) < 1.3)  
           {
 
-            w = (isMC ? genWeight : 1.);
+            //w = (isMC ? genWeight : 1.);
+	    w = (isMC ? (doPSVar ? genWeight * PSvariation : genWeight) : 1.);
 	   
 	    if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
                 fabs(p4.Eta()) > h->absetamin &&
@@ -7558,7 +7605,8 @@ if (isMG)
 	    */ 
             if (it5 != _runNumberBin.end() && mlumi[trg][run] > 0){
               //std::cout << run << " is included in runNumberBin and the rec luminosity is: " << _lums[run] << std::endl;
-              w = (isMC ? genWeight : 1./mlumi[trg][run]);
+              //w = (isMC ? genWeight : 1./mlumi[trg][run]);
+	      w = (isMC ? (doPSVar ? genWeight * PSvariation : genWeight) : 1./mlumi[trg][run]);
             }
             else {
               //w = (isMC ? genWeight : 1.);
@@ -7579,7 +7627,8 @@ if (isMG)
           }
         }
       }
-      w = (isMC ? genWeight : 1.);
+      //w = (isMC ? genWeight : 1.);
+      w = (isMC ? (doPSVar ? genWeight * PSvariation : genWeight) : 1.);
     } // doJetsperRun
 
 
