@@ -71,7 +71,7 @@ R__LOAD_LIBRARY(src/DijetHistosFill_C)
 R__LOAD_LIBRARY(src/DijetHistosFill_C.so)
 #endif
 
-void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesMax = 9999) {
+void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesMax = 9999, int chunk = -1) {
 
   // Get JMENANO from either location:
   // - lxplus:/eos/cms/store/group/phys_jetmet/JMENanoRun3/v2p1/JetMET
@@ -110,6 +110,7 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Winter26MC_Flat22",
      "Summer24MC_Flat22_Herwig", "Summer24MC_Flat22_JME",
      "Summer22MC_Flat22_JME", "Summer23MC_Flat22_JME",
+     "Summer22MC_base_1M", "Summer22MC_hadCalibOff_1M",
      "Summer24MG_JME_1", "Summer24MG_JME_2", "Summer24MG_JME_3", "Summer24MG_JME_4", "Summer24MG_JME_5",
      "Summer24MG_JME_6", "Summer24MG_JME_7", "Summer24MG_JME_8", "Summer24MG_JME_9", "Summer24MG_JME_10",
      "Summer24MG_JME_11",
@@ -117,12 +118,15 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Winter25MG_v15_6", "Winter25MG_v15_7", "Winter25MG_v15_8", "Winter25MG_v15_9", "Winter25MG_v15_10",
      "Winter25MG_v15_11",
      "Summer24MC_withNP", "Summer24MC_NPoff",
+     "Summer24MC_Flat22_NoPFH", "Summer24MC_Flat22_NoPFH_v2",
      "Summer24MG_2026_1", "Summer24MG_2026_2", "Summer24MG_2026_3", "Summer24MG_2026_4",
      "Summer24MG_2026_5", "Summer24MG_2026_6", "Summer24MG_2026_7", "Summer24MG_2026_8",
      "Summer24MG_2026_9", "Summer24MG_2026_10", "Summer24MG_2026_11",
      "Summer24MG_2025_1", "Summer24MG_2025_2", "Summer24MG_2025_3", "Summer24MG_2025_4", 
      "Summer24MG_2025_5", "Summer24MG_2025_6", "Summer24MG_2025_7", "Summer24MG_2025_8",
-     "Summer24MG_2025_9", "Summer24MG_2025_10", "Summer24MG_2025_11"
+     "Summer24MG_2025_9", "Summer24MG_2025_10", "Summer24MG_2025_11",
+     "Winter26MG_1", "Winter26MG_2", "Winter26MG_3", "Winter26MG_4", "Winter26MG_5", "Winter26MG_6",
+     "Winter26MG_7", "Winter26MG_8", "Winter26MG_9", "Winter26MG_10", "Winter26MG_11"
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 
@@ -167,14 +171,21 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
   "2024F_ECAL2_1", "2024F_ECAL2_2", "2024F_ECAL2_3", "2024F_ECAL2_4",
   "2024I_ZB_HCPF1x", "2024I_ZB_HCPF2x", "2024I_ZB_HCPF3x", "2024I_ZB_HCPF4x", "2024I_ZB_HCPF5x", "2024I_ZB_HCPFSpecial", "2024I_ZB_Special",
+  "2024I_ZB",
   "2024_skim", "2025B", "2025B_ZB", "2025Cv1", "2025Cv1_ZB", "2025Cv2", "2025Cv2_ZB", "2025D", "2025D_ZB", "2025E", "2025E_ZB", "2025F", "2025F_ZB",
   "2025D_1", "2025D_1_ZB", "2025D_2", "2025D_2_ZB", "2025E_1", "2025E_2", "2025Fv1_1", "2025Fv1_2", "2025Fv1_ZB", "2025Fv2_1", "2025Fv2_2", "2025Fv2_ZB", "2025Fv1_11", "2025Fv1_12", "2025Fv1_13", "2025Fv1_21", "2025Fv1_22", "2025Fv1_23",
   "2025G_11", "2025G_12", "2025G_21", "2025G_22", "2025G_ZB", "2025D_11", "2025D_12", "2025D_21", "2025D_22",
+  "2025Fv1", "2025Fv1_ZB", "2025Fv2", "2025Fv2_ZB", "2025G", "2025G_ZB",
   "2025C_Trk", "2025C_Trk_ZB",
   "2025Fv1_Skim_11", "2025Fv1_Skim_12", "2025Fv1_Skim_13", "2025Fv1_Skim_21", "2025Fv1_Skim_22", "2025Fv1_Skim_23",
   "2025Fv2_Skim_1", "2025Fv2_Skim_2",
   "2025Cv1_Skim_1", "2025Cv1_Skim_2", "2025Cv1_Skim_ZB",
-  "2026A_0", "2026A_1", "2026A_ZB", "2026Bnib1_0", "2026Bnib1_1", "2026Bnib2_0", "2026Bnib2_1",
+  "2025Cv1_JME_0", "2025Cv1_JME_1", "2025Cv2_JME_0", "2025Cv2_JME_1", "2025D_JME_0", "2025D_JME_1", "2025E_JME_0", "2025E_JME_1",
+  "2025Fv1_JME_0", "2025Fv1_JME_1", "2025Fv2_JME_0", "2025Fv2_JME_1", "2025G_JME_0", "2025G_JME_1",
+  "2025Cv1_JME_ZB", "2025Cv2_JME_ZB", "2025D_JME_ZB", "2025E_JME_ZB", "2025Fv1_JME_ZB", "2025Fv2_JME_ZB", "2025G_JME_ZB", 
+  "2026A_0", "2026A_1", "2026A_ZB", 
+  "2026B_0", "2026B_1", "2026B_ZB", 
+  "2026Bnib1_0", "2026Bnib1_1", "2026Bnib2_0", "2026Bnib2_1",
   "2026Bnib1_ZB", "2026Bnib2_ZB", "2026Bnib2_03", "2026Bnib2_02", "2026Bnib2_01",
   "2026Bnib2_11", "2026Bnib2_12", "2026Bnib2_13", "2026Bnib2_14",
   "2026Bnib2_121", "2026Bnib2_122",
@@ -187,7 +198,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2026B_ZB_part_00", "2026B_ZB_part_01", "2026B_ZB_part_02", "2026B_ZB_part_03",
   "2026B_ZB_part_04", "2026B_ZB_part_05",
   "2026C_0", "2026C_1", "2026C_2", "2026C_3", "2026C_4", "2026C_5", "2026C_ZB",
-  "2026C_01", "2026C_11", "2026C_21", "2026C_31", "2026C_41", "2026C_51", "2026C_ZB1"
+  "2026C_01", "2026C_11", "2026C_21", "2026C_31", "2026C_41", "2026C_51", "2026C_ZB1",
+  "2026D_0", "2026D_1", "2026D_ZB"
   };
 
   // Check if dataset is supported
@@ -254,10 +266,15 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   if (!runLocal) assert(runGPU);
   
   if (addData) {
-    ifstream fin(runLocal ? Form("input_files_lxplus/dataFiles_local_%s.txt",dataset.c_str()) : 
-		 Form("input_files_lxplus/dataFiles_%s.txt",dataset.c_str()), ios::in);
+    // Look for chunked txt files if chunk >= 0
+    string txtFile = runLocal ? Form("input_files_lxplus/dataFiles_local_%s.txt", dataset.c_str()) : Form("input_files_lxplus/dataFiles_%s.txt", dataset.c_str());
+    if (chunk >= 0) {
+        txtFile = runLocal ? Form("input_files_lxplus/dataFiles_local_%s_%d.txt", dataset.c_str(), chunk) : Form("input_files_lxplus/dataFiles_%s_%d.txt", dataset.c_str(), chunk);
+    }
+    
+    ifstream fin(txtFile.c_str(), ios::in);
     string filename;
-    cout << "Chaining data files:" << endl << flush;
+    cout << "Chaining data files from: " << txtFile << endl << flush;
     int nFiles(0);
     while (fin >> filename && nFiles<nFilesMax) {
       ++nFiles;
@@ -266,20 +283,21 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
       //c->AddFile(filename.c_str());
     }
     cout << "Chained " << nFiles <<  " files" << endl << flush;
-
-    // bool isZB = (dataset=="UL2017B_ZB" || dataset=="UL2017C_ZB" || dataset=="UL2017D_ZB" ||
-    //		 dataset=="UL2017E_ZB" || dataset=="UL2017F_ZB");
-    // => decide internally from dataset.Contains("_ZB")
     
-    DijetHistosFill filler(c,0,dataset,version);    
+    DijetHistosFill filler(c, 0, dataset, version); // Note: 'version' here is already "v160_1" passed from Python   
     filler.Loop();
   }
   
   if (addMC) {
-    ifstream fin(runLocal ? Form("input_files_lxplus/mcFiles_local_%s.txt",dataset.c_str()) :
-		 Form("input_files_lxplus/mcFiles_%s.txt",dataset.c_str()), ios::in);
+    // Look for chunked txt files if chunk >= 0
+    string txtFile = runLocal ? Form("input_files_lxplus/mcFiles_local_%s.txt", dataset.c_str()) : Form("input_files_lxplus/mcFiles_%s.txt", dataset.c_str());
+    if (chunk >= 0) {
+        txtFile = runLocal ? Form("input_files_lxplus/mcFiles_local_%s_%d.txt", dataset.c_str(), chunk) : Form("input_files_lxplus/mcFiles_%s_%d.txt", dataset.c_str(), chunk);
+    }
+
+    ifstream fin(txtFile.c_str(), ios::in);
     string filename;
-    cout << "Chaining MC files:" << endl << flush;
+    cout << "Chaining MC files from: " << txtFile << endl << flush;
     int nFiles(0);
     while (fin >> filename && nFiles<nFilesMax) {
       ++nFiles;
@@ -288,16 +306,9 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
       //c->AddFile(filename.c_str());
     }
     cout << "Chained " << nFiles <<  " files" << endl << flush;
-
-    bool isMG = (dataset.find("MG") != std::string::npos); //(dataset=="UL2016APVMG" || dataset=="UL2016MG" ||
-		 // dataset=="UL2017MG" || dataset=="UL2018MG" ||
-		 // dataset=="Summer22MG" ||
-		 // dataset=="Summer22MG1" || dataset=="Summer22MG2" ||
-		 // dataset=="Summer22EEMG" ||
-		 // dataset=="Summer22EEMG1" || dataset=="Summer22EEMG2" ||
-		 // dataset=="Summer22EEMG3" || dataset=="Summer22EEMG4");
+    bool isMG = (dataset.find("MG") != std::string::npos); 
     
-    DijetHistosFill filler(c, isMG ? 2 : 1, dataset,version);
+    DijetHistosFill filler(c, isMG ? 2 : 1, dataset, version); // Note: 'version' here is already "v160_1" passed from Python
     filler.Loop();
   }
 

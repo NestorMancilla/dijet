@@ -27,6 +27,7 @@
 #include <array>
 #include <string_view>
 #include <algorithm>
+#include <TSystem.h>
 
 
 // Unfolding, Nestor Jan20,2025.
@@ -41,8 +42,8 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = false;
-bool useJERSFvsPt = false; // new file format
+bool smearJets = true;
+bool useJERSFvsPt = true; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
 std::mt19937 _mersennetwister;
@@ -83,8 +84,12 @@ bool doPSVar = false;
 bool doISRdown = false;
 bool doFSRdown = false;
 bool doISRup = false;
-bool doFSRup = true;
+bool doFSRup = false; // same as JMENANO 0p5
+bool doFSRup_JMENANO = false;
+bool doFSRup0p5_JMENANO = false;
 
+bool doQvsG_Eff = true;
+bool doGluonJets_SF = false;
 bool doJetId_variables = true; // To compare Jet_jetId branch 
 bool debug = false;      // general debug
 bool debugevent = false; // per-event debug
@@ -171,11 +176,26 @@ constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_3
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401624to402040_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTZeroBias.csv";
-constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_402655_DCS_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_402655_DCS_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_402655_DCS_HLTZeroBias.csv";
+//constexpr const char lumibyls2026B[] = "luminosityscripts/csvfiles/2026/lumi_401624_402537_golden_HLTPFJet500.csv";
+constexpr const char lumibyls2026B[] = "luminosityscripts/csvfiles/2026/lumi_401624_402537_golden_HLTZeroBias.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402825_MLM_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402825_MLM_HLTZeroBias.csv";
+constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_403008_hybrid_HLTPFJet500.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_403008_hybrid_HLTZeroBias.csv";
+//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_HLTPFJet500.csv";
+//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_HLTZeroBias.csv";
+constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTPFJet500.csv";
+//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTZeroBias.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTPFJet500.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTZeroBias.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFJet500.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFZeroBias.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTPFJet500.csv";
+constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTZeroBias.csv";
 
-
-constexpr std::array<std::pair<const char*, const char*>, 262> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 3200> lumifiles = {{
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -250,6 +270,7 @@ constexpr std::array<std::pair<const char*, const char*>, 262> lumifiles = {{
     {"2024G_ZB", lumibyls2024BCDEFG},
     {"2024H", lumibyls2024BCDEFG},
     {"2024H_ZB", lumibyls2024BCDEFG},
+    {"2024I_ZB", lumibyls2024BCDEFG},
     {"2024Iv1", lumibyls2024BCDEFG},
     {"2024Iv1_ZB", lumibyls2024BCDEFG},
     {"2024Iv2", lumibyls2024BCDEFG},
@@ -330,6 +351,36 @@ constexpr std::array<std::pair<const char*, const char*>, 262> lumifiles = {{
     {"2024I_ZB_HCPF5x", lumibyls2024BCDEFG},
     {"2024I_ZB_HCPFSpecial", lumibyls2024BCDEFG},
     {"2024I_ZB_Special", lumibyls2024BCDEFG},
+    {"2024C_Rp_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024C_Rp_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024C_Rp_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024D_Rp_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024D_Rp_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024D_Rp_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024E_Rp_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024E_Rp_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024E_Rp_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024F_nib1_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024F_nib1_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024F_nib1_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024F_nib2_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024F_nib2_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024F_nib2_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024F_nib3_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024F_nib3_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024F_nib3_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024G_nib1_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024G_nib1_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024G_nib1_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024G_nib2_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024G_nib2_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024G_nib2_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024H_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024H_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024H_JME_Skim_ZB", lumibyls2024BCDEFG},
+    {"2024I_JME_Skim_0", lumibyls2024BCDEFG},
+    {"2024I_JME_Skim_1", lumibyls2024BCDEFG},
+    {"2024I_JME_Skim_ZB", lumibyls2024BCDEFG},
     {"2025B", lumibyls2025BCD},
     {"2025B_ZB", lumibyls2025BCD},
     {"2025Cv1", lumibyls2025BCD},
@@ -361,8 +412,8 @@ constexpr std::array<std::pair<const char*, const char*>, 262> lumifiles = {{
     {"2025Fv2_1", lumibyls2025BCD},
     {"2025Fv2_2", lumibyls2025BCD},
     {"2025Fv2_ZB", lumibyls2025BCD},
-    {"2025Fv1_11", lumibyls2025BCD},
-    {"2025Fv1_12", lumibyls2025BCD},
+    {"2025Fv1", lumibyls2025BCD},
+    {"2025Fv1_ZB", lumibyls2025BCD},
     {"2025Fv1_13", lumibyls2025BCD},
     {"2025Fv1_21", lumibyls2025BCD},
     {"2025Fv1_22", lumibyls2025BCD},
@@ -373,18 +424,42 @@ constexpr std::array<std::pair<const char*, const char*>, 262> lumifiles = {{
     {"2025Fv1_Skim_21", lumibyls2025BCD},
     {"2025Fv1_Skim_22", lumibyls2025BCD},
     {"2025Fv1_Skim_23", lumibyls2025BCD},
-    {"2025Fv2_Skim_1", lumibyls2025BCD},
-    {"2025Fv2_Skim_2", lumibyls2025BCD},
-    {"2025G_11", lumibyls2025BCD},
-    {"2025G_12", lumibyls2025BCD},
+    {"2025Fv2", lumibyls2025BCD},
+    {"2025Fv2_ZB", lumibyls2025BCD},
+    {"2025G", lumibyls2025BCD},
+    {"2025G_ZB", lumibyls2025BCD},
     {"2025G_21", lumibyls2025BCD},
     {"2025G_22", lumibyls2025BCD},
     {"2025G_ZB", lumibyls2025BCD},
     {"2025C_Trk", lumibyls2025BCD},
     {"2025C_Trk_ZB", lumibyls2025BCD},
+    {"2025Cv1_JME_0", lumibyls2025BCD},
+    {"2025Cv1_JME_1", lumibyls2025BCD},
+    {"2025Cv1_JME_ZB", lumibyls2025BCD},
+    {"2025Cv2_JME_0", lumibyls2025BCD},
+    {"2025Cv2_JME_1", lumibyls2025BCD},
+    {"2025Cv2_JME_ZB", lumibyls2025BCD},
+    {"2025D_JME_0", lumibyls2025BCD},
+    {"2025D_JME_1", lumibyls2025BCD},
+    {"2025D_JME_ZB", lumibyls2025BCD},
+    {"2025E_JME_0", lumibyls2025BCD},
+    {"2025E_JME_1", lumibyls2025BCD},
+    {"2025E_JME_ZB", lumibyls2025BCD},
+    {"2025Fv1_JME_0", lumibyls2025BCD},
+    {"2025Fv1_JME_1", lumibyls2025BCD},
+    {"2025Fv1_JME_ZB", lumibyls2025BCD},
+    {"2025Fv2_JME_0", lumibyls2025BCD},
+    {"2025Fv2_JME_1", lumibyls2025BCD},
+    {"2025Fv2_JME_ZB", lumibyls2025BCD},
+    {"2025G_JME_0", lumibyls2025BCD},
+    {"2025G_JME_1", lumibyls2025BCD},
+    {"2025G_JME_ZB", lumibyls2025BCD},
     {"2026A_0", lumibyls2026BCD},
     {"2026A_1", lumibyls2026BCD},
     {"2026A_ZB", lumibyls2026BCD},
+    {"2026B_0", lumibyls2026B},
+    {"2026B_1", lumibyls2026B},
+    {"2026B_ZB", lumibyls2026B},
     {"2026Bnib1_0", lumibyls2026BCD},
     {"2026Bnib1_1", lumibyls2026BCD},
     {"2026Bnib2_0", lumibyls2026BCD},
@@ -424,20 +499,23 @@ constexpr std::array<std::pair<const char*, const char*>, 262> lumifiles = {{
     {"2026B_ZB_part_03", lumibyls2026BCD},
     {"2026B_ZB_part_04", lumibyls2026BCD},
     {"2026B_ZB_part_05", lumibyls2026BCD},
-    {"2026C_0", lumibyls2026BCD},
-    {"2026C_1", lumibyls2026BCD},
-    {"2026C_2", lumibyls2026BCD},
-    {"2026C_3", lumibyls2026BCD},
-    {"2026C_4", lumibyls2026BCD},
-    {"2026C_5", lumibyls2026BCD},
-    {"2026C_ZB", lumibyls2026BCD},
+    {"2026C_0", lumibyls2026C},
+    {"2026C_1", lumibyls2026C},
+    {"2026C_2", lumibyls2026C},
+    {"2026C_3", lumibyls2026C},
+    {"2026C_4", lumibyls2026C},
+    {"2026C_5", lumibyls2026C},
+    {"2026C_ZB", lumibyls2026C},
     {"2026C_01", lumibyls2026BCD},
     {"2026C_11", lumibyls2026BCD},
     {"2026C_21", lumibyls2026BCD},
     {"2026C_31", lumibyls2026BCD},
     {"2026C_41", lumibyls2026BCD},
     {"2026C_51", lumibyls2026BCD},
-    {"2026C_ZB1", lumibyls2026BCD}
+    {"2026C_ZB1", lumibyls2026BCD},
+    {"2026D_0", lumibyls2026D},
+    {"2026D_1", lumibyls2026D},
+    {"2026D_ZB", lumibyls2026D}
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -558,7 +636,9 @@ public:
 
   // (Optional) composition plots
   TProfile2D *p2pt, *p2rho, *p2rho_PURW, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;
+  TProfile2D *p2jes, *p2res;
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13;
+  TProfile *pjes13, *pres13;
   // Related to the tails issue. May 17, 2024. Nestor
   TH2D *h2chf13;
 
@@ -647,10 +727,50 @@ public:
   TProfile2D *p2m0tc_gq, *p2m2tc_gq, *p2mntc_gq, *p2mutc_gq;     // pT,tag (central)
   TProfile2D *p2m0pf_gq, *p2m2pf_gq, *p2mnpf_gq, *p2mupf_gq;
 
+  ///// SF
+  //both tag and probe quarks
+  TProfile2D *p2m0_qq_sf, *p2m0x_qq_sf, *p2m2_qq_sf, *p2m2x_qq_sf;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_qq_sf, *p2m2ab_qq_sf, *p2mnab_qq_sf, *p2muab_qq_sf;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_qq_sf, *p2m2ad_qq_sf, *p2mnad_qq_sf, *p2muad_qq_sf;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_qq_sf, *p2m2tc_qq_sf, *p2mntc_qq_sf, *p2mutc_qq_sf;     // pT,tag (central)
+  TProfile2D *p2m0pf_qq_sf, *p2m2pf_qq_sf, *p2mnpf_qq_sf, *p2mupf_qq_sf;     // pt,probe (forward)
+
+  //tag quark and probe gluon
+  TProfile2D *p2m0_qg_sf, *p2m0x_qg_sf, *p2m2_qg_sf, *p2m2x_qg_sf;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_qg_sf, *p2m2ab_qg_sf, *p2mnab_qg_sf, *p2muab_qg_sf;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_qg_sf, *p2m2ad_qg_sf, *p2mnad_qg_sf, *p2muad_qg_sf;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_qg_sf, *p2m2tc_qg_sf, *p2mntc_qg_sf, *p2mutc_qg_sf;     // pT,tag (central)
+  TProfile2D *p2m0pf_qg_sf, *p2m2pf_qg_sf, *p2mnpf_qg_sf, *p2mupf_qg_sf;
+
+  //both tag and probe gluons
+  TProfile2D *p2m0_gg_sf, *p2m0x_gg_sf, *p2m2_gg_sf, *p2m2x_gg_sf;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_gg_sf, *p2m2ab_gg_sf, *p2mnab_gg_sf, *p2muab_gg_sf;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_gg_sf, *p2m2ad_gg_sf, *p2mnad_gg_sf, *p2muad_gg_sf;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_gg_sf, *p2m2tc_gg_sf, *p2mntc_gg_sf, *p2mutc_gg_sf;     // pT,tag (central)
+  TProfile2D *p2m0pf_gg_sf, *p2m2pf_gg_sf, *p2mnpf_gg_sf, *p2mupf_gg_sf;
+
+  //tag gluon and probe quark
+  TProfile2D *p2m0_gq_sf, *p2m0x_gq_sf, *p2m2_gq_sf, *p2m2x_gq_sf;           // JER MPFX, DBX methods
+  TProfile2D *p2m0ab_gq_sf, *p2m2ab_gq_sf, *p2mnab_gq_sf, *p2muab_gq_sf;     // pT,avp (bisector)
+  TProfile2D *p2m0ad_gq_sf, *p2m2ad_gq_sf, *p2mnad_gq_sf, *p2muad_gq_sf;     // pT,ave (dijet axis)
+  TProfile2D *p2m0tc_gq_sf, *p2m2tc_gq_sf, *p2mntc_gq_sf, *p2mutc_gq_sf;     // pT,tag (central)
+  TProfile2D *p2m0pf_gq_sf, *p2m2pf_gq_sf, *p2mnpf_gq_sf, *p2mupf_gq_sf;
+  //
+  //
+
   TH1D *h_tagprobeab_qq, *h_tagprobeab_qg, *h_tagprobeab_gq, *h_tagprobeab_gg;
   TH1D *h_tagprobead_qq, *h_tagprobead_qg, *h_tagprobead_gq, *h_tagprobead_gg;
   TH1D *h_tagprobetc_qq, *h_tagprobetc_qg, *h_tagprobetc_gq, *h_tagprobetc_gg;
   TH1D *h_tagprobepf_qq, *h_tagprobepf_qg, *h_tagprobepf_gq, *h_tagprobepf_gg;
+
+  // SF for MC
+  TH1D *h_tagprobeab_qq_sf, *h_tagprobeab_qg_sf, *h_tagprobeab_gq_sf, *h_tagprobeab_gg_sf;
+  TH1D *h_tagprobead_qq_sf, *h_tagprobead_qg_sf, *h_tagprobead_gq_sf, *h_tagprobead_gg_sf;
+  TH1D *h_tagprobetc_qq_sf, *h_tagprobetc_qg_sf, *h_tagprobetc_gq_sf, *h_tagprobetc_gg_sf;
+  TH1D *h_tagprobepf_qq_sf, *h_tagprobepf_qg_sf, *h_tagprobepf_gq_sf, *h_tagprobepf_gg_sf;
+
+  // ptprobe eff
+  TH2D *h2_QvGProbeEff_Denom_Quark, *h2_QvGProbeEff_Denom_Gluon, *h2_QvGProbeEff_Num_Quark, *h2_QvGProbeEff_Num_Gluon;
 
 };
 
@@ -695,6 +815,7 @@ public:
 
   TProfile *ptleada, *ptleadm, *ptleadl, *ptleadr;
   TProfile *pcrecoila, *pcrecoilm, *pcrecoill, *pcrecoilr;
+  TProfile *pcrecoila_pt15, *pcrecoilm_pt15, *pcrecoill_pt15, *pcrecoilr_pt15;
   TH1D *hpta_all, *hptm_all, *hptl_all, *hptr_all;
   TH1D *hetar_all; // JEC4Prompt
   TH1D *hpta_sel, *hptm_sel, *hptl_sel, *hptr_sel;
@@ -706,6 +827,7 @@ public:
 
   // (Optional) 2D recoils
   TH2D *h2recoila, *h2recoilm, *h2recoill, *h2recoilr;
+  TH2D *h2recoila_pt30, *h2recoilm_pt30, *h2recoill_pt30, *h2recoilr_pt30;
 
   // (Optional) composition plots
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13; // lead pT,avp
@@ -748,6 +870,7 @@ public:
   int trgpt;
   double ptmin, ptmax, absetamin, absetamax;
   TH1D *h_PUProfile, *h_RhoAll, *h_Rho_C, *h_Rho_CCPU, *h_NPV, *h_NPVGood;
+  TProfile *h_Muvsrun;
   TProfile *prhovsmu, *pnpvgoodvsmu, *pnpvvsmu;
   TProfile *prhovsmu_nocut, *prhovsmu_pt30, *pnpvgoodvsmu_nocut, *pnpvgoodvsmu_pt30, *pnpvvsmu_nocut, *pnpvvsmu_pt30;
 };
@@ -827,7 +950,11 @@ void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
     }
     std::vector<std::string> vtrg = {
 	"HLT_ZeroBias",
-        "HLT_PFJet40", "HLT_PFJet60", "HLT_PFJet80", "HLT_PFJet110",
+        "HLT_PFJet40", 
+	"HLT_PFJet40_L1Jet24", "HLT_PFJet40_L1Jet35", //LowPU
+	"HLT_PFJet60", "HLT_PFJet80", 
+        "HLT_PFJet80_L1Jet60",	//LowPU
+	"HLT_PFJet110",
         "HLT_PFJet140", "HLT_PFJet200",
         "HLT_PFJet260", "HLT_PFJet320", "HLT_PFJet400", "HLT_PFJet450", "HLT_PFJet500",
         "HLT_PFJetFwd40", "HLT_PFJetFwd60", "HLT_PFJetFwd80", "HLT_PFJetFwd140", "HLT_PFJetFwd200",
@@ -935,8 +1062,11 @@ bool DijetHistosFill::LoadLumi()
 	vector<string> vtrg = {
 		"HLT_ZeroBias",
 		"HLT_PFJet40",
+		"HLT_PFJet40_L1Jet24", //LowPU
+		"HLT_PFJet40_L1Jet35", //LowPU
 		"HLT_PFJet60",
 		"HLT_PFJet80",
+		"HLT_PFJet80_L1Jet60", //LowPU
 		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
@@ -973,13 +1103,27 @@ bool DijetHistosFill::LoadLumi()
 
 	string data_year;
 	string JSON_version;
-	if (TString(dataset.c_str()).Contains("2026")){
-	  JSON_version = "Collisions26_401623_402655";
+	if (TString(dataset.c_str()).Contains("2026D")){
+	  JSON_version = "Collisions26_401623_403937_MLEnhancedGolden";
+	  //JSON_version = "Collisions26_401630_403895";
+	  //JSON_version = "Collisions26_401630_403493";
+	  data_year = "2026";	
+	}
+	if (TString(dataset.c_str()).Contains("2026C")){
+	  JSON_version = "Collisions26_lowPU_Filtered";
+	  //JSON_version = "Collisions26_lowPU";
+	  //JSON_version = "Collisions26_401630_402825";
+	  //JSON_version = "Collisions26_401630_403008";
+	  //JSON_version = "Collisions26_401623_402655";
 	  //JSON_version = "Collisions26_401630to402244";
 	  //JSON_version = "Collisions26_401624to402040";
 	  //JSON_version = "Collisions26_401623_401951_DCSOnly";
 	  data_year = "2026";
 	//string JSON_version = "Collisions26_401623_401844_DCSOnly";
+	}
+	if (TString(dataset.c_str()).Contains("2026B")){
+	  JSON_version = "Collisions26_401624_402537_golden";
+	  data_year = "2026";
 	}
 	if (TString(dataset.c_str()).Contains("2025")){
 	  JSON_version = "Collisions2025_391658_398860_Golden"; // 2025 full year
@@ -1011,8 +1155,11 @@ bool DijetHistosFill::LoadLumi()
 	vector<string> filenames = {
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_ZeroBias_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet24_"+JSON_version+".csv", //LowPU
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet35_"+JSON_version+".csv", //LowPU
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet60_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_"+JSON_version+".csv",
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_L1Jet60_"+JSON_version+".csv", //LowPU
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet110_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet140_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet200_"+JSON_version+".csv",
@@ -1414,6 +1561,7 @@ bool DijetHistosFill::LoadLumi()
 	return true;
 } // LoadLumi
 
+
 /////////////////////////
 
 void DijetHistosFill::Loop()
@@ -1465,25 +1613,29 @@ void DijetHistosFill::Loop()
 
 	if (isMC)
 		fChain->SetBranchStatus("genWeight", 1);
-	if (isMC)
+	if (isMC) {
 	        fChain->SetBranchStatus("PSWeight", 1);
+		fChain->SetBranchStatus("nPSWeight", 1);
+	}
 
         Float_t PSvariation;
         if (doPSVar && doISRdown) {
-          PSvariation = PSWeight[0];
 	  cout << "PS variation True! The variation is doISRdown" << endl;
 	}
 	if (doPSVar && doFSRdown) {
-	  PSvariation = PSWeight[1];
 	  cout << "PS variation True! The variation is doFSRdown" << endl;
 	}
 	if (doPSVar && doISRup) {
-	  PSvariation = PSWeight[2];
 	  cout << "PS variation True! The variation is doISRup" << endl;
 	}
 	if (doPSVar && doFSRup) {
-	  PSvariation = PSWeight[3];
 	  cout << "PS variation True! The variation is doFSRup" << endl;
+	}
+	if (doPSVar && doFSRup_JMENANO && nPSWeight > 4) {
+          cout << "PS variation True! The variation is doFSRup_JMENANO" << endl;
+        }
+	if (doPSVar && doFSRup0p5_JMENANO && nPSWeight > 4) {
+	  cout << "PS variation True! The variation is doFSRup0p5_JMENANO" << endl;
 	}
 
 	if (isMC)
@@ -1516,6 +1668,7 @@ void DijetHistosFill::Loop()
 		fChain->SetBranchStatus("GenJet_phi", 1);
 		fChain->SetBranchStatus("GenJet_mass", 1);
 
+		fChain->SetBranchStatus("Jet_partonFlavour", 1);
 		if (doMCtruth)
 		{
 			fChain->SetBranchStatus("GenVtx_z", 1);
@@ -1555,8 +1708,11 @@ void DijetHistosFill::Loop()
 		//"HLT_ZeroBias_FirstCollisionInTrain",
 		//"HLT_ZeroBias_LastCollisionInTrain",
 		"HLT_PFJet40",
+		"HLT_PFJet40_L1Jet24", //LowPU
+		"HLT_PFJet40_L1Jet35", //LowPU
 		"HLT_PFJet60",
 		"HLT_PFJet80",
+		"HLT_PFJet80_L1Jet60", //LowPU
 		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
@@ -1839,9 +1995,12 @@ mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
 //https://github.com/miquork/jecsys3/blob/main/minitools/DijetHistosCombine.C#L264-L370
 //mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
 mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
+mt["HLT_PFJet40_L1Jet24"] = range{64, 84, 0, 3.0}; //LowPU
+mt["HLT_PFJet40_L1Jet35"] = range{64, 84, 0, 3.0}; //LowPU
 mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
 //mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
 mt["HLT_PFJet80"]  = range{114, 155, 0, 3.0};
+mt["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, 3.0}; //LowPU
 //mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
 mt["HLT_PFJet110"] = range{155, 196, 0, 3.0};
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
@@ -1872,9 +2031,12 @@ mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
 //mi["HLT_ZeroBias_LastCollisionInTrain"] = range{10,  49,  0, 5.2};
 //mi["HLT_MC"]       = range{15,6500,  0, 5.2};
 mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
+mi["HLT_PFJet40_L1Jet24"]  = range{49,  84,  0, fwdeta0}; //LowPU
+mi["HLT_PFJet40_L1Jet35"]  = range{49,  84,  0, fwdeta0}; //LowPU
 mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
 //mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
 mi["HLT_PFJet80"]  = range{114, 155, 0, fwdeta};  // Upper bound hands off to 110
+mi["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, fwdeta}; //LowPU
 mi["HLT_PFJet110"] = range{155, 196, 0, fwdeta};  // Bridges the gap between 80 and 140
 mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
 //mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
@@ -1948,12 +2110,15 @@ md2pf["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 //md2pf["HLT_ZeroBias_FirstCollisionInTrain"] = range{15,  59,  0, 5.2};
 //md2pf["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
+md2pf["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
+md2pf["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
 md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet110"] = range{140, 236, 0, 5.2};
 md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
+md2pf["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
 md2pf["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
 md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2pf["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
@@ -1979,12 +2144,15 @@ md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 //md2tc["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
 md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
+md2tc["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
+md2tc["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
 md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet110"] = range{140, 236, 0, 5.2};
 md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
+md2tc["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
 md2tc["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
 md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2tc["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
@@ -2386,17 +2554,29 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 			//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
-	jerpathsf = "";
+	//jerpathsf = "";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV4M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV1M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026C_JRV1M_MC_SF_AK4PFPuppi.txt";
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026D_JRV1M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi.txt";
+	//jersfvspt = getFJC("", "Prompt24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV4M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt26_2026B_JRV1M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt26_2026C_JRV1M_MC_SF_AK4PFPuppi", "");
+	jersfvspt = getFJC("", "Prompt26_2026D_JRV1M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "", "");
-	//jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	jerpath = "";
-	useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+	//jersfvspt = getFJC("", "ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "", "");
+	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+	//jerpath = "";
+	useJERSFvsPt = true; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
 
            	
 	   if (reweightPU && !doPU_per_trigger)
@@ -2476,7 +2656,8 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                     		//"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024C_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024C_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+		                "Prompt24_Run2024C_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
 	}
 	else {
 		jec = getFJC("",
@@ -2503,7 +2684,8 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024D_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024D_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+		                "Prompt24_Run2024D_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
         }
 	else {
 	        jec = getFJC("",
@@ -2554,7 +2736,8 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024E_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024E_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+		                "Prompt24_Run2024E_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
         }
        	else 
 	{
@@ -2589,21 +2772,24 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024F_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024F_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024F_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024F_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
         } else if (TString(dataset.c_str()).Contains("2024F_nib2"))
         {
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024F_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024F_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024F_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024F_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
 	} else if (TString(dataset.c_str()).Contains("2024F_nib3"))
 	{
 		jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024F_nib3_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024F_nib3_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024F_nib3_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024F_nib3_V10M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -2627,14 +2813,16 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024G_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024G_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024G_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
         } else if (TString(dataset.c_str()).Contains("2024G_nib2"))
         {
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024G_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024G_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024G_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -2656,13 +2844,14 @@ if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || d
 			"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
 	
-        if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_NT") ||
-	     TString(dataset.c_str()).Contains("2024H_Skim"))
+        if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_JME_Skim") ||
+	     TString(dataset.c_str()).Contains("2024H_Skim") || TString(dataset.c_str()).Contains("2024H_ZB"))
         {
                 jec = getFJC("",
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024H_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -2682,13 +2871,15 @@ if (TString(dataset.c_str()).Contains("2024I"))
 			"Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
         if (TString(dataset.c_str()).Contains("2024Iv1_nib1") || TString(dataset.c_str()).Contains("2024Iv2_nib1") ||
-	    TString(dataset.c_str()).Contains("2024I_ZB_HCPF") || TString(dataset.c_str()).Contains("2024I_Skim"))
+	    TString(dataset.c_str()).Contains("2024I_JME_Skim") || TString(dataset.c_str()).Contains("2024I_Skim") || 
+	    TString(dataset.c_str()).Contains("2024I_ZB"))
         {
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
-				"ReReco24_Run2024I_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				//"ReReco24_Run2024I_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024I_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -2738,45 +2929,67 @@ if (TString(dataset.c_str()).Contains("2025C")) {
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025C_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025C_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025C_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025C_V4M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if (TString(dataset.c_str()).Contains("2025D")) {
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025D_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025D_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025D_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025D_V4M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if (TString(dataset.c_str()).Contains("2025E")) {
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025E_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025E_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025E_V4M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if (TString(dataset.c_str()).Contains("2025F")) {
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025F_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025F_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025F_V4M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
 if (TString(dataset.c_str()).Contains("2025G")) {
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025G_V4M_DATA_L2L3Residual_AK4PFPuppi");
 }
 
-if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Contains("2026B") ||
-    TString(dataset.c_str()).Contains("2026C")) {
+if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Contains("2026B")) {
         jec = getFJC("",
 			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         //"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt26_Run2026B_V0M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt26_Run2026B_V0M_DATA_L2L3Residual_AK4PFPuppi");
+	                "Prompt26_Run2026B_V1M_DATA_L2L3Residual_AK4PFPuppi");
 }
+
+if (TString(dataset.c_str()).Contains("2026C")) {
+
+        jec = getFJC("",
+                        "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+                        "Prompt26_Run2026C_V1M_DATA_L2L3Residual_AK4PFPuppi");
+
+}
+
+if (TString(dataset.c_str()).Contains("2026D")) {
+
+        jec = getFJC("",
+                        "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+                        "Prompt26_Run2026D_V1M_DATA_L2L3Residual_AK4PFPuppi");
+
+}
+
 
 if (TString(dataset.c_str()).Contains("Winter26MG") || TString(dataset.c_str()).Contains("Winter26MC"))
 {
@@ -2853,11 +3066,35 @@ TLorentzVector p4c, p4cx, p4f, p4fx, p4l, p4r;
 TLorentzVector p4m0, p4m2, p4mn, p4mu; //, p4mo;
 TLorentzVector p4m3, p4mn3, p4mu3;
 TLorentzVector p4corrjets, p4rcjets, p4rawjets;
+/*
 TFile *fout = new TFile(Form("rootfiles/%s/jmenano_%s_out_%s_%s.root",
 			version.c_str(),
 			isMC ? "mc" : "data",
 			dataset.c_str(), version.c_str()),
 		"RECREATE");
+
+*/
+// Read the environment variables set by Python: runIOVs.py
+  const char* env_dir = gSystem->Getenv("DIJET_OUTDIR");
+  TString outdir = env_dir ? env_dir : Form("rootfiles/%s", version.c_str());
+
+  const char* env_chunk = gSystem->Getenv("DIJET_CHUNK");
+  int chunk_num = env_chunk ? atoi(env_chunk) : -1;
+
+  // Build the filename dynamically
+  TString outName;
+  if (chunk_num >= 0) {
+      // Chunked mode: append _X to the filename
+      outName = Form("%s/jmenano_%s_out_%s_%s_%d.root", 
+                     outdir.Data(), isMC ? "mc" : "data", dataset.c_str(), version.c_str(), chunk_num);
+  } else {
+      // Normal mode: original filename
+      outName = Form("%s/jmenano_%s_out_%s_%s.root", 
+                     outdir.Data(), isMC ? "mc" : "data", dataset.c_str(), version.c_str());
+  }
+
+  TFile *fout = new TFile(outName, "RECREATE");
+///////
 
 // Monitor trigger rates
 TH1D *htrg = new TH1D("htrg", "Triggers;Trigger;N_{events}",
@@ -2921,16 +3158,57 @@ if (isMG)
     int vnevt2[nht2] = {0, 0, 11197186, 23002929, 17512439, 16405924, 14359110,
                         13473185, 4365993, 2944561, 1836165};
     // int vnevt3[nht3] = {0, 9929, 26573, 16411, 10495, 8260, 7929, 10082, 14390, 6548, 6250}; // Summer22MG, local files
-    int vnevt3[nht3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Summer22MG, local files
-    int vnwgt3[nht3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Summer22MG, local files
+    //int vnevt3[nht3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Summer22MG, local files
+    //int vnwgt3[nht3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Summer22MG, local files
+
+    // JME Summer24MG samples
+    int vnevt3_Summer24MG_JME[nht3] = {0, 110777315, 108163764, 120388125, 115255250, 106725734, 128192794, 125650480, 114412542, 107835822, 113208234, 91407008};
+    double vnwgt3_Summer24MG_JME[nht3] = {0.0, 1.2383210232505446e+17, 3.299947987573129e+16, 1.972290608434036e+16, 1982422831362021.0, 111570395661362.89, 20657850356179.35, 4772769377287.2295, 1309740066697.9924, 545057117560.91296, 190151039828.80084, 31926060782.64449};
+    //Calculated Summer24MG: python3 src/get_mg_weights.py
+    
+    int vnevt3_Summer24MG[nht3] = {0, 110777315, 108584880, 120453600, 115255250, 106725734, 128235651, 124956604, 114436708, 107835822, 113208234, 91953615};
+    double vnwgt3_Summer24MG[nht3] = {0.0, 1.2383210232505451e+17, 3.3127947810715256e+16, 1.9733632472302824e+16, 1982422831362021.0, 111570395661362.88, 
+	20664752829497.465, 4746410360197.466, 1310016603143.1804, 545057117560.9131, 190151039828.80078, 32116997674.070297};
+
+    //Winter26MG
+    int vnevt3_Winter26MG[nht3] = {0, 10119228, 8431555, 9112658, 10554984, 10065559, 10597239, 10588607, 9572261, 9889987, 8867056, 9579495};
+    double vnwgt3_Winter26MG[nht3] = {0.0, 1.13170570907319e+16, 2572952522725280.0, 1493178473700920.0, 181631535021091.0, 10525172327100.0,
+	                  1707660210118.12, 402189245330.36005, 109592764959.61401, 49997724948.47508, 14896742425.454603, 3349000050.623581};
+
+    int* vnevt3 = nullptr;
+    double* vnwgt3 = nullptr;
+    TString dsName(dataset);
+
+    if (dsName.Contains("Summer24MG_JME")) {
+        vnevt3 = vnevt3_Summer24MG_JME;
+        vnwgt3 = vnwgt3_Summer24MG_JME;
+    }
+    else if (dsName.Contains("Summer24MG")) {
+        vnevt3 = vnevt3_Summer24MG;
+        vnwgt3 = vnwgt3_Summer24MG;
+    }
+    else if (dsName.Contains("Winter26MG")) {
+        vnevt3 = vnevt3_Winter26MG;
+        vnwgt3 = vnwgt3_Winter26MG;
+    }
+    else {
+        cout << "\n[ERROR] Unknown MadGraph dataset: " << dataset << endl;
+        cout << "Please add its global weights to the arrays in DijetHistosFill.C!" << endl;
+    }
+ 
+    //const int *vnevt = (isRun3 ? active_vnevt3 : &vnevt2[0]);
     const int *vnevt = (isRun3 ? &vnevt3[0] : &vnevt2[0]);
-    const int *vnwgt = (isRun3 ? &vnwgt3[0] : &vnevt2[0]);
+    //const int *vnwgt = (isRun3 ? &vnwgt3[0] : &vnevt2[0]);
     for (int i = 0; i != nht; ++i)
     {
+      double current_vnwgt = (isRun3 ? vnwgt3[i] : (double)vnevt2[i]);
+      //double current_vnwgt = (isRun3 ? active_vnwgt3[i] : (double)vnevt2[i]);
       hnevt->SetBinContent(i + 1, vnevt[i]);
-      hnwgt->SetBinContent(i + 1, vnwgt[i]);
+      hnwgt->SetBinContent(i + 1, current_vnwgt);
+      //hnwgt->SetBinContent(i + 1, vnwgt[i]);
       nMG += vnevt[i];
-      sumwMG += vnwgt[i];
+      //sumwMG += vnwgt[i];
+      sumwMG += current_vnwgt;
     }
     cout << "Loaded Hefaistos MadGraph event numbers ("
          << nMG << ")" << endl
@@ -3255,12 +3533,22 @@ if (isMG)
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_398860_daily_dials.json");
       //LoadJSON("rootfiles/2025/Collisions25_13p6TeV_391658_398903_daily_dials.json");
       LoadJSON("rootfiles/2025/Cert_Collisions2025_391658_398860_Golden.json");
-    if (TString(dataset.c_str()).Contains("2026"))
+    if (TString(dataset.c_str()).Contains("2026B"))
+      LoadJSON("rootfiles/2026/Cert_Collisions2026_401624_402537_golden.json");
+    if (TString(dataset.c_str()).Contains("2026C"))
       //LoadJSON("rootfiles/2026/Collisions26_13p6TeV_401623_401844_DCSOnly_TkPx.json");
       //LoadJSON("rootfiles/2026/Collisions26_13p6TeV_401623_401951_DCSOnly_TkPx.json");
       //LoadJSON("rootfiles/2026/CombinedJSONS_DCSCMLE_Runs_401624to402040.json");
       //LoadJSON("rootfiles/2026/CombinedJSONS_MLJSONRuns_401630to402172_DCSRuns_402173to402244.json");
-      LoadJSON("rootfiles/2026/CombinedJSONS_MLMRuns_401630to402604_DCSRuns_402605to402655.json");
+      //LoadJSON("rootfiles/2026/CombinedJSONS_MLMRuns_401630to402604_DCSRuns_402605to402655.json");
+      //LoadJSON("rootfiles/2026/CombinedJSONS_GoldenRuns_401630to402788_DCSRuns_402789to402825.json");
+      //LoadJSON("rootfiles/2026/CombinedJSONS_MLEnhancedGoldenRuns_401630to402825_DCSRuns_402826to403008.json");
+      //LoadJSON("rootfiles/2026/Cert_Collisions2026_lowPU.json");
+      LoadJSON("rootfiles/2026/Cert_Collisions2026_lowPU_Filtered.json");
+    if (TString(dataset.c_str()).Contains("2026D"))
+      //LoadJSON("rootfiles/2026/CombinedJSONS_MLEnhancedGolden_401630to403457_DCSRuns_403458to403493.json");
+      //LoadJSON("rootfiles/2026/CombinedJSONS_GoldenRuns_401630to403774_DCSRuns_403775to403895.json");
+      LoadJSON("rootfiles/2026/Collisions26_401623_403937_MLEnhancedGolden_Latest.json");
 
   }
   int _nbadevts_json(0);
@@ -3656,6 +3944,10 @@ if (isMG)
       h->pnpvgoodvsmu = new TProfile("pnpvgoodvsmu",";#mu;NPV_good;",119, 0, 120);
       h->pnpvvsmu = new TProfile("pnpvvsmu",";#mu;NPV;",119, 0, 120);
 
+      if (!isMC){
+        h->h_Muvsrun = new TProfile("h_Muvsrun", ";RunNumber;Mu;", _runNumberBin.size()-1, _runNumberBin.data());
+      }
+
       if (isZB || TString(dataset.c_str()).Contains("SingleNeutrino")) {
         h->prhovsmu_nocut = new TProfile("prhovsmu_nocut",";#mu;#rho;",119, 0, 120);
         h->prhovsmu_pt30 = new TProfile("prhovsmu_pt30",";#mu;#rho;",119, 0, 120);
@@ -3790,6 +4082,12 @@ if (isMG)
                                 nx, vx, npti, vpti);
       h->h2pteta = new TH2D("h2pteta", ";#eta;p_{T} (GeV);N_{jet}",
                             nx, vx, npti, vpti);
+      h->p2jes = new TProfile2D("p2jes", ";|#eta_{jet}|;p_{T,gen} (GeV);",
+				nxd, vxd, nptd, vptd);
+
+      h->p2res = new TProfile2D("p2res", ";|#eta_{jet}|;p_{T,gen} (GeV);",
+                                nxd, vxd, nptd, vptd);
+
       h->h2pteta_lumi = new TH2D("h2pteta_lumi", ";#eta;p_{T} (GeV);N_{jet}",
                             nx, vx, npti, vpti);
 
@@ -3803,6 +4101,10 @@ if (isMG)
       }
 
       h->hpt13 = new TH1D("hpt13", ";p_{T,jet} (GeV)", npti, vpti);
+
+      h->pjes13 = new TProfile("pjes13", ";p_{T,jet} (GeV);", npti, vpti);
+
+      h->pres13 = new TProfile("pres13", ";p_{T,jet} (GeV)", npti, vpti);
 
       h->hpteta20 = new TH1D("hpteta20", ";#eta;Number of entries", nx, vx);
 
@@ -3834,9 +4136,11 @@ if (isMG)
         h->p2pt = new TProfile2D("p2pt", ";#eta;p_{T,jet} (GeV);"
                                          "p_{T,jet}",
                                  nx, vx, npt, vpt);
+	if(doPU_per_trigger){
         h->p2rho_PURW = new TProfile2D("p2rho_PURW", ";#eta;p_{T,jet} (GeV);"
                                            "#rho",
                                   nx, vx, npt, vpt);
+	}
         h->p2rho = new TProfile2D("p2rho", ";#eta;p_{T,jet} (GeV);"
                                            "#rho",
                                   nx, vx, npt, vpt);
@@ -4405,6 +4709,7 @@ if (isMG)
         h->p2mupf_gq = new TProfile2D("p2mupf_gq", ";#eta;p_{T,probe} (GeV);MPFu",
                                    nx, vx, npt, vpt);
 
+
 	// tagger score
 	h->h_tagprobeab_qq = new TH1D("h_tagprobeab_qq", ";p_{T,avp} (GeV);tag score;score quark-quark",npt, vpt);
 	h->h_tagprobeab_qg = new TH1D("h_tagprobeab_qg", ";p_{T,avp} (GeV);tag score;score quark-gluon",npt, vpt);
@@ -4425,6 +4730,30 @@ if (isMG)
         h->h_tagprobepf_qg = new TH1D("h_tagprobepf_qg", ";p_{T,probe} (GeV);tag score;score quark-gluon",npt, vpt);
         h->h_tagprobepf_gq = new TH1D("h_tagprobepf_gq", ";p_{T,probe} (GeV);tag score;score gluon-quark",npt, vpt);
         h->h_tagprobepf_gg = new TH1D("h_tagprobepf_gg", ";p_{T,probe} (GeV);tag score;score gluon-gluon",npt, vpt);
+
+	
+	if (isMC && doGluonJets_SF) {
+	  h->h_tagprobeab_qq_sf = new TH1D("h_tagprobeab_qq_sf", ";p_{T,avp} (GeV);tag score;score quark-quark",npt, vpt);
+          h->h_tagprobeab_qg_sf = new TH1D("h_tagprobeab_qg_sf", ";p_{T,avp} (GeV);tag score;score quark-gluon",npt, vpt);
+          h->h_tagprobeab_gq_sf = new TH1D("h_tagprobeab_gq_sf", ";p_{T,avp} (GeV);tag score;score gluon-quark",npt, vpt);
+          h->h_tagprobeab_gg_sf = new TH1D("h_tagprobeab_gg_sf", ";p_{T,avp} (GeV);tag score;score gluon-gluon",npt, vpt);
+
+          h->h_tagprobead_qq_sf = new TH1D("h_tagprobead_qq_sf", ";p_{T,ave} (GeV);tag score;score quark-quark",npt, vpt);
+          h->h_tagprobead_qg_sf = new TH1D("h_tagprobead_qg_sf", ";p_{T,ave} (GeV);tag score;score quark-gluon",npt, vpt);
+          h->h_tagprobead_gq_sf = new TH1D("h_tagprobead_gq_sf", ";p_{T,ave} (GeV);tag score;score gluon-quark",npt, vpt);
+          h->h_tagprobead_gg_sf = new TH1D("h_tagprobead_gg_sf", ";p_{T,ave} (GeV);tag score;score gluon-gluon",npt, vpt);
+
+          h->h_tagprobetc_qq_sf = new TH1D("h_tagprobetc_qq_sf", ";p_{T,tag} (GeV);tag score;score quark-quark",npt, vpt);
+          h->h_tagprobetc_qg_sf = new TH1D("h_tagprobetc_qg_sf", ";p_{T,tag} (GeV);tag score;score quark-gluon",npt, vpt);
+          h->h_tagprobetc_gq_sf = new TH1D("h_tagprobetc_gq_sf", ";p_{T,tag} (GeV);tag score;score gluon-quark",npt, vpt);
+          h->h_tagprobetc_gg_sf = new TH1D("h_tagprobetc_gg_sf", ";p_{T,tag} (GeV);tag score;score gluon-gluon",npt, vpt);
+
+          h->h_tagprobepf_qq_sf = new TH1D("h_tagprobepf_qq_sf", ";p_{T,probe} (GeV);tag score;score quark-quark",npt, vpt);
+          h->h_tagprobepf_qg_sf = new TH1D("h_tagprobepf_qg_sf", ";p_{T,probe} (GeV);tag score;score quark-gluon",npt, vpt);
+          h->h_tagprobepf_gq_sf = new TH1D("h_tagprobepf_gq_sf", ";p_{T,probe} (GeV);tag score;score gluon-quark",npt, vpt);
+          h->h_tagprobepf_gg_sf = new TH1D("h_tagprobepf_gg_sf", ";p_{T,probe} (GeV);tag score;score gluon-gluon",npt, vpt);
+	} // to add SF for MC
+	
       }
 
 
@@ -4496,6 +4825,199 @@ if (isMG)
 
       }
 
+      if (doQvsG_Eff) {
+
+	dout->mkdir("GluonJets/Eff");
+        dout->cd("GluonJets/Eff");
+	
+        h->h2_QvGProbeEff_Denom_Quark = new TH2D("h2_QvGProbeEff_Denom_Quark", ";#eta;p_{T,probe} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+	h->h2_QvGProbeEff_Denom_Gluon = new TH2D("h2_QvGProbeEff_Denom_Gluon", ";#eta;p_{T,probe} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+	h->h2_QvGProbeEff_Num_Quark = new TH2D("h2_QvGProbeEff_Num_Quark", ";#eta;p_{T,probe} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+        h->h2_QvGProbeEff_Num_Gluon = new TH2D("h2_QvGProbeEff_Num_Gluon", ";#eta;p_{T,probe} (GeV);"
+                                                   "N_{events}",
+                                  nx, vx, npt, vpt);
+      }
+      if (isMC && doGluonJets_SF){
+        dout->mkdir("GluonJets/tight/SF");
+        dout->cd("GluonJets/tight/SF");
+        // Both tag and probe quarks    
+        // MPF decomposition for HDM method
+        h->p2m0ab_qq_sf = new TProfile2D("p2m0ab_qq_sf", ";#eta;p_{T,avp} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ab_qq_sf = new TProfile2D("p2m2ab_qq_sf", ";#eta;p_{T,avp} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnab_qq_sf = new TProfile2D("p2mnab_qq_sf", ";#eta;p_{T,avp} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muab_qq_sf = new TProfile2D("p2muab_qq_sf", ";#eta;p_{T,avp} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // MPF decomposition for HDM method
+        h->p2m0ad_qq_sf = new TProfile2D("p2m0ad_qq_sf", ";#eta;p_{T,ave} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ad_qq_sf = new TProfile2D("p2m2ad_qq_sf", ";#eta;p_{T,ave} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnad_qq_sf = new TProfile2D("p2mnad_qq_sf", ";#eta;p_{T,ave} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muad_qq_sf = new TProfile2D("p2muad_qq_sf", ";#eta;p_{T,ave} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0tc_qq_sf = new TProfile2D("p2m0tc_qq_sf", ";#eta;p_{T,tag} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2tc_qq_sf = new TProfile2D("p2m2tc_qq_sf", ";#eta;p_{T,tag} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mntc_qq_sf = new TProfile2D("p2mntc_qq_sf", ";#eta;p_{T,tag} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mutc_qq_sf = new TProfile2D("p2mutc_qq_sf", ";#eta;p_{T,tag} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0pf_qq_sf = new TProfile2D("p2m0pf_qq_sf", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_qq_sf = new TProfile2D("p2m2pf_qq_sf", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_qq_sf = new TProfile2D("p2mnpf_qq_sf", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_qq_sf = new TProfile2D("p2mupf_qq_sf", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // Tag quark and probe gluon    
+        // MPF decomposition for HDM method
+        h->p2m0ab_qg_sf = new TProfile2D("p2m0ab_qg_sf", ";#eta;p_{T,avp} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ab_qg_sf = new TProfile2D("p2m2ab_qg_sf", ";#eta;p_{T,avp} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnab_qg_sf = new TProfile2D("p2mnab_qg_sf", ";#eta;p_{T,avp} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muab_qg_sf = new TProfile2D("p2muab_qg_sf", ";#eta;p_{T,avp} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // MPF decomposition for HDM method
+        h->p2m0ad_qg_sf = new TProfile2D("p2m0ad_qg_sf", ";#eta;p_{T,ave} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ad_qg_sf = new TProfile2D("p2m2ad_qg_sf", ";#eta;p_{T,ave} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnad_qg_sf = new TProfile2D("p2mnad_qg_sf", ";#eta;p_{T,ave} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muad_qg_sf = new TProfile2D("p2muad_qg_sf", ";#eta;p_{T,ave} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0tc_qg_sf = new TProfile2D("p2m0tc_qg_sf", ";#eta;p_{T,tag} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2tc_qg_sf = new TProfile2D("p2m2tc_qg_sf", ";#eta;p_{T,tag} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mntc_qg_sf = new TProfile2D("p2mntc_qg_sf", ";#eta;p_{T,tag} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mutc_qg_sf = new TProfile2D("p2mutc_qg_sf", ";#eta;p_{T,tag} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0pf_qg_sf = new TProfile2D("p2m0pf_qg_sf", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_qg_sf = new TProfile2D("p2m2pf_qg_sf", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_qg_sf = new TProfile2D("p2mnpf_qg_sf", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_qg_sf = new TProfile2D("p2mupf_qg_sf", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // Both tag and probe gluons 
+        // MPF decomposition for HDM method
+        h->p2m0ab_gg_sf = new TProfile2D("p2m0ab_gg_sf", ";#eta;p_{T,avp} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ab_gg_sf = new TProfile2D("p2m2ab_gg_sf", ";#eta;p_{T,avp} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnab_gg_sf = new TProfile2D("p2mnab_gg_sf", ";#eta;p_{T,avp} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muab_gg_sf = new TProfile2D("p2muab_gg_sf", ";#eta;p_{T,avp} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // MPF decomposition for HDM method
+        h->p2m0ad_gg_sf = new TProfile2D("p2m0ad_gg_sf", ";#eta;p_{T,ave} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ad_gg_sf = new TProfile2D("p2m2ad_gg_sf", ";#eta;p_{T,ave} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnad_gg_sf = new TProfile2D("p2mnad_gg_sf", ";#eta;p_{T,ave} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muad_gg_sf = new TProfile2D("p2muad_gg_sf", ";#eta;p_{T,ave} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0tc_gg_sf = new TProfile2D("p2m0tc_gg_sf", ";#eta;p_{T,tag} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2tc_gg_sf = new TProfile2D("p2m2tc_gg_sf", ";#eta;p_{T,tag} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mntc_gg_sf = new TProfile2D("p2mntc_gg_sf", ";#eta;p_{T,tag} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mutc_gg_sf = new TProfile2D("p2mutc_gg_sf", ";#eta;p_{T,tag} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0pf_gg_sf = new TProfile2D("p2m0pf_gg_sf", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_gg_sf = new TProfile2D("p2m2pf_gg_sf", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_gg_sf = new TProfile2D("p2mnpf_gg_sf", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_gg_sf = new TProfile2D("p2mupf_gg_sf", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // tag gluon and probe quark    
+        // MPF decomposition for HDM method
+        h->p2m0ab_gq_sf = new TProfile2D("p2m0ab_gq_sf", ";#eta;p_{T,avp} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ab_gq_sf = new TProfile2D("p2m2ab_gq_sf", ";#eta;p_{T,avp} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnab_gq_sf = new TProfile2D("p2mnab_gq_sf", ";#eta;p_{T,avp} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muab_gq_sf = new TProfile2D("p2muab_gq_sf", ";#eta;p_{T,avp} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        // MPF decomposition for HDM method
+        h->p2m0ad_gq_sf = new TProfile2D("p2m0ad_gq_sf", ";#eta;p_{T,ave} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2ad_gq_sf = new TProfile2D("p2m2ad_gq_sf", ";#eta;p_{T,ave} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnad_gq_sf = new TProfile2D("p2mnad_gq_sf", ";#eta;p_{T,ave} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2muad_gq_sf = new TProfile2D("p2muad_gq_sf", ";#eta;p_{T,ave} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0tc_gq_sf = new TProfile2D("p2m0tc_gq_sf", ";#eta;p_{T,tag} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2tc_gq_sf = new TProfile2D("p2m2tc_gq_sf", ";#eta;p_{T,tag} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mntc_gq_sf = new TProfile2D("p2mntc_gq_sf", ";#eta;p_{T,tag} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mutc_gq_sf = new TProfile2D("p2mutc_gq_sf", ";#eta;p_{T,tag} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+
+
+        h->p2m0pf_gq_sf = new TProfile2D("p2m0pf_gq_sf", ";#eta;p_{T,probe} (GeV);MPF0",
+                                   nx, vx, npt, vpt);
+        h->p2m2pf_gq_sf = new TProfile2D("p2m2pf_gq_sf", ";#eta;p_{T,probe} (GeV);MPF2",
+                                   nx, vx, npt, vpt);
+        h->p2mnpf_gq_sf = new TProfile2D("p2mnpf_gq_sf", ";#eta;p_{T,probe} (GeV);MPFn",
+                                   nx, vx, npt, vpt);
+        h->p2mupf_gq_sf = new TProfile2D("p2mupf_gq_sf", ";#eta;p_{T,probe} (GeV);MPFu",
+                                   nx, vx, npt, vpt);
+      } // SF
+     
     } // GluonJets
 
     if (doDijet2)
@@ -4721,6 +5243,7 @@ if (isMG)
       h->presa = new TProfile("presa", "", npti, vpti);
       h->ptleada = new TProfile("ptleada", "", npti, vpti);
       h->pcrecoila = new TProfile("pcrecoila", "", npti, vpti);
+      h->pcrecoila_pt15 = new TProfile("pcrecoila_pt15", "", npti, vpti);
 
       h->pm0a = new TProfile("pm0a", "", npti, vpti);
       h->pm2a = new TProfile("pm2a", "", npti, vpti);
@@ -4732,6 +5255,7 @@ if (isMG)
       h->presm = new TProfile("presm", "", npti, vpti);
       h->ptleadm = new TProfile("ptleadm", "", npti, vpti);
       h->pcrecoilm = new TProfile("pcrecoilm", "", npti, vpti);
+      h->pcrecoilm_pt15 = new TProfile("pcrecoilm_pt15", "", npti, vpti);
 
       h->pm0m = new TProfile("pm0m", "", npti, vpti);
       h->pm2m = new TProfile("pm2m", "", npti, vpti);
@@ -4743,6 +5267,7 @@ if (isMG)
       h->presl = new TProfile("presl", "", npti, vpti);
       h->ptleadl = new TProfile("ptleadl", "", npti, vpti);
       h->pcrecoill = new TProfile("pcrecoill", "", npti, vpti);
+      h->pcrecoill_pt15 = new TProfile("pcrecoill_pt15", "", npti, vpti);
 
       h->pm0l = new TProfile("pm0l", "", npti, vpti);
       h->pm2l = new TProfile("pm2l", "", npti, vpti);
@@ -4756,6 +5281,7 @@ if (isMG)
       h->presr = new TProfile("presr", "", npti, vpti);
       h->ptleadr = new TProfile("ptleadr", "", npti, vpti);
       h->pcrecoilr = new TProfile("pcrecoilr", "", npti, vpti);
+      h->pcrecoilr_pt15 = new TProfile("pcrecoilr_pt15", "", npti, vpti);
 
       h->pm0r = new TProfile("pm0r", "", npti, vpti);
       h->pm2r = new TProfile("pm2r", "", npti, vpti);
@@ -4776,6 +5302,13 @@ if (isMG)
         h->h2recoilm = new TH2D("h2recoilm", "", npti, vpti, npti, vpti);
         h->h2recoill = new TH2D("h2recoill", "", npti, vpti, npti, vpti);
         h->h2recoilr = new TH2D("h2recoilr", "", npti, vpti, npti, vpti);
+
+	/*
+	h->h2recoila_pt30 = new TH2D("h2recoila_pt30", "", npti, vpti, npti, vpti);
+        h->h2recoilm_pt30 = new TH2D("h2recoilm_pt30", "", npti, vpti, npti, vpti);
+        h->h2recoill_pt30 = new TH2D("h2recoill_pt30", "", npti, vpti, npti, vpti);
+        h->h2recoilr_pt30 = new TH2D("h2recoilr_pt30", "", npti, vpti, npti, vpti);
+	*/
       }
       if (doPFComposition)
       {
@@ -4903,6 +5436,20 @@ if (isMG)
   } // for itrg
 
 
+  
+  // Load Qvs SF.
+  // Open the SF file before looping over events
+  TFile *fSF(0);
+  TH3D *h3_quark(0), *h3_gluon(0);
+  if (doGluonJets && isMC && doGluonJets_SF) {
+    fSF = new TFile("rootfiles/PNET_SFs.root", "READ");
+    cout << "Reading rootfile for SF" << endl;  
+    h3_quark = (TH3D *)fSF->Get("h3_quark_central");
+    h3_gluon = (TH3D *)fSF->Get("h3_gluon_central"); 
+  }
+  //
+  
+
   if (debugevent)
     cout << "Load jet veto maps" << endl
          << flush;
@@ -4987,7 +5534,7 @@ if (isMG)
       TString(dataset.c_str()).Contains("Winter25"))
     //fjv = new TFile("rootfiles/jetveto2025CDE_V2M.root");
     fjv = new TFile("rootfiles/jetveto2025CDEFG_V3M.root");
-  if (TString(dataset.c_str()).Contains("2026"))                   
+  if (TString(dataset.c_str()).Contains("2026") || TString(dataset.c_str()).Contains("Winter26"))                   
     fjv = new TFile("rootfiles/jetveto2026B_V0M.root");
   assert(fjv);
 
@@ -5060,7 +5607,7 @@ if (isMG)
   if (TString(dataset.c_str()).Contains("2025") ||
       TString(dataset.c_str()).Contains("Winter25"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
-  if (TString(dataset.c_str()).Contains("2026")) 
+  if (TString(dataset.c_str()).Contains("2026") || TString(dataset.c_str()).Contains("Winter26")) 
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
@@ -5069,7 +5616,15 @@ if (isMG)
   Long64_t nentries = fChain->GetEntries(); // Long startup time
   cout << "Loaded " << nentries << " entries" << endl
        << flush;
-  if (isMG && nentries != nMG)
+
+  //For splitting
+  const char* env_chunk_check = gSystem->Getenv("DIJET_CHUNK");
+  int current_chunk = env_chunk_check ? atoi(env_chunk_check) : -1;
+  //
+
+  //Only recalculate if it's a mismatch AND we are NOT running a chunk
+  if (isMG && nentries != nMG && current_chunk < 0)
+  //if (isMG && nentries != nMG)
   {
     cout << "Nentries = " << nentries << ", expected nMG = " << nMG << endl
          << flush;
@@ -5085,6 +5640,18 @@ if (isMG)
         break;
       b_LHE_HT->GetEntry(ientry);    // read only this branch
       b_genWeight->GetEntry(ientry); // also this if MG
+
+      if (doPSVar) b_PSWeight->GetEntry(ientry);
+      Float_t PSvariation = 1.0;
+      if (doPSVar) {
+          if (doISRdown) PSvariation = PSWeight[0];
+          else if (doFSRdown) PSvariation = PSWeight[1];
+          else if (doISRup) PSvariation = PSWeight[2];
+          else if (doFSRup) PSvariation = PSWeight[3]; // Same variation as JMENANO
+          else if (doFSRup_JMENANO) PSvariation = PSWeight[4];
+	  else if (doFSRup0p5_JMENANO) PSvariation = PSWeight[2];
+      }
+
       //double w = genWeight;
       double w = doPSVar ? genWeight * PSvariation : genWeight;
       double w_ptlead = genWeight;
@@ -5271,7 +5838,7 @@ if (isMG)
         continue;
       }
       */
-      if (TString(dataset.c_str()).Contains("2026B") && (run > 402513)){
+      if (TString(dataset.c_str()).Contains("2026Bnib") && (run > 402513)){
         continue;
       }
     } // doJSON
@@ -5286,6 +5853,15 @@ if (isMG)
     nb = fChain->GetEntry(jentry);
     nbytes += nb;
     // if (Cut(ientry) < 0) continue;
+    Float_t PSvariation = 1.0;
+    if (isMC && doPSVar) {
+        if (doISRdown) PSvariation = PSWeight[0];
+        else if (doFSRdown) PSvariation = PSWeight[1];
+        else if (doISRup) PSvariation = PSWeight[2];
+        else if (doFSRup) PSvariation = PSWeight[3];
+        else if (doFSRup_JMENANO) PSvariation = PSWeight[4];
+	else if (doFSRup0p5_JMENANO) PSvariation = PSWeight[2];
+    }
 
     //double w = (isMC ? genWeight : 1.);
     double w = (isMC ? (doPSVar ? genWeight * PSvariation : genWeight) : 1.);
@@ -5314,8 +5890,12 @@ if (isMG)
       w_ptavp3 *= wht;
       w_ptave *= wht;
       w_ptrecoil *= wht;
-      if (w > 10000 || w_ptlead > 10000 || w_ptavp3 > 10000 || w_ptrecoil > 10000 ){
-        cout << "WARNING: w = " << w << " for " << _filename << endl << flush;
+      if (w > 100000 || w_ptlead > 10000 || w_ptavp3 > 10000 || w_ptrecoil > 10000 ){
+        cout << "WARNING: w = " << w
+	     << "genWeight = " << genWeight
+	     << ", PS_n = " << nPSWeight
+	     << ", PS_var = " << PSvariation
+	     << " for " << _filename << endl << flush;
       }
       hLHE_HT->Fill(LHE_HT);     // cross-check hnevt afterwards
       hLHE_HTw->Fill(LHE_HT, w); // cross-check hnwgt afterwards
@@ -5338,7 +5918,10 @@ if (isMG)
         continue;
       if (isMG && isRun3 && 2. * Jet_pt[0] / LHE_HT > 2.5 / pow(LHE_HT / 40., 2) + 1.5)
         continue; // Run3 MG patch for missing Pileup_pthatmax
-      if (!isMG && Pileup_pthatmax > Generator_binvar && !(TString(dataset.c_str()).Contains("SingleNeutrino")))
+      if (!isMG && Pileup_pthatmax > Generator_binvar &&
+	  !(TString(dataset.c_str()).Contains("Summer22MC_hadCalibOff")) && 
+	  !(TString(dataset.c_str()).Contains("Summer22MC_base_1M")) &&
+	  !(TString(dataset.c_str()).Contains("SingleNeutrino")))
 	//cout << "The Pileup_pthatmax:" << Pileup_pthatmax << " is > than Generator_binvar: " << Generator_binvar << endl;
         continue;
     }
@@ -5408,6 +5991,7 @@ if (isMG)
     // From the CondFormats/JetMETObjects/src/JetIdHelper.cc
     // To include function that replaces the JetId for NANOAODV15.
     const std::vector<UChar_t>& Jet_jetId_ref = InitJetId(
+    //const std::vector<Int_t>& Jet_jetId_ref = InitJetId(
     dataset,
     nJet,
     Jet_eta,
@@ -5889,8 +6473,7 @@ if (isMG)
           h->p2eff_recEta->Fill(fabs(hasMatchJet_dR4 ? p4.Eta() : p4g.Eta()), p4g.Pt(), hasMatchJet_dR4 ? 1 : 0, w);
 	}
 
-	// To compare JetID results
-	if (Jet_jetId[i] >= 4) {
+	if (i >= 0 && Jet_jetId[i] >= 4) {
           
           h->h2pteta_gEtaIDNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), w);
           h->p2r_gEtaIDNoVtx->Fill(fabs(p4g.Eta()), p4g.Pt(), p4.Pt() / p4g.Pt(), w);
@@ -6172,6 +6755,10 @@ if (isMG)
 	      h->prhovsmu->Fill(trpu, rho, w);
 	      h->pnpvgoodvsmu->Fill(trpu, NPV_Good, w);
 	      h->pnpvvsmu->Fill(trpu, NPV, w);
+
+	      if(!isMC){
+	      h->h_Muvsrun->Fill(run, trpu, w);
+	      }
 	    }
 	  }
 
@@ -6228,6 +6815,9 @@ if (isMG)
 
 	    //std::cout << run << " Inclusive h2pteta weight: " << w << std::endl;
             h->h2pteta->Fill(p4.Eta(), p4.Pt(), w);
+            h->p2res->Fill(p4.Eta(), p4.Pt(), Jet_RES[i], w);
+            h->p2jes->Fill(p4.Eta(), p4.Pt(), (1.0 - Jet_rawFactor[i]), w); ////(1. - Jet_rawFactor[i])
+
 
 	    if (p4.Pt()>20){
 	      h->hpteta20->Fill(p4.Eta(), w);
@@ -6265,8 +6855,9 @@ if (isMG)
               h->h2pteta_sel->Fill(p4.Eta(), p4.Pt(), w);
 
             if (fabs(p4.Rapidity()) < 1.3){
-	      //std::cout << run << " Inclusive hpt13 weight: " << w << std::endl;
               h->hpt13->Fill(p4.Pt(), w);
+	      h->pres13->Fill(p4.Pt(), Jet_RES[i], w);
+	      h->pjes13->Fill(p4.Pt(), (1.0 - Jet_rawFactor[i]), w);
 	    }
             int iy = int(fabs(p4.Rapidity()) / 0.5);
             if (iy < h->ny){
@@ -6302,8 +6893,8 @@ if (isMG)
 	      //
 	      if (doPU_per_trigger){
 	         get_weight(pt, eta, "doInc");
+                 h->p2rho_PURW->Fill(eta, pt, rho, w * PU_weight);
 	      }
-              h->p2rho_PURW->Fill(eta, pt, rho, w * PU_weight);
 	      //
 	      h->p2rho->Fill(eta, pt, rho, w);
               h->p2chf->Fill(eta, pt, Jet_chHEF[i], w);
@@ -6549,6 +7140,7 @@ if (isMG)
 
     // Calculate Crecoil
     double logCrecoil(0);
+    double logCrecoil_15(0);
     double ptavp3(0);
     if (ismultijet && doMultijet) //remove for test Condor, empty histograms.
     //if (ismultijet_noJetID && doMultijet)
@@ -6584,6 +7176,34 @@ if (isMG)
 
         // Make sure selection here matches the one above for p4recoil
         p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
+
+	if (i > 0 && p4.Pt() > 15. && fabs(p4.Eta()) < 2.5 &&
+            DELTAPHI(p4.Phi(), p4lead.Phi()) > 1.0) 
+	{
+	  double pti_15 = p4.Pt();
+          double fi_15 = pti_15 / ptrecoil;
+          double Fi_15 = fi_15 * cos(DELTAPHI(p4.Phi(), p4recoil.Phi()));
+          logCrecoil_15 += Fi_15 * log(fi_15);
+
+	  if (doMultijet2Drecoil)
+          {
+	    for (int itrg = 0; itrg != ntrg; ++itrg)
+            {
+              string &trg = vtrg[itrg];
+              if (!(*mtrg[trg]))
+              //if (!(mtrg[trg]))
+                continue;
+
+              multijetHistos *h = mhmj[trg];
+
+              // Assumption is that sum_i F_i = 1, but should check?
+              h->h2recoila->Fill(ptavp3, pti_15, w * Fi_15);
+              h->h2recoilm->Fill(ptave, pti_15, w * Fi_15);
+              h->h2recoill->Fill(ptlead, pti_15, w * Fi_15);
+              h->h2recoilr->Fill(ptrecoil, pti_15, w * Fi_15);
+	    }
+	  }
+	}
         if (i > 0 && p4.Pt() > 30. && fabs(p4.Eta()) < 2.5 &&
             DELTAPHI(p4.Phi(), p4lead.Phi()) > 1.0)
         {
@@ -6606,10 +7226,12 @@ if (isMG)
               multijetHistos *h = mhmj[trg];
 
               // Assumption is that sum_i F_i = 1, but should check?
-              h->h2recoila->Fill(ptavp3, pti, w * Fi);
-              h->h2recoilm->Fill(ptave, pti, w * Fi);
-              h->h2recoill->Fill(ptlead, pti, w * Fi);
-              h->h2recoilr->Fill(ptrecoil, pti, w * Fi);
+	      /*
+              h->h2recoila_pt30->Fill(ptavp3, pti, w * Fi);
+              h->h2recoilm_pt30->Fill(ptave, pti, w * Fi);
+              h->h2recoill_pt30->Fill(ptlead, pti, w * Fi);
+              h->h2recoilr_pt30->Fill(ptrecoil, pti, w * Fi);
+              */
 
               if (doPFComposition)
               {
@@ -6627,15 +7249,9 @@ if (isMG)
         }     // good recoil jet
       }       // for i in injet
     }         // doMultijet
-    /*
-    if (!ismultijet && doMultijet)
-    {
-      std::cout << " Jet_pt[0] > 30." << Jet_pt[0] << std::endl;
-      std::cout << " Jet_pt[0] > 30." << Jet_pt[0] << std::endl;
-      std::cout << " Jet_pt[0] > 30." << Jet_pt[0] << std::endl;
-    }
-    */
+
     double Crecoil = exp(logCrecoil);
+    double Crecoil_15 = exp(logCrecoil_15);
 
     hnjet->Fill(njet, w);
 
@@ -6756,8 +7372,10 @@ if (isMG)
 
         bool isdijet = (fabs(p4t.Eta()) < 1.3 && dphi > 2.7 &&
                         fabs(asymm) < maxa && //!
-                        p4t.Pt() > 15. && Jet_jetId[itag] >= 4 &&
-                        p4p.Pt() > 15. && Jet_jetId[iprobe] >= 4 &&
+                        p4t.Pt() > 15. && 
+			Jet_jetId[itag] >= 4 &&
+                        p4p.Pt() > 15. && 
+			Jet_jetId[iprobe] >= 4 &&
                         !Jet_jetveto[itag] && !Jet_jetveto[iprobe] && //!
                         pass_METfilter > 0);
         // DESY selection. Note tighter asymmetry cut and allJetsGood
@@ -6996,6 +7614,68 @@ if (isMG)
             
             gluonHistos *h = mhgj[trg];
             double res = Jet_RES[iprobe] / Jet_RES[itag];
+	    double w_sf(0);
+	    
+	    // doQvsG_Eff
+	    if (doQvsG_Eff && isMC) {
+    	      int truthFlav = abs(Jet_partonFlavour[iprobe]);
+
+    	      bool isTrueLightQuark = (truthFlav >= 1 && truthFlav < 4);
+    	      bool isTrueGluon      = (truthFlav == 21);
+
+    	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 && fabs(eta) < 1.3) {
+
+        	if (isTrueLightQuark){
+		  h->h2_QvGProbeEff_Denom_Quark->Fill(eta, ptprobe, w);
+		}
+        	if (isTrueGluon){
+		  h->h2_QvGProbeEff_Denom_Gluon->Fill(eta, ptprobe, w);
+                }
+
+        	bool passesQuarkTag = (Jet_btagPNetQvG[iprobe] >= 0.0 && Jet_btagPNetQvG[iprobe] <= 0.45);
+        	bool passesGluonTag = (Jet_btagPNetQvG[iprobe] > 0.45 && Jet_btagPNetQvG[iprobe] <= 1.0);
+
+        	if (isTrueLightQuark && passesQuarkTag) {
+		  h->h2_QvGProbeEff_Num_Quark->Fill(eta, ptprobe, w);
+		}
+        	if (isTrueGluon && passesGluonTag){
+		  h->h2_QvGProbeEff_Num_Gluon->Fill(eta, ptprobe, w);
+		}
+	      } // tagger conditions
+	    } // doQvsG_Eff
+
+
+	    
+	    // To take SF for tag and probe jets
+	    if (doGluonJets_SF && isMC && itag >= 0 && iprobe >= 0) {
+              double sf_tag = 1.0;
+              int flav_tag = abs(Jet_partonFlavour[itag]);
+              if (flav_tag >= 1 && flav_tag <= 5 && h3_quark) {
+                  sf_tag = h3_quark->GetBinContent(h3_quark->FindBin(Jet_btagPNetQvG[itag], fabs(Jet_eta[itag]), Jet_pt[itag]));
+              } else if (flav_tag == 21 && h3_gluon) {
+                  sf_tag = h3_gluon->GetBinContent(h3_gluon->FindBin(Jet_btagPNetQvG[itag], fabs(Jet_eta[itag]), Jet_pt[itag]));
+              }
+              if (sf_tag <= 0) sf_tag = 1.0; // Safety check
+
+              double sf_probe = 1.0;
+              int flav_probe = abs(Jet_partonFlavour[iprobe]);
+              if (flav_probe >= 1 && flav_probe <= 5 && h3_quark) {
+                  sf_probe = h3_quark->GetBinContent(h3_quark->FindBin(Jet_btagPNetQvG[iprobe], fabs(Jet_eta[iprobe]), Jet_pt[iprobe]));
+              } else if (flav_probe == 21 && h3_gluon) {
+                  sf_probe = h3_gluon->GetBinContent(h3_gluon->FindBin(Jet_btagPNetQvG[iprobe], fabs(Jet_eta[iprobe]), Jet_pt[iprobe]));
+              }
+              if (sf_probe <= 0) sf_probe = 1.0; // Safety check
+
+	      //define new weight
+              w_sf = w * sf_tag * sf_probe;
+            }
+	     else if (doGluonJets_SF && isMC && !(itag >= 0 && iprobe >= 0)) {
+	       cout << "CRITICAL WARNING: itag or iprobe < 0!" << endl;
+	       w_sf = w;
+	     }
+	    //
+	    
+
 	    if (Jet_btagUParTAK4B[itag] <= 0.4648 && Jet_btagUParTAK4CvL[itag] <= 0.421 &&
 	        0. <= Jet_btagPNetQvG[itag] && 0.45 <= Jet_btagPNetQvG[itag]) 
 	    {
@@ -7006,6 +7686,42 @@ if (isMG)
                 h->h_tagprobead_qq->Fill(ptave, w);
                 h->h_tagprobetc_qq->Fill(pttag, w);
                 h->h_tagprobepf_qq->Fill(ptprobe, w);
+
+		
+		if (isMC && doGluonJets_SF) {
+		  h->h_tagprobeab_qq_sf->Fill(ptavp2, w_sf);
+                  h->h_tagprobead_qq_sf->Fill(ptave, w_sf);
+                  h->h_tagprobetc_qq_sf->Fill(pttag, w_sf);
+                  h->h_tagprobepf_qq_sf->Fill(ptprobe, w_sf);
+
+		  { // Bisector (proper) WP_t
+                    h->p2m0ab_qq_sf->Fill(eta, ptavp2, m0b, w);
+                    h->p2m2ab_qq_sf->Fill(eta, ptavp2, m2b, w);
+                    h->p2mnab_qq_sf->Fill(eta, ptavp2, mnb, w);
+                    h->p2muab_qq_sf->Fill(eta, ptavp2, mub, w);
+                  }
+                  { // Dijet axis
+                    h->p2m0ad_qq_sf->Fill(eta, ptave, m0d, w);
+                    h->p2m2ad_qq_sf->Fill(eta, ptave, m2d, w);
+                    h->p2mnad_qq_sf->Fill(eta, ptave, mnd, w);
+                    h->p2muad_qq_sf->Fill(eta, ptave, mud, w);
+                  }
+                  // Tag jet axis
+                  {
+                    h->p2m0tc_qq_sf->Fill(eta, pttag, m0c, w);
+                    h->p2m2tc_qq_sf->Fill(eta, pttag, m2c, w);
+                    h->p2mntc_qq_sf->Fill(eta, pttag, mnc, w);
+                    h->p2mutc_qq_sf->Fill(eta, pttag, muc, w);
+                  }
+                  // Probe jet axis
+                  {
+                    h->p2m0pf_qq_sf->Fill(eta, ptprobe, m0f, w);
+                    h->p2m2pf_qq_sf->Fill(eta, ptprobe, m2f, w);
+                    h->p2mnpf_qq_sf->Fill(eta, ptprobe, mnf, w);
+                    h->p2mupf_qq_sf->Fill(eta, ptprobe, muf, w);
+                  }
+		} //isMC && doGluonJets_SF
+		
 
                 { // Bisector (proper) WP_t
                   if (doGluonJets && doDijetJER)
@@ -7050,6 +7766,42 @@ if (isMG)
                 h->h_tagprobead_qg->Fill(ptave, w);
                 h->h_tagprobetc_qg->Fill(pttag, w);
                 h->h_tagprobepf_qg->Fill(ptprobe, w);
+
+		
+		if (isMC && doGluonJets_SF) {
+		  h->h_tagprobeab_qg_sf->Fill(ptavp2, w_sf);
+                  h->h_tagprobead_qg_sf->Fill(ptave, w_sf);
+                  h->h_tagprobetc_qg_sf->Fill(pttag, w_sf);
+                  h->h_tagprobepf_qg_sf->Fill(ptprobe, w_sf);
+
+		  { // Bisector (proper) WP_t
+                    h->p2m0ab_qg_sf->Fill(eta, ptavp2, m0b, w);
+                    h->p2m2ab_qg_sf->Fill(eta, ptavp2, m2b, w);
+                    h->p2mnab_qg_sf->Fill(eta, ptavp2, mnb, w);
+                    h->p2muab_qg_sf->Fill(eta, ptavp2, mub, w);
+                  }
+                  { // Dijet axis
+                    h->p2m0ad_qg_sf->Fill(eta, ptave, m0d, w);
+                    h->p2m2ad_qg_sf->Fill(eta, ptave, m2d, w);
+                    h->p2mnad_qg_sf->Fill(eta, ptave, mnd, w);
+                    h->p2muad_qg_sf->Fill(eta, ptave, mud, w);
+                  }
+                  // Tag jet axis
+                  {
+                    h->p2m0tc_qg_sf->Fill(eta, pttag, m0c, w);
+                    h->p2m2tc_qg_sf->Fill(eta, pttag, m2c, w);
+                    h->p2mntc_qg_sf->Fill(eta, pttag, mnc, w);
+                    h->p2mutc_qg_sf->Fill(eta, pttag, muc, w);
+                  }
+                  // Probe jet axis
+                  {
+                   h->p2m0pf_qg_sf->Fill(eta, ptprobe, m0f, w);
+                   h->p2m2pf_qg_sf->Fill(eta, ptprobe, m2f, w);
+                   h->p2mnpf_qg_sf->Fill(eta, ptprobe, mnf, w);
+                   h->p2mupf_qg_sf->Fill(eta, ptprobe, muf, w);
+                  }
+		} //isMC && doGluonJets_SF
+                
 
 	        { // Bisector (proper) WP_t
                   if (doGluonJets && doDijetJER)
@@ -7100,6 +7852,44 @@ if (isMG)
                 h->h_tagprobetc_gq->Fill(pttag, w);
                 h->h_tagprobepf_gq->Fill(ptprobe, w);
 
+		
+		if (isMC && doGluonJets_SF) {
+		  h->h_tagprobeab_gq_sf->Fill(ptavp2, w_sf);
+                  h->h_tagprobead_gq_sf->Fill(ptave, w_sf);
+                  h->h_tagprobetc_gq_sf->Fill(pttag, w_sf);
+                  h->h_tagprobepf_gq_sf->Fill(ptprobe, w_sf);
+
+		  { // Bisector (proper) WP_t
+                  
+                    h->p2m0ab_gq_sf->Fill(eta, ptavp2, m0b, w);
+                    h->p2m2ab_gq_sf->Fill(eta, ptavp2, m2b, w);
+                    h->p2mnab_gq_sf->Fill(eta, ptavp2, mnb, w);
+                    h->p2muab_gq_sf->Fill(eta, ptavp2, mub, w);
+                  }
+                  { // Dijet axis
+                    h->p2m0ad_gq_sf->Fill(eta, ptave, m0d, w);
+                    h->p2m2ad_gq_sf->Fill(eta, ptave, m2d, w);
+                    h->p2mnad_gq_sf->Fill(eta, ptave, mnd, w);
+                    h->p2muad_gq_sf->Fill(eta, ptave, mud, w);
+                  }
+                  // Tag jet axis
+                  {
+                    h->p2m0tc_gq_sf->Fill(eta, pttag, m0c, w);
+                    h->p2m2tc_gq_sf->Fill(eta, pttag, m2c, w);
+                    h->p2mntc_gq_sf->Fill(eta, pttag, mnc, w);
+                    h->p2mutc_gq_sf->Fill(eta, pttag, muc, w);
+                  }
+                  // Probe jet axis
+                  {
+                    h->p2m0pf_gq_sf->Fill(eta, ptprobe, m0f, w);
+                    h->p2m2pf_gq_sf->Fill(eta, ptprobe, m2f, w);
+                    h->p2mnpf_gq_sf->Fill(eta, ptprobe, mnf, w);
+                    h->p2mupf_gq_sf->Fill(eta, ptprobe, muf, w);
+                  }
+
+		} // isMC && doGluonJets_SF
+		
+
                 { // Bisector (proper) WP_t
                   if (doGluonJets && doDijetJER)
                   {
@@ -7143,6 +7933,42 @@ if (isMG)
                 h->h_tagprobead_gg->Fill(ptave, w);
                 h->h_tagprobetc_gg->Fill(pttag, w);
                 h->h_tagprobepf_gg->Fill(ptprobe, w);
+
+		
+		if (isMC && doGluonJets_SF) {
+		  h->h_tagprobeab_gg_sf->Fill(ptavp2, w_sf);
+                  h->h_tagprobead_gg_sf->Fill(ptave, w_sf);
+                  h->h_tagprobetc_gg_sf->Fill(pttag, w_sf);
+                  h->h_tagprobepf_gg_sf->Fill(ptprobe, w_sf);
+
+		  { // Bisector (proper) WP_t
+                    h->p2m0ab_gg_sf->Fill(eta, ptavp2, m0b, w);
+                    h->p2m2ab_gg_sf->Fill(eta, ptavp2, m2b, w);
+                    h->p2mnab_gg_sf->Fill(eta, ptavp2, mnb, w);
+                    h->p2muab_gg_sf->Fill(eta, ptavp2, mub, w);
+                  }
+                  { // Dijet axis
+                    h->p2m0ad_gg_sf->Fill(eta, ptave, m0d, w);
+                    h->p2m2ad_gg_sf->Fill(eta, ptave, m2d, w);
+                    h->p2mnad_gg_sf->Fill(eta, ptave, mnd, w);
+                    h->p2muad_gg_sf->Fill(eta, ptave, mud, w);
+                  }
+                  // Tag jet axis
+                  {
+                    h->p2m0tc_gg_sf->Fill(eta, pttag, m0c, w);
+                    h->p2m2tc_gg_sf->Fill(eta, pttag, m2c, w);
+                    h->p2mntc_gg_sf->Fill(eta, pttag, mnc, w);
+                    h->p2mutc_gg_sf->Fill(eta, pttag, muc, w);
+                  }
+                  // Probe jet axis
+                  {
+                    h->p2m0pf_gg_sf->Fill(eta, ptprobe, m0f, w);
+                    h->p2m2pf_gg_sf->Fill(eta, ptprobe, m2f, w);
+                    h->p2mnpf_gg_sf->Fill(eta, ptprobe, mnf, w);
+                    h->p2mupf_gg_sf->Fill(eta, ptprobe, muf, w);
+                  }
+		} // isMC && doGluonJets_SF
+		
 
                 { // Bisector (proper) WP_t
                   if (doGluonJets && doDijetJER)
@@ -7425,6 +8251,11 @@ if (isMG)
         h->pcrecoilm->Fill(ptave, Crecoil, w);
         h->pcrecoill->Fill(ptlead, Crecoil, w);
         h->pcrecoilr->Fill(ptrecoil, Crecoil, w);
+
+	h->pcrecoila_pt15->Fill(ptavp3, Crecoil_15, w);
+        h->pcrecoilm_pt15->Fill(ptave, Crecoil_15, w);
+        h->pcrecoill_pt15->Fill(ptlead, Crecoil_15, w);
+        h->pcrecoilr_pt15->Fill(ptrecoil, Crecoil_15, w);
 
         //h->pm0a->Fill(ptavp3, m0b, w);
         //h->pm2a->Fill(ptavp3, m3b, w);
@@ -7716,9 +8547,23 @@ if (isMG)
        << nls << " luminosity blocks and " << nevt << " events" << endl;
   cout << "Saving these to file rootfiles/jmenano.json for brilcalc" << endl;
 
+  /*
   ofstream fjson(Form("rootfiles/%s/jmenano_%s_%s.json",
                       version.c_str(),
                       dataset.c_str(), version.c_str()));
+  */
+  TString jsonName;
+  if (chunk_num >= 0) {
+      jsonName = Form("%s/jmenano_%s_%s_%d.json", 
+                      outdir.Data(), dataset.c_str(), version.c_str(), chunk_num);
+  } else {
+      jsonName = Form("%s/jmenano_%s_%s.json", 
+                      outdir.Data(), dataset.c_str(), version.c_str());
+  }
+
+  ofstream fjson(jsonName.Data());
+  /////
+
   fjson << "{" << endl;
   for (map<int, map<int, int>>::iterator it = mrunls.begin();
        it != mrunls.end(); ++it)

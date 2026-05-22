@@ -72,6 +72,36 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v169. Process 2025 and 2026 JMENANO samples. For that, implementing addJEC to read 2024 per nib.
+// v168. Process 2024-2026 with new JECs.
+//       v_2 JER SF 2024_nib V10M Summer24MG_JMENANO sample.
+//       v_3 JER SF 2025CDEFG_JRV4M.
+//       v_4 2026B_JRV1M.
+//       v_5 2026C_JRV1M.
+//       v_6 2026D_JRV1M.
+// v167. Add 3D histogram with SF for Quark vs Gluon. Read the root file and apply it to the weight for MC.
+//       2026D using json from May 15.
+//	 v2 adds the SF to the MPF and DB responses.
+// v166. Add efficiency for SF only probe dijet ptprobe selection. Recoil stating at 15 GeV.
+//       v166_v2 Summer24MG NANOAOD and Summer24MG JMENANO. 
+//       v166_v3 Summer24MG JMENANO SF 2025 and PSWeight[4].
+//       v166_v4 Summer24MG JMENANO PSWeight[4].
+//       v166_v5 Summer24MG JMENANO SF 2025.
+// v165. Process 2024 and 2025. Include 2026D. Process 2026C using the filter lowPU JSON.
+// v164. Proces JMENANO Summer24MG with the PSWeights. 
+//       v1 test JMENANO PSWeight[2] fsr 0.5.
+//       v2 test NANOAOD PSWeight[3] fsr 0.5.
+// v163. Process 2026B and 2026C removing the low PU data for 2026B. The versions v2 and v3 are test to remove high PU runs from 2026C.
+//       v3 include the run vs mu histogram.
+//       v4 removes the high PU runs from the json.
+// v162. Process 2026B using golden and 2026C using Hybrid.
+// v161. Process 2026C using the new job submission method. The original runIOV.py was moved to runIOVs_lxplus_running_v160.
+//       The original make/mk_DijetHistosFill.C was move to make/mk_DijetHistosFill_lxplus_running_v160.C
+//       Also the .sh and .sub files were updated.
+//       v2 and v3 are test for MG and MG JME with the updated weights, so the split does not overcount.
+//       v161_v4 includes JMENANO with JER SF 2025.
+//       v161_v5 JER SF 2026B.
+//       v161_v6 JER SF 2024CDEFGHI.
 // v160. Process 2026C. v2 splits the datasets, but no other difference.
 // v159. Remove 398803 run from the 2025 Golden Json file and processing 2025G.
 //       v2 add the fix on JER SF. Running for Summer24 JME MG and Flat 2025 JERSF.

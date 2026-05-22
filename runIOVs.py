@@ -49,6 +49,7 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2024BR', '2024CR', '2024Crs', '2024CS', '2024CT', '2024F_TeVJet', '2024F_JetHT',
     '2024C_Rp', '2024C_Rp_ZB', '2024D_Rp', '2024D_Rp_ZB', '2024E_Rp', '2024E_Rp_ZB',
     '2024I_ZB_HCPF1x', '2024I_ZB_HCPF2x', '2024I_ZB_HCPF3x', '2024I_ZB_HCPF4x', '2024I_ZB_HCPF5x', '2024I_ZB_HCPFSpecial', '2024I_ZB_Special',
+    '2024I_ZB',
     '2024_skim',
     '2024C_Rp_Skim_0', '2024C_Rp_Skim_1', '2024C_Rp_Skim_ZB',
     '2024D_Rp_Skim_0', '2024D_Rp_Skim_1', '2024D_Rp_Skim_ZB',
@@ -71,6 +72,7 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2025B', '2025B_ZB', '2025Cv1', '2025Cv1_ZB', '2025Cv2', '2025Cv2_ZB', '2025D', '2025D_ZB', '2025E', '2025E_ZB', '2025F', '2025F_ZB',
     '2025D_1', '2025D_1_ZB', '2025D_2', '2025D_2_ZB', '2025E_1', '2025E_2', '2025Fv1_1', '2025Fv1_2', '2025Fv1_ZB', '2025Fv2_1', '2025Fv2_2', '2025Fv2_ZB', '2025Fv1_11', '2025Fv1_12', '2025Fv1_13', '2025Fv1_21', '2025Fv1_22', '2025Fv1_23',
     '2025G_11', '2025G_12', '2025G_21', '2025G_22', '2025G_ZB', '2025D_11', '2025D_12', '2025D_21', '2025D_22',
+    '2025G', '2025G_ZB',
     '2025C_Trk', '2025C_Trk_ZB',
     'Winter25MG_1', 'Winter25MG_2', 'Winter25MG_3', 'Winter25MG_4', 'Winter25MG_5', 'Summer24MC_Flat2022',
     'Winter25MC_Flat22', 'Summer24MC_Flat22_NoDeepCore', 'Summer24MC_Flat22_Base', 'Summer24MC_Flat22_NoPU',
@@ -83,6 +85,7 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     'Winter25MG_v15_11',
     'Summer24MC_Flat22_JME', 'Summer24MG_JME_1', 'Summer24MG_JME_2', 'Summer24MG_JME_3', 'Summer24MG_JME_4',
     'Summer22MC_Flat22_JME', 'Summer23MC_Flat22_JME',
+    'Summer22MC_base_1M', 'Summer22MC_hadCalibOff_1M',
     'Summer24MG_JME_5', 'Summer24MG_JME_6', 'Summer24MG_JME_7', 'Summer24MG_JME_8', 'Summer24MG_JME_9',
     'Summer24MG_JME_10', 'Summer24MG_JME_11',
     'Summer24MG_2025_1', 'Summer24MG_2025_2', 'Summer24MG_2025_3', 'Summer24MG_2025_4',
@@ -91,11 +94,20 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     'Summer24MG_2026_1', 'Summer24MG_2026_2', 'Summer24MG_2026_3', 'Summer24MG_2026_4', 
     'Summer24MG_2026_5', 'Summer24MG_2026_6', 'Summer24MG_2026_7', 'Summer24MG_2026_8',
     'Summer24MG_2026_9', 'Summer24MG_2026_10', 'Summer24MG_2026_11',
+    'Winter26MG_1', 'Winter26MG_2', 'Winter26MG_3', 'Winter26MG_4', 'Winter26MG_5', 'Winter26MG_6',
+    'Winter26MG_7', 'Winter26MG_8', 'Winter26MG_9', 'Winter26MG_10', 'Winter26MG_11',
     '2025Fv1_Skim_11', '2025Fv1_Skim_12', '2025Fv1_Skim_13', '2025Fv1_Skim_21', '2025Fv1_Skim_22', '2025Fv1_Skim_23',
     '2025Fv2_Skim_1', '2025Fv2_Skim_2',
+    '2025Fv1', '2025Fv1_ZB', '2025Fv2', '2025Fv2_ZB'
     '2025Cv1_Skim_1', '2025Cv1_Skim_2', '2025Cv1_Skim_ZB',
+    '2025Cv1_JME_0', '2025Cv1_JME_1', '2025Cv2_JME_0', '2025Cv2_JME_1', '2025D_JME_0', '2025D_JME_1',
+    '2025E_JME_0', '2025E_JME_1', '2025Fv1_JME_0', '2025Fv1_JME_1', '2025Fv2_JME_0', '2025Fv2_JME_1',
+    '2025G_JME_0', '2025G_JME_1',
+    '2025Cv1_JME_ZB', '2025Cv2_JME_ZB', '2025D_JME_ZB', '2025E_JME_ZB', '2025Fv1_JME_ZB', '2025Fv2_JME_ZB', '2025G_JME_ZB',
     '2026A_1', '2026A_0', '2026A_ZB', '2026Bnib1_0', '2026Bnib1_1', '2026Bnib2_0', '2026Bnib2_1', '2026Bnib1_ZB', '2026Bnib2_ZB',
     'Summer24MC_withNP', 'Summer24MC_NPoff',
+    'Summer24MC_Flat22_NoPFH', 'Summer24MC_Flat22_NoPFH_v2',
+    '2026B_0', '2026B_1', '2026B_ZB',
     '2026Bnib2_ZB_16', '2026Bnib2_ZB_15', '2026Bnib2_ZB_14', '2026Bnib2_ZB_13', '2026Bnib2_ZB_12',
     '2026Bnib2_ZB_11',
     '2026Bnib2_03', '2026Bnib2_02', '2026Bnib2_01',
@@ -108,7 +120,8 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2026B_1_part_05', '2026B_1_part_04', '2026B_1_part_03', '2026B_1_part_02',
     '2026B_1_part_01', '2026B_1_part_00', 
     '2026C_0', '2026C_1', '2026C_2', '2026C_3', '2026C_4', '2026C_5', '2026C_ZB',
-    '2026C_01', '2026C_11', '2026C_21', '2026C_31', '2026C_41', '2026C_51', '2026C_ZB1'
+    '2026C_01', '2026C_11', '2026C_21', '2026C_31', '2026C_41', '2026C_51', '2026C_ZB1',
+    '2026D_0', '2026D_1', '2026D_ZB'
 ]
 
 # Run 3 is all samples with year 2023 and 2022 from the full IOV_list
@@ -117,7 +130,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v160_v2'
+version = 'v169'
 #version = 'v120'
 
 IOV_input = []
@@ -125,9 +138,10 @@ IOV_input = []
 parser = argparse.ArgumentParser(description='Run all IOVs')
 
 # The user can pass the IOV list, version, max number of files as an argument
-parser.add_argument('--IOV_list', nargs='+', default=IOV_input)
-parser.add_argument('--version', default=version)
-parser.add_argument('--max_files', default=9999)
+parser.add_argument('--IOV_list', nargs='+', default=IOV_input, help='IOV to process i.e 2024C')
+parser.add_argument('--version', default=version, help='Version of the process i.e. v150')
+parser.add_argument('--max_files', default=9999, help='Max number of root files per IOV list')
+parser.add_argument('--chunk', type=int, default=-1, help='Chunk number for splitting jobs')
 args = parser.parse_args()
 
 if args.IOV_list:
@@ -165,26 +179,35 @@ if args.max_files and ('test' not in args.IOV_list):
     
 print('IOVs to run: ', IOV_input)
 
-# Check that the version directory exists, if not create it
-if not os.path.exists('rootfiles/'+version):
-    os.makedirs('rootfiles/'+version)
+EOS_BASE = "/eos/user/n/nmancill/Helsinki/dijet/Rootfiles_afs" # <-- Update if you're not Nestor :D
 
+eos_version_dir = f"{EOS_BASE}/{version}"
+
+# Ensure the EOS directory exists
+if not os.path.exists(eos_version_dir):
+    os.makedirs(eos_version_dir)
+
+# Keep log files locally in AFS
 if not os.path.exists('logs/'+version):
     os.makedirs('logs/'+version)
 
+# Pass the EOS path and chunk number to C++ via environment variables!
+os.environ["DIJET_OUTDIR"] = eos_version_dir
+os.environ["DIJET_CHUNK"] = str(args.chunk)
+
 for iov in IOV_input:
-    print(f"Process DijetHistosFill.C+g for IOV {iov}")
-    # os.system(f"ls -ltrh rootfiles/jmenano_mc_out_{iov}_{version}.root")
-    # os.system(f"ls -ltrh rootfiles/jmenano_data_out_{iov}_{version}.root")
-    # os.system(f"ls -ltrh logs/log_{iov}_{version}.txt")
+    print(f"Process DijetHistosFill.C+g for IOV {iov} (Chunk {args.chunk}) -> Saving to EOS")
+    
+    os.system(f"root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files},{args.chunk})'")
+
+
     #os.system(f"nohup root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
-    print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
+    #print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
     #os.system(f"root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > /afs/cern.ch/user/n/nmancill/Helsinki/dijet/logs/{version}/log_{iov}_{version}.txt")
-    os.system(f"root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})'")
+    #os.system(f"root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})'")
     #print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
     #os.system(f"nohup time root -l -b -q 'make/mk_DijetHistosFill.C(\"{iov}\",\"{version}\",{max_files})' > logs/{version}/log_{iov}_{version}.txt &")
     #print(f" => Follow logging with 'tail -f logs/{version}/log_{iov}_{version}.txt'")
-
 #    os.system("fs flush")
 #    wait()
 #    time.sleep(sleep_time)
