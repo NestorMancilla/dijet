@@ -2172,7 +2172,12 @@ if (debug)
 
 	// Redo JEC
 	// NB: could implement time dependence as in jetphys/IOV.h
-	FactorizedJetCorrector *jec(0), *jecl1rc(0), *jersfvspt(0);
+	//FactorizedJetCorrector *jec(0), *jecl1rc(0), *jersfvspt(0);
+	// new nib method
+	FactorizedJetCorrectorWrapper *jec = new FactorizedJetCorrectorWrapper();
+        FactorizedJetCorrector *jecl1rc(0), *jersfvspt(0);
+	//
+	
 	string jerpath(""), jerpathsf("");
 	// jec = getFJC("","Winter22Run3_V1_MC_L2Relative","","");
 	// if (isRun2==0) {
@@ -2183,10 +2188,15 @@ if (debug)
 
 	TH1D *pileupRatio = new TH1D("puRatio", "PURatio;;Ratio", 99, 0, 100);
 
-	if (dataset == "UL2016APVMG")
+if (dataset == "UL2016APVMG")
 {
-	jec = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
-			"Summer19UL16APV_V7_MC_L2Relative_AK4PFchs", "");
+	//jec = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
+	//		"Summer19UL16APV_V7_MC_L2Relative_AK4PFchs", "");
+        FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
+                        "Summer19UL16APV_V7_MC_L2Relative_AK4PFchs", "");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL16APV_V7_MC_L1RC_AK4PFchs", "", "");
 	jerpath = "JRDatabase/textFiles/Summer20UL16APV_JRV3_MC/Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs.txt";
 	jerpathsf = "JRDatabase/textFiles/Summer20UL16APV_JRV3_MC/Summer20UL16APV_JRV3_MC_SF_AK4PFchs.txt";
@@ -2194,23 +2204,38 @@ if (debug)
 }
 if (dataset == "UL2016BCD" || dataset == "UL2016BCD_ZB")
 {
-	jec = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL16APV_RunBCD_V7_DATA_L2Relative_AK4PFchs",
-			"Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL16APV_RunBCD_V7_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL16APV_RunBCD_V7_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
 	jecl1rc = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2016EF" || dataset == "UL2016EF_ZB")
 {
-	jec = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL16APV_RunEF_V7_DATA_L2Relative_AK4PFchs",
-			"Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL16APV_RunEF_V7_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL16APV_RunEF_V7_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1RC_AK4PFchs", "", "");
 }
 // 2016 non-APV (GH)
 if (dataset == "UL2016MG" || dataset == "UL2016Flat")
 {
-	jec = getFJC("Summer19UL16_V7_MC_L1FastJet_AK4PFchs",
-			"Summer19UL16_V7_MC_L2Relative_AK4PFchs", "");
+	//jec = getFJC("Summer19UL16_V7_MC_L1FastJet_AK4PFchs",
+	//		"Summer19UL16_V7_MC_L2Relative_AK4PFchs", "");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16_V7_MC_L1FastJet_AK4PFchs",
+                        "Summer19UL16_V7_MC_L2Relative_AK4PFchs", "");
+	jec->addJEC(tempJEC, 1, 999999);
+
 	jecl1rc = getFJC("Summer19UL16_V7_MC_L1RC_AK4PFchs", "", "");
 	// jec = getFJC("Summer20UL16_V1_MC_L1FastJet_AK4PFchs",
 	//		  "Summer20UL16_V1_MC_L2Relative_AK4PFchs","");
@@ -2221,9 +2246,15 @@ if (dataset == "UL2016MG" || dataset == "UL2016Flat")
 }
 if (dataset == "UL2016GH" || dataset == "UL2016GH_ZB")
 {
-	jec = getFJC("Summer19UL16_RunFGH_V7_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL16_RunFGH_V7_DATA_L2Relative_AK4PFchs",
-			"Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL16_RunFGH_V7_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL16_RunFGH_V7_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16_RunFGH_V7_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL16_RunFGH_V7_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL16_RunFGH_V7_DATA_L1RC_AK4PFchs", "", "");
 	// jec = getFJC("Summer20UL16_RunGH_V1_DATA_L1FastJet_AK4PFchs",
 	//"Summer20UL16_RunGH_V1_DATA_L2Relative_AK4PFchs",
@@ -2234,8 +2265,13 @@ if (dataset == "UL2016GH" || dataset == "UL2016GH_ZB")
 // 2017
 if (dataset == "UL2017MG")
 {
-	jec = getFJC("Summer19UL17_V6_MC_L1FastJet_AK4PFchs",
-			"Summer19UL17_V6_MC_L2Relative_AK4PFchs", "");
+	//jec = getFJC("Summer19UL17_V6_MC_L1FastJet_AK4PFchs",
+	//		"Summer19UL17_V6_MC_L2Relative_AK4PFchs", "");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_V6_MC_L1FastJet_AK4PFchs",
+                        "Summer19UL17_V6_MC_L2Relative_AK4PFchs", "");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL17_V6_MC_L1RC_AK4PFchs", "", "");
 	jerpath = "JRDatabase/textFiles/Summer19UL17_JRV3_MC/Summer19UL17_JRV3_MC_PtResolution_AK4PFchs.txt";
 	jerpathsf = "JRDatabase/textFiles/Summer19UL17_JRV3_MC/Summer19UL17_JRV3_MC_SF_AK4PFchs.txt";
@@ -2243,44 +2279,80 @@ if (dataset == "UL2017MG")
 }
 if (dataset == "UL2017B" || dataset == "UL2017B_ZB")
 {
-	jec = getFJC("Summer19UL17_RunB_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunB_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunB_V6_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL17_RunB_V6_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL17_RunB_V6_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL17_RunB_V6_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunB_V6_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL17_RunB_V6_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL17_RunB_V6_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL17_RunB_V6_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2017C" || dataset == "UL2017C_ZB")
 {
-	jec = getFJC("Summer19UL17_RunC_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunC_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunC_V6_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL17_RunC_V6_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL17_RunC_V6_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL17_RunC_V6_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunC_V6_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL17_RunC_V6_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL17_RunC_V6_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL17_RunC_V6_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2017D" || dataset == "UL2017D_ZB")
 {
-	jec = getFJC("Summer19UL17_RunD_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunD_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunD_V6_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL17_RunD_V6_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL17_RunD_V6_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL17_RunD_V6_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunD_V6_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL17_RunD_V6_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL17_RunD_V6_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL17_RunD_V6_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2017E" || dataset == "UL2017E_ZB")
 {
-	jec = getFJC("Summer19UL17_RunE_V6_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL17_RunE_V6_DATA_L2Relative_AK4PFchs",
-			"Summer19UL17_RunE_V6_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL17_RunE_V6_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL17_RunE_V6_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL17_RunE_V6_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunE_V6_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL17_RunE_V6_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL17_RunE_V6_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999); 
+
+
 	jecl1rc = getFJC("Summer19UL17_RunE_V6_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2017F" || dataset == "UL2017F_ZB")
 {
+	/*
 	jec = getFJC("Summer19UL17_RunF_V6_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL17_RunF_V6_DATA_L2Relative_AK4PFchs",
 			"Summer19UL17_RunF_V6_DATA_L2L3Residual_AK4PFchs");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunF_V6_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL17_RunF_V6_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL17_RunF_V6_DATA_L2L3Residual_AK4PFchs");
 	jecl1rc = getFJC("Summer19UL17_RunF_V6_DATA_L1RC_AK4PFchs", "", "");
+
+
 }
 // 2018
 if (dataset == "UL2018MG" || TString(dataset.c_str()).Contains("UL2018MG") || TString(dataset.c_str()).Contains("UL2018MC"))
 {
-	jec = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
-			"Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
+	//jec = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
+	//		"Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
+                        "Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL18_V5_MC_L1RC_AK4PFchs", "", "");
 	//jerpath = "JRDatabase/textFiles/Summer19UL18_JRV2_MC/Summer19UL18_JRV2_MC_PtResolution_AK4PFchs.txt";
 	//jerpathsf = "JRDatabase/textFiles/Summer19UL18_JRV2_MC/Summer19UL18_JRV2_MC_SF_AK4PFchs.txt";
@@ -2291,31 +2363,55 @@ if (dataset == "UL2018MG" || TString(dataset.c_str()).Contains("UL2018MG") || TS
 }
 if (dataset == "UL2018A" || dataset == "UL2018A_ZB")
 {
-	jec = getFJC("Summer19UL18_RunA_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunA_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL18_RunA_V5_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL18_RunA_V5_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunA_V5_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL18_RunA_V5_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL18_RunA_V5_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2018B" || dataset == "UL2018B_ZB")
 {
-	jec = getFJC("Summer19UL18_RunB_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunB_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL18_RunB_V5_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL18_RunB_V5_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunB_V5_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL18_RunB_V5_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
+        jec->addJEC(tempJEC, 1, 999999); 	
+
+
 	jecl1rc = getFJC("Summer19UL18_RunB_V5_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2018C" || dataset == "UL2018C_ZB")
 {
-	jec = getFJC("Summer19UL18_RunC_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunC_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL18_RunC_V5_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL18_RunC_V5_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunC_V5_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL18_RunC_V5_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999); 
+
+
 	jecl1rc = getFJC("Summer19UL18_RunC_V5_DATA_L1RC_AK4PFchs", "", "");
 }
 if (dataset == "UL2018D" || dataset == "UL2018D_ZB" ||
 		dataset == "UL2018D1" || dataset == "UL2018D2")
 {
-	jec = getFJC("Summer19UL18_RunD_V5_DATA_L1FastJet_AK4PFchs",
-			"Summer19UL18_RunD_V5_DATA_L2Relative_AK4PFchs",
-			"Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
+	//jec = getFJC("Summer19UL18_RunD_V5_DATA_L1FastJet_AK4PFchs",
+	//		"Summer19UL18_RunD_V5_DATA_L2Relative_AK4PFchs",
+	//		"Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
+	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunD_V5_DATA_L1FastJet_AK4PFchs",
+                        "Summer19UL18_RunD_V5_DATA_L2Relative_AK4PFchs",
+                        "Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
+	jec->addJEC(tempJEC, 1, 999999);
+
+
 	jecl1rc = getFJC("Summer19UL18_RunD_V5_DATA_L1RC_AK4PFchs", "", "");
 }
 
@@ -2325,6 +2421,7 @@ if (dataset == "UL2018D" || dataset == "UL2018D_ZB" ||
 if (TString(dataset.c_str()).Contains("2022C"))
     //dataset == "2022C" || dataset == "2022C_ZB" || dataset == "2022C_prompt" || dataset == "2022C_ZB_prompt")
 {
+	/*
 	jec = getFJC("",                                       // Winter22Run3_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
 			//"Winter22Run3_RunC_V2_DATA_L2Relative_AK4PFPuppi",
 			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
@@ -2332,10 +2429,17 @@ if (TString(dataset.c_str()).Contains("2022C"))
 			// "Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
 	    "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Winter22Run3_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("", 
+			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI",
+		       	"Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+	
 }
 if (TString(dataset.c_str()).Contains("2022D"))
     //dataset == "2022D" || dataset == "2022D_ZB" || dataset == "2022D_prompt" || dataset == "2022D_ZB_prompt")
 {
+	/*
 	jec = getFJC("",                                       // Winter22Run3_RunD_V2_DATA_L1FastJet_AK4PFPuppi",
 			//"Winter22Run3_RunD_V2_DATA_L2Relative_AK4PFPuppi",
 			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
@@ -2343,10 +2447,17 @@ if (TString(dataset.c_str()).Contains("2022D"))
 			//"Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
 	    "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Winter22Run3_RunD_V2_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+	
 }
 if (TString(dataset.c_str()).Contains("2022E"))
     //dataset == "2022E" || dataset == "2022E_ZB")
 {
+	/*
 	jec = getFJC("",                                             // Summer22EEPrompt22_RunF_V1_DATA_L1FastJet_AK4PFPuppi",
 			//"Summer22EEPrompt22_RunF_V1_DATA_L2Relative_AK4PFPuppi",
 			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
@@ -2355,10 +2466,17 @@ if (TString(dataset.c_str()).Contains("2022E"))
 	    "Summer22EE-22Sep2023_Run2022E_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"Summer22EEPrompt22_RunE_V2_L2Residual_AK4PFPuppi");
 	//"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
+			"Summer22EE-22Sep2023_Run2022E_V3_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+	
 }
 // if (dataset=="2022F" || dataset=="2022F_ZB") {
 if (TString(dataset.c_str()).Contains("2022F"))
 {
+	/*
 	jec = getFJC("",                                             // Summer22EEPrompt22_RunF_V1_DATA_L1FastJet_AK4PFPuppi",
 			//"Summer22EEPrompt22_RunF_V1_DATA_L2Relative_AK4PFPuppi",
 			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
@@ -2366,10 +2484,17 @@ if (TString(dataset.c_str()).Contains("2022F"))
 			// "Run22F-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer22EEPrompt22_Run2022F_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
+			"Summer22EEPrompt22_Run2022F_V3_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 if (TString(dataset.c_str()).Contains("2022G"))
     //dataset == "2022G" || dataset == "2022G_ZB")
 {
+	/*
 	jec = getFJC("",                                             // Summer22EEPrompt22_RunG_V1_DATA_L1FastJet_AK4PFPuppi",
 			//"Summer22EEPrompt22_RunG_V1_DATA_L2Relative_AK4PFPuppi",
 			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
@@ -2377,6 +2502,12 @@ if (TString(dataset.c_str()).Contains("2022G"))
 			// "Run22G-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer22EEPrompt22_Run2022G_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Summer22EEPrompt22_RunG_V1_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
+			"Summer22EEPrompt22_Run2022G_V3_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 // 22/23 MC
@@ -2385,10 +2516,17 @@ if (dataset == "Summer22" ||
 		TString(dataset.c_str()).Contains("Summer22MC") ||
 		TString(dataset.c_str()).Contains("Summer22MG"))
 {
+	/*
 	jec = getFJC("",                                       // Winter22Run3_V2_MC_L1FastJet_AK4PFPuppi",
 			//"Winter22Run3_V2_MC_L2Relative_AK4PFPuppi",
 			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
 			"");                                      // Winter22Run3_V2_MC_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI",
+			"");
+	jec->addJEC(tempJEC, 1, 999999);
+
 	//jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
 	jerpath = "";
@@ -2409,10 +2547,17 @@ if (dataset == "Summer22EE" ||
 		dataset == "Summer22EEFlat" ||
 		TString(dataset.c_str()).Contains("Summer22EEMG"))
 {
+	/*
 	jec = getFJC("",                                             // Summer22EEPrompt22_V1_MC_L1FastJet_AK4PFPuppi",
 			//"Summer22EEPrompt22_V1_MC_L2Relative_AK4PFPuppi",
 			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
 			"");                                            // Summer22EEPrompt22_V1_MC_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
+			"");
+	jec->addJEC(tempJEC, 1, 999999);
+
 	jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt";
 	jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt";
 	//jerpath = "";
@@ -2434,18 +2579,32 @@ if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str
 		//dataset == "Summer23" ||
 {
 	if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str()).Contains("Summer23MCBPixFlat") || TString(dataset.c_str()).Contains("Summer23MCBPix")) {
+		/*
 		jec = getFJC("",
 				"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
 				"");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
+				"");
+		jec->addJEC(tempJEC, 1, 999999);
+
 		jerpathsf = "";
 		jersfvspt = getFJC("", "", "");
 		//jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
 		//jersfvspt = getFJC("", "Summer23_2023D_JRV1_MC_SF_AK4PFPuppi", "");
 		//jersfvspt = getFJC("", "Summer23_2023D_JRV2_MC_SF_AK4PFPuppi", "");
 	} else {
+		/*
 		jec = getFJC("", 
 				"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
 				"");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
+				"");
+		jec->addJEC(tempJEC, 1, 999999);
+
 		jerpathsf = "";
 		jersfvspt = getFJC("", "", "");
 		//jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
@@ -2500,43 +2659,71 @@ if (TString(dataset.c_str()).Contains("2023B") || TString(dataset.c_str()).Conta
 		//dataset == "2023BCv123_ZB" || dataset == "2023Cv123" || dataset == "2023Cv123_ZB" ||
 		//dataset == "2023Cv123_prompt" || dataset == "2023Cv123_ZB_prompt")
 {
+	/*
 	jec = getFJC("",                                                               // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
 			//"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
 			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                         // Mikel
 			// "Run23C123-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2023Cv4"))
 		//dataset == "2023Cv4" || dataset == "2023Cv4_ZB" || 
 		//dataset == "2023Cv4_prompt" || dataset == "2023Cv4_ZB_prompt")
 {
+	/*
 	jec = getFJC("",                                                             // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
 			//"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
 			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                       // Mikel
 			//"Run23C4-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2023D"))
 		//dataset == "2023D" || dataset == "2023D_ZB" ||
 		//dataset == "2023D_prompt" || dataset == "2023D_ZB_prompt")
 {
+	/*
 	jec = getFJC("",                                                           // Winter23Prompt23_RunC_V2_DATA_L1FastJet_AK4PFPuppi",
 			//"Winter23Prompt23_RunC_V2_DATA_L2Relative_AK4PFPuppi",
 			"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",                     // Mikel
 			//"Run23D-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
 	    "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
+			"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
 {
+	/*
 	jec = getFJC("",
 			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI"
 			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
 			//"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
 			"");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+			"");
+	jec->addJEC(tempJEC, 1, 999999);
+
 	jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
 	//jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
 	jerpathsf = "";
@@ -2550,10 +2737,17 @@ if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
 if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).Contains("Summer24MG") || TString(dataset.c_str()).Contains("QCDFlatECAL") ||
     TString(dataset.c_str()).Contains("Summer24MC"))
 {
+	/*
 	jec = getFJC("",
 			//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+			"");
+	jec->addJEC(tempJEC, 1, 999999);
+
 	//jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV4M_MC_SF_AK4PFPuppi.txt";
@@ -2611,12 +2805,20 @@ if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
 {
 	if (TString(dataset.c_str()).Contains("2024BR"))
 	{
+		/*
 		jec = getFJC(""
 				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
 		    "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
 	}
 	else {
+		/*
 		jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 				//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -2631,6 +2833,11 @@ if (TString(dataset.c_str()).Contains("2024B")  || dataset == "2024B_ZB")
 		    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
 		                "Prompt24_Run2024B_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi"); // Prompt V8 -> nib
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024B_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
 	}
 }
 
@@ -2638,28 +2845,50 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 { 
 	if (TString(dataset.c_str()).Contains("2024CR"))
 	{
+		/*
 		jec = getFJC("",
 				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
 		    "Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024CR_V4M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
 	}
 	else if (dataset == "2024CS" || dataset == "2024CT")
 	{
+		/*
 		jec = getFJC("",
 				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 				//"Prompt24_Run2024CR_V3M_DATA_L2L3Residual_AK4PFPuppi");
 		    "Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024CS_V4M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
 	}
 	else if (TString(dataset.c_str()).Contains("2024C_Rp"))
 	{
+		/*
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                     		//"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024C_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 		                "Prompt24_Run2024C_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024C_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
 	}
 	else {
+		/*
 		jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 				//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
@@ -2673,6 +2902,11 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
 		    		//"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
 				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024C_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
 	}
 }
 
@@ -2680,14 +2914,22 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
 {
         if (TString(dataset.c_str()).Contains("2024D_Rp"))
         {
+		/*
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024D_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 		                "Prompt24_Run2024D_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024D_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
         }
 	else {
+		/*
 	        jec = getFJC("",
                         "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                         //"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // BPix D
@@ -2701,6 +2943,11 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
                         //"Prompt24_Run2024BCD_V6M_DATA_L2L3Residual_AK4PFPuppi");
                         "Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
                         //"Prompt24_Run2024D_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024BCD_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
 	}
 }
 
@@ -2722,28 +2969,55 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
 	*/
         if (TString(dataset.c_str()).Contains("2024Ev1_nib"))
         {       
+		/*
                 jec = getFJC("",
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024Ev1_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024Ev1_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
         } else if (TString(dataset.c_str()).Contains("2024Ev2_nib"))
 	{
+		/*
 	        jec = getFJC("",
                                 "Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024Ev2_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024Ev2_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
 	} else if (TString(dataset.c_str()).Contains("2024E_Rp"))
         {
+		/*
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024E_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 		                "Prompt24_Run2024E_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024E_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
         }
        	else 
 	{
+		/*
 	        jec = getFJC("",
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024E_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024E_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
 	}
 
 
@@ -2766,6 +3040,7 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
 			//"Prompt24_Run2024F_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024F_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
+	/*
         if (TString(dataset.c_str()).Contains("2024F_nib1"))
         {
                 jec = getFJC("",
@@ -2796,6 +3071,33 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024F_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
+	*/
+	
+	if (TString(dataset.c_str()).Contains("2024F_nib1")) {
+		FactorizedJetCorrector *tempJEC = getFJC("", 
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI", 
+				"Prompt24_Run2024F_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 382229, 382262); // 2024F nib1 range
+	} 
+	else if (TString(dataset.c_str()).Contains("2024F_nib2")) {
+		FactorizedJetCorrector *tempJEC = getFJC("", 
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI", 
+				"Prompt24_Run2024F_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 382298, 383175); // 2024F nib2 range (fib2 to fib15)
+	} 
+	else if (TString(dataset.c_str()).Contains("2024F_nib3")) {
+		FactorizedJetCorrector *tempJEC = getFJC("", 
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI", 
+				"Prompt24_Run2024F_nib3_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 383247, 383779); // 2024F nib3 range (fib16 to fib27)
+	} 
+	else {
+		FactorizedJetCorrector *tempJEC = getFJC("", 
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI", 
+				"Prompt24_Run2024F_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999); // Fallback for standard 2024F
+	}
+
 }
 
 if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
@@ -2807,6 +3109,7 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
 			//"Prompt24_Run2024G_V6M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt24_Run2024G_V7M_DATA_L2L3Residual_AK4PFPuppi");
 	*/
+	/*
         if (TString(dataset.c_str()).Contains("2024G_nib1"))
         {
                 jec = getFJC("",
@@ -2830,6 +3133,26 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024G_V7M_DATA_L2L3Residual_AK4PFPuppi");
         }
+	*/
+
+	if (TString(dataset.c_str()).Contains("2024G_nib1")) {
+		FactorizedJetCorrector *tempJEC = getFJC("", 
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI", 
+				"Prompt24_Run2024G_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 383811, 384644); // 2024G nib1 range (fib1 to fib17)
+	}
+	else if (TString(dataset.c_str()).Contains("2024G_nib2")) {
+		FactorizedJetCorrector *tempJEC = getFJC("", 
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI", 
+				"Prompt24_Run2024G_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 384933, 385801); // 2024G nib2 range (fib18 to fib39)
+	}
+	else {
+		FactorizedJetCorrector *tempJEC = getFJC("", 
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI", 
+				"Prompt24_Run2024G_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999); // Fallback for standard 2024G
+	}
 }
 
 if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || dataset == "2024H_Skim")
@@ -2847,17 +3170,32 @@ if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || d
         if (TString(dataset.c_str()).Contains("2024H_nib") || TString(dataset.c_str()).Contains("2024H_JME_Skim") ||
 	     TString(dataset.c_str()).Contains("2024H_Skim") || TString(dataset.c_str()).Contains("2024H_ZB"))
         {
+		/*
                 jec = getFJC("",
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 				"Prompt24_Run2024H_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024H_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
         } else
         {
+		/*
                 jec = getFJC("",
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024H_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
         }
+
 	
 }
 
@@ -2874,25 +3212,46 @@ if (TString(dataset.c_str()).Contains("2024I"))
 	    TString(dataset.c_str()).Contains("2024I_JME_Skim") || TString(dataset.c_str()).Contains("2024I_Skim") || 
 	    TString(dataset.c_str()).Contains("2024I_ZB"))
         {
+		/*
                 jec = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024I_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 				"Prompt24_Run2024I_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024I_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999);
+
         } else
         {
+		/*
                 jec = getFJC("",
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		*/
+		FactorizedJetCorrector *tempJEC = getFJC("",
+				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
+				"Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
+		jec->addJEC(tempJEC, 1, 999999); 
+
         }
 }
 
 if (TString(dataset.c_str()).Contains("Winter25MG") || TString(dataset.c_str()).Contains("Winter25MC"))
 {
+	/*
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         "");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			"");
+	jec->addJEC(tempJEC, 1, 999999);
+
         jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
         //jersfvspt = getFJC("", "Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi", "");
@@ -2917,85 +3276,154 @@ if (TString(dataset.c_str()).Contains("Winter25MG") || TString(dataset.c_str()).
 
 if (TString(dataset.c_str()).Contains("2025B"))
 {
+	/*
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025C_V1M_DATA_L2L3Residual_AK4PFPuppi");
 	                //"Prompt25_Run2025C_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt25_Run2025C_V3M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("", 
+			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Prompt25_Run2025C_V3M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2025C")) {
+	/*
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025C_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025C_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt25_Run2025C_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Prompt25_Run2025C_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2025D")) {
+	/*
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025D_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025D_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt25_Run2025D_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Prompt25_Run2025D_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2025E")) {
+	/*
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025E_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt25_Run2025E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Prompt25_Run2025E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2025F")) {
+	/*
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025F_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt25_Run2025F_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Prompt25_Run2025F_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2025G")) {
+	/*
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt25_Run2025G_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
+			"Prompt25_Run2025G_V4M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Contains("2026B")) {
-        jec = getFJC("",
+        /*
+	jec = getFJC("",
 			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         //"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt26_Run2026B_V0M_DATA_L2L3Residual_AK4PFPuppi");
 	                "Prompt26_Run2026B_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+			"Prompt26_Run2026B_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 }
 
 if (TString(dataset.c_str()).Contains("2026C")) {
 
+	/*
         jec = getFJC("",
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         "Prompt26_Run2026C_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+			"Prompt26_Run2026C_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
 
 }
 
 if (TString(dataset.c_str()).Contains("2026D")) {
 
+	/*
         jec = getFJC("",
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         "Prompt26_Run2026D_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("", 
+			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+			"Prompt26_Run2026D_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	jec->addJEC(tempJEC, 1, 999999);
+
 
 }
 
 
 if (TString(dataset.c_str()).Contains("Winter26MG") || TString(dataset.c_str()).Contains("Winter26MC"))
 {
+	/*
         jec = getFJC("",
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         "");
+	*/
+	FactorizedJetCorrector *tempJEC = getFJC("",
+			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+			"");
+	jec->addJEC(tempJEC, 1, 999999);
+
         jerpathsf = "";
         //jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
         //jersfvspt = getFJC("", "Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi", "");
@@ -5841,6 +6269,24 @@ if (isMG)
       if (TString(dataset.c_str()).Contains("2026Bnib") && (run > 402513)){
         continue;
       }
+      // Inside your main event loop, right after loading the event:
+
+      // Pernib files.
+      if (TString(dataset.c_str()).Contains("2024F_nib1")) {
+        if (run < 382229 || run > 382262) continue; // Skip if not nib1
+      }
+      else if (TString(dataset.c_str()).Contains("2024F_nib2")) {
+        if (run < 382298 || run > 383175) continue; // Skip if not nib2
+      }
+      else if (TString(dataset.c_str()).Contains("2024F_nib3")) {
+        if (run < 383247 || run > 383779) continue; // Skip if not nib3
+      }
+      else if (TString(dataset.c_str()).Contains("2024G_nib1")) {
+        if (run < 383811 || run > 384644) continue; // Skip if not nib1
+      }
+      else if (TString(dataset.c_str()).Contains("2024G_nib2")) {
+        if (run < 384933 || run > 385801) continue; // Skip if not nib2
+      }
     } // doJSON
 
     
@@ -6014,6 +6460,7 @@ if (isMG)
       {
         double rawJetPt = Jet_pt[i] * (1.0 - Jet_rawFactor[i]);
         double rawJetMass = Jet_mass[i] * (1.0 - Jet_rawFactor[i]);
+	jec->setRun(run);
         jec->setJetPt(rawJetPt);
         jec->setJetEta(Jet_eta[i]);
         jec->setJetPhi(Jet_phi[i]);
