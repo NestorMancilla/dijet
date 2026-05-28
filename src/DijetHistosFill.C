@@ -6280,15 +6280,12 @@ if (isMG)
       b_run->GetEntry(ientry);
       b_luminosityBlock->GetEntry(ientry);
  
-      // Check and track runs and lumisections
       if (mrunls.find(run) == mrunls.end()) {
         ++nrun;
       }
     
-      // If the lumisection is not in the set for this run, add it and increment counter
       if (mrunls[run].find(luminosityBlock) == mrunls[run].end()) {
         ++nls;
-        //mrunls[run].insert(luminosityBlock); // <-- THIS is what was missing!
 	mrunls[run][luminosityBlock] = 1;
       }
       ++nevt;
