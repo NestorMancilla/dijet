@@ -79,6 +79,7 @@ Bugs:
 //       v_4 2026B_JRV1M.
 //       v_5 2026C_JRV1M.
 //       v_6 2026D_JRV1M.
+//       v_7 Re process 2024 to compare with initial version.
 // v167. Add 3D histogram with SF for Quark vs Gluon. Read the root file and apply it to the weight for MC.
 //       2026D using json from May 15.
 //	 v2 adds the SF to the MPF and DB responses.

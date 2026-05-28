@@ -61,6 +61,16 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2024F_nib3_Skim_0', '2024F_nib3_Skim_1', '2024F_nib3_Skim_ZB',
     '2024G_nib1_Skim_0', '2024G_nib1_Skim_1', '2024G_nib1_Skim_ZB',
     '2024G_nib2_Skim_0', '2024G_nib2_Skim_1', '2024G_nib2_Skim_ZB',
+    '2024C_Rp_JME_Skim_0', '2024C_Rp_JME_Skim_1', '2024C_Rp_JME_Skim_ZB',
+    '2024D_Rp_JME_Skim_0', '2024D_Rp_JME_Skim_1', '2024D_Rp_JME_Skim_ZB',
+    '2024E_Rp_JME_Skim_0', '2024E_Rp_JME_Skim_1', '2024E_Rp_JME_Skim_ZB',
+    '2024F_nib1_JME_Skim_0', '2024F_nib1_JME_Skim_1', '2024F_nib1_JME_Skim_ZB',
+    '2024F_nib2_JME_Skim_0', '2024F_nib2_JME_Skim_1', '2024F_nib2_JME_Skim_ZB',
+    '2024F_nib3_JME_Skim_0', '2024F_nib3_JME_Skim_1', '2024F_nib3_JME_Skim_ZB',
+    '2024G_nib1_JME_Skim_0', '2024G_nib1_JME_Skim_1', '2024G_nib1_JME_Skim_ZB',
+    '2024G_nib2_JME_Skim_0', '2024G_nib2_JME_Skim_1', '2024G_nib2_JME_Skim_ZB',
+    '2024H_JME_Skim_0', '2024H_JME_Skim_1', '2024H_JME_Skim_ZB',
+    '2024I_JME_Skim_0', '2024I_JME_Skim_1', '2024I_JME_Skim_ZB',
     '2024F_ECAL_CC_1', '2024F_ECAL_CC_2', '2024F_ECAL_CC_3', '2024F_ECAL_CC_4',
     '2024F_ECAL2_1', '2024F_ECAL2_2', '2024F_ECAL2_3', '2024F_ECAL2_4',
     'Winter24MG_1', 'Winter24MG_2', 'Winter24MG_3', 'Winter24MG_4', 'Winter24MG_5',
@@ -121,7 +131,10 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2026B_1_part_01', '2026B_1_part_00', 
     '2026C_0', '2026C_1', '2026C_2', '2026C_3', '2026C_4', '2026C_5', '2026C_ZB',
     '2026C_01', '2026C_11', '2026C_21', '2026C_31', '2026C_41', '2026C_51', '2026C_ZB1',
-    '2026D_0', '2026D_1', '2026D_ZB'
+    '2026D_0', '2026D_1', '2026D_ZB',
+    '2026B_JME_0', '2026B_JME_1', '2026B_JME_ZB', 
+    '2026C_JME_0', '2026C_JME_1', '2026C_JME_2', '2026C_JME_3', '2026C_JME_4', '2026C_JME_5', '2026C_JME_ZB',
+    '2026D_JME_0', '2026D_JME_1', '2026D_JME_ZB'
 ]
 
 # Run 3 is all samples with year 2023 and 2022 from the full IOV_list
@@ -130,7 +143,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v169'
+version = 'v168_v7'
 #version = 'v120'
 
 IOV_input = []

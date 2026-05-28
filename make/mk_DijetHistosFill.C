@@ -6,7 +6,7 @@
 #include "../CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "../CondFormats/JetMETObjects/interface/SimpleJetCorrector.h"
 #include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrectorWrapper.h"
+//#include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrectorWrapper.h"
 
 #include "../CondFormats/JetMETObjects/interface/JetIdHelper.h" // Substitute of JetId branch for NANOAODV15. Nestor, April 7.
 
@@ -166,6 +166,16 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2024F_nib3_Skim_0", "2024F_nib3_Skim_1", "2024F_nib3_Skim_ZB",
   "2024G_nib1_Skim_0", "2024G_nib1_Skim_1", "2024G_nib1_Skim_ZB",
   "2024G_nib2_Skim_0", "2024G_nib2_Skim_1", "2024G_nib2_Skim_ZB",
+  "2024C_Rp_JME_Skim_0", "2024C_Rp_JME_Skim_1", "2024C_Rp_JME_Skim_ZB",
+  "2024D_Rp_JME_Skim_0", "2024D_Rp_JME_Skim_1", "2024D_Rp_JME_Skim_ZB",
+  "2024E_Rp_JME_Skim_0", "2024E_Rp_JME_Skim_1", "2024E_Rp_JME_Skim_ZB",
+  "2024F_nib1_JME_Skim_0", "2024F_nib1_JME_Skim_1", "2024F_nib1_JME_Skim_ZB",
+  "2024F_nib2_JME_Skim_0", "2024F_nib2_JME_Skim_1", "2024F_nib2_JME_Skim_ZB",
+  "2024F_nib3_JME_Skim_0", "2024F_nib3_JME_Skim_1", "2024F_nib3_JME_Skim_ZB",
+  "2024G_nib1_JME_Skim_0", "2024G_nib1_JME_Skim_1", "2024G_nib1_JME_Skim_ZB",
+  "2024G_nib2_JME_Skim_0", "2024G_nib2_JME_Skim_1", "2024G_nib2_JME_Skim_ZB",
+  "2024H_JME_Skim_0", "2024H_JME_Skim_1", "2024H_JME_Skim_ZB",
+  "2024I_JME_Skim_0", "2024I_JME_Skim_1", "2024I_JME_Skim_ZB",
   "2024BR", "2024CR", "2024Ev2", "2024Crs", "2024CS", "2024CT",
   "2024C_Rp", "2024C_Rp_ZB", "2024D_Rp", "2024D_Rp_ZB", "2024E_Rp", "2024E_Rp_ZB",
   "2024F_ECAL_CC_1", "2024F_ECAL_CC_2", "2024F_ECAL_CC_3", "2024F_ECAL_CC_4",
@@ -199,7 +209,10 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2026B_ZB_part_04", "2026B_ZB_part_05",
   "2026C_0", "2026C_1", "2026C_2", "2026C_3", "2026C_4", "2026C_5", "2026C_ZB",
   "2026C_01", "2026C_11", "2026C_21", "2026C_31", "2026C_41", "2026C_51", "2026C_ZB1",
-  "2026D_0", "2026D_1", "2026D_ZB"
+  "2026D_0", "2026D_1", "2026D_ZB",
+  "2026B_JME_0", "2026B_JME_1", "2026B_JME_ZB",
+  "2026C_JME_0", "2026C_JME_1", "2026C_JME_2", "2026C_JME_3", "2026C_JME_4", "2026C_JME_5", "2026C_JME_ZB",
+  "2026D_JME_0", "2026D_JME_1", "2026D_JME_ZB"
   };
 
   // Check if dataset is supported
