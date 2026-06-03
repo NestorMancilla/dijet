@@ -72,6 +72,12 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v170. New JECs V11M 2024, V5M 2025, V2M 2026. Also fix histograms for Incjet.
+//       v170_v2 JERSF 2024.
+//	 v170_v3 JERSF 2025. Only one that finished.
+//	 v170_v4 JERSF 2026B.
+//	 v170_v5 JERSF 2026C.
+//	 v170_v6 JERSF 2026D.
 // v169. Process 2025 and 2026 JMENANO samples. For that, implementing addJEC to read 2024 per nib.
 // v168. Process 2024-2026 with new JECs.
 //       v_2 JER SF 2024_nib V10M Summer24MG_JMENANO sample.

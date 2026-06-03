@@ -148,8 +148,8 @@ constexpr const char lumibyls2024ECALB[] = "luminosityscripts/csvfiles/lumibyrun
 constexpr const char lumibyls2024eraB[] = "luminosityscripts/csvfiles/lumibyrun2024_eraB_Golden.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500.csv";
 //constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias.csv";
-constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500_v2.csv";
-//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias_v2.csv";
+//constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTPFJet500_v2.csv";
+constexpr const char lumibyls2024BCDEFG[] = "luminosityscripts/csvfiles/2024/lumi_378981_386951_Golden_HLTZeroBias_v2.csv";
 //constexpr const char lumibyls2025B[] = "luminosityscripts/csvfiles/2025/lumi_391658_392221_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392382_DIALS.csv";
 //constexpr const char lumibyls2025BC[] = "luminosityscripts/csvfiles/2025/lumi_391658_392526_DIALS.csv";
@@ -182,18 +182,18 @@ constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_3
 constexpr const char lumibyls2026B[] = "luminosityscripts/csvfiles/2026/lumi_401624_402537_golden_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402825_MLM_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402825_MLM_HLTZeroBias.csv";
-constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_403008_hybrid_HLTPFJet500.csv";
-//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_403008_hybrid_HLTZeroBias.csv";
+//constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_403008_hybrid_HLTPFJet500.csv";
+constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_403008_hybrid_HLTZeroBias.csv";
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_HLTPFJet500.csv";
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_HLTZeroBias.csv";
-constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTPFJet500.csv";
-//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTZeroBias.csv";
+//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTPFJet500.csv";
+constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTPFJet500.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFJet500.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFZeroBias.csv";
-constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTPFJet500.csv";
-//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTZeroBias.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTPFJet500.csv";
+constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTZeroBias.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 333> lumifiles = {{
     {"2022C", lumibyls2022C},
@@ -649,7 +649,7 @@ public:
 
   // (Optional) composition plots
   TProfile2D *p2pt, *p2rho, *p2rho_PURW, *p2chf, *p2nef, *p2nhf, *p2cef, *p2muf;
-  TProfile2D *p2jes, *p2res;
+  TProfile2D *p2jes, *p2res, *p2jes_abseta, *p2res_abseta;
   TProfile *ppt13, *prho13, *pchf13, *pnef13, *pnhf13, *pcef13, *pmuf13;
   TProfile *pjes13, *pres13;
   // Related to the tails issue. May 17, 2024. Nestor
@@ -2800,28 +2800,32 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 			//"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
 			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
-			"");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 	//jerpathsf = "";
+	jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026D_JRV2M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026C_JRV2M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV2M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV5M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024_nib_JRV11M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV4M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV1M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026C_JRV1M_MC_SF_AK4PFPuppi.txt";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026D_JRV1M_MC_SF_AK4PFPuppi.txt";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026D_JRV1M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi.txt";
+	jersfvspt = getFJC("", "Prompt26_2026D_JRV2M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt26_2026C_JRV2M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt26_2026B_JRV2M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV5M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt24_2024_nib_JRV11M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV4M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt26_2026B_JRV1M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt26_2026C_JRV1M_MC_SF_AK4PFPuppi", "");
-	jersfvspt = getFJC("", "Prompt26_2026D_JRV1M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt26_2026D_JRV1M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "ReReco24_2024_nib_JRV10M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
@@ -2942,7 +2946,8 @@ if (TString(dataset.c_str()).Contains("2024C")  || dataset == "2024C_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                     		//"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024C_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
-		                "Prompt24_Run2024C_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		                //"Prompt24_Run2024C_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024C_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
 		/*
 		FactorizedJetCorrector *tempJEC = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
@@ -2985,7 +2990,8 @@ if (TString(dataset.c_str()).Contains("2024D")  || dataset == "2024D_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024D_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
-		                "Prompt24_Run2024D_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		                //"Prompt24_Run2024D_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024D_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
 		/*
 		FactorizedJetCorrector *tempJEC = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
@@ -3068,7 +3074,8 @@ if (TString(dataset.c_str()).Contains("2024E")  || dataset == "2024Ev1_ZB" || da
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024E_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
-		                "Prompt24_Run2024E_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+		                //"Prompt24_Run2024E_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024E_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
 		/*
 		FactorizedJetCorrector *tempJEC = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
@@ -3119,7 +3126,8 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024F_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024F_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024F_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024F_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024F_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
         } else if (TString(dataset.c_str()).Contains("2024F_nib2"))
         {
                 jec = getFJC("",
@@ -3127,7 +3135,8 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024F_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024F_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024F_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024F_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024F_nib2_V11M_DATA_L2L3Residual_AK4PFPuppi");
 	} else if (TString(dataset.c_str()).Contains("2024F_nib3"))
 	{
 		jec = getFJC("",
@@ -3135,7 +3144,8 @@ if (TString(dataset.c_str()).Contains("2024F"))//  || dataset == "2024F_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024F_nib3_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024F_nib3_V9M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024F_nib3_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024F_nib3_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024F_nib3_V11M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -3190,7 +3200,8 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024G_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024G_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024G_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024G_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
         } else if (TString(dataset.c_str()).Contains("2024G_nib2"))
         {
                 jec = getFJC("",
@@ -3198,7 +3209,8 @@ if (TString(dataset.c_str()).Contains("2024G")  || dataset == "2024G_ZB")
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024G_nib2_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024G_nib2_V9M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024G_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024G_nib2_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024G_nib2_V11M_DATA_L2L3Residual_AK4PFPuppi");
         } else
         {
                 jec = getFJC("",
@@ -3249,7 +3261,8 @@ if (TString(dataset.c_str()).Contains("2024H"))//  || dataset == "2024H_ZB" || d
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024H_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024H_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024H_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024H_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024H_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
 		/*
 		FactorizedJetCorrector *tempJEC = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
@@ -3294,7 +3307,8 @@ if (TString(dataset.c_str()).Contains("2024I"))
                                 //"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
                                 //"Prompt24_Run2024I_nib1_V8M_DATA_L2L3Residual_AK4PFPuppi");
 				//"ReReco24_Run2024I_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
-				"Prompt24_Run2024I_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				//"Prompt24_Run2024I_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
+				"Prompt24_Run2024I_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
 		/*
 		FactorizedJetCorrector *tempJEC = getFJC("",
 				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
@@ -3376,7 +3390,8 @@ if (TString(dataset.c_str()).Contains("2025C")) {
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025C_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025C_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025C_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025C_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025C_V5M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("",
 			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3391,7 +3406,8 @@ if (TString(dataset.c_str()).Contains("2025D")) {
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025D_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025D_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025D_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025D_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025D_V5M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("",
 			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3407,7 +3423,8 @@ if (TString(dataset.c_str()).Contains("2025E")) {
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025E_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025E_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025E_V5M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("",
 			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3422,7 +3439,8 @@ if (TString(dataset.c_str()).Contains("2025F")) {
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025F_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025F_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025F_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025F_V5M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("",
 			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3438,7 +3456,8 @@ if (TString(dataset.c_str()).Contains("2025G")) {
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         //"Prompt25_Run2025E_V2M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt25_Run2025G_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			//"Prompt25_Run2025G_V4M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt25_Run2025G_V5M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("",
 			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
@@ -3455,7 +3474,8 @@ if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Conta
                         //"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
 			//"Prompt25_Run2025G_V3M_DATA_L2L3Residual_AK4PFPuppi");
 			//"Prompt26_Run2026B_V0M_DATA_L2L3Residual_AK4PFPuppi");
-	                "Prompt26_Run2026B_V1M_DATA_L2L3Residual_AK4PFPuppi");
+	                //"Prompt26_Run2026B_V1M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt26_Run2026B_V2M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("",
 			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
@@ -3470,7 +3490,8 @@ if (TString(dataset.c_str()).Contains("2026C")) {
 	
         jec = getFJC("",
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
-                        "Prompt26_Run2026C_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt26_Run2026C_V1M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt26_Run2026C_V2M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("",
 			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
@@ -3485,7 +3506,8 @@ if (TString(dataset.c_str()).Contains("2026D")) {
 	
         jec = getFJC("",
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
-                        "Prompt26_Run2026D_V1M_DATA_L2L3Residual_AK4PFPuppi");
+                        //"Prompt26_Run2026D_V1M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt26_Run2026D_V2M_DATA_L2L3Residual_AK4PFPuppi");
 	/*
 	FactorizedJetCorrector *tempJEC = getFJC("", 
 			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
@@ -4595,11 +4617,17 @@ if (isMG)
                                 nx, vx, npti, vpti);
       h->h2pteta = new TH2D("h2pteta", ";#eta;p_{T} (GeV);N_{jet}",
                             nx, vx, npti, vpti);
-      h->p2jes = new TProfile2D("p2jes", ";|#eta_{jet}|;p_{T,gen} (GeV);",
-				nxd, vxd, nptd, vptd);
+      h->p2jes_abseta = new TProfile2D("p2jes_abseta", ";|#eta_{jet}|;p_{T,ptcl} (GeV);",
+				nxd, vxd, npti, vpti);
 
-      h->p2res = new TProfile2D("p2res", ";|#eta_{jet}|;p_{T,gen} (GeV);",
-                                nxd, vxd, nptd, vptd);
+      h->p2res_abseta = new TProfile2D("p2res_abseta", ";|#eta_{jet}|;p_{T,ptcl} (GeV);",
+                                nxd, vxd, npti, vpti);
+
+      h->p2jes = new TProfile2D("p2jes", ";#eta_{jet};p_{T,ptcl} (GeV);",
+                                nx, vx, npti, vpti);
+
+      h->p2res = new TProfile2D("p2res", ";#eta_{jet};p_{T,ptcl} (GeV);",
+                                nx, vx, npti, vpti);
 
       h->h2pteta_lumi = new TH2D("h2pteta_lumi", ";#eta;p_{T} (GeV);N_{jet}",
                             nx, vx, npti, vpti);
@@ -7343,7 +7371,9 @@ if (isMG)
 
 	    //std::cout << run << " Inclusive h2pteta weight: " << w << std::endl;
             h->h2pteta->Fill(p4.Eta(), p4.Pt(), w);
-            h->p2res->Fill(p4.Eta(), p4.Pt(), Jet_RES[i], w);
+            h->p2res_abseta->Fill(abs(p4.Eta()), p4.Pt(), Jet_RES[i], w);
+            h->p2jes_abseta->Fill(abs(p4.Eta()), p4.Pt(), (1.0 - Jet_rawFactor[i]), w); ////(1. - Jet_rawFactor[i])
+	    h->p2res->Fill(p4.Eta(), p4.Pt(), Jet_RES[i], w);
             h->p2jes->Fill(p4.Eta(), p4.Pt(), (1.0 - Jet_rawFactor[i]), w); ////(1. - Jet_rawFactor[i])
 
 
