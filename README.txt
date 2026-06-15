@@ -74,7 +74,7 @@ Bugs:
 
 // v170. New JECs V11M 2024, V5M 2025, V2M 2026. Also fix histograms for Incjet.
 //       v170_v2 JERSF 2024.
-//	 v170_v3 JERSF 2025. Only one that finished.
+//	 v170_v3 JERSF 2025. Only one that finished. It also contains the corrected SF version for Summer24MG.
 //	 v170_v4 JERSF 2026B.
 //	 v170_v5 JERSF 2026C.
 //	 v170_v6 JERSF 2026D.
@@ -129,6 +129,7 @@ Bugs:
 // v156. 2024 and 2025 data including the NHF TProfile3D histograms and the HLT_PFJet110 trigger.
 // Pending. Process Run2 using NanoAODV15 samples (From fikri first, later centraly produced samples) not done yet.
 // v155. Changes in the incl jets histograms in data to match the selection in MC. MPF response vs mu, NPV, rho.
+//       Response plots for quark vs gluon.
 // v154. Modify the lumi histograms.
 // v153. V3M JECS. v153_v2 uses the variation for multijet, next versions does not include that.
 // v152. Process 2025 using the Golden JSON file 391658_398860. Include ZB selection or not. v2 also include SingleNeutrino.

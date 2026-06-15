@@ -42,8 +42,8 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = true;
-bool useJERSFvsPt = true; // new file format
+bool smearJets = false;
+bool useJERSFvsPt = false; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
 std::mt19937 _mersennetwister;
@@ -89,7 +89,7 @@ bool doFSRup_JMENANO = false;
 bool doFSRup0p5_JMENANO = false;
 
 bool doQvsG_Eff = true;
-bool doGluonJets_SF = false;
+bool doGluonJets_SF = true;
 bool doJetId_variables = true; // To compare Jet_jetId branch 
 bool debug = false;      // general debug
 bool debugevent = false; // per-event debug
@@ -187,13 +187,17 @@ constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_4
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_HLTPFJet500.csv";
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_HLTZeroBias.csv";
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTPFJet500.csv";
-constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTZeroBias.csv";
+//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTZeroBias.csv";
+//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_May19_HLTPFJet500.csv";
+constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_May19_HLTZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTPFJet500.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFJet500.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTPFJet500.csv";
-constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTZeroBias.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTZeroBias.csv";
+//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTPFJet500.csv";
+constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTZeroBias.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 333> lumifiles = {{
     {"2022C", lumibyls2022C},
@@ -1117,13 +1121,15 @@ bool DijetHistosFill::LoadLumi()
 	string data_year;
 	string JSON_version;
 	if (TString(dataset.c_str()).Contains("2026D")){
-	  JSON_version = "Collisions26_401623_403937_MLEnhancedGolden";
+	  JSON_version = "Collisions26_401624_403937_golden";
+	  //JSON_version = "Collisions26_401623_403937_MLEnhancedGolden";
 	  //JSON_version = "Collisions26_401630_403895";
 	  //JSON_version = "Collisions26_401630_403493";
 	  data_year = "2026";	
 	}
 	if (TString(dataset.c_str()).Contains("2026C")){
-	  JSON_version = "Collisions26_lowPU_Filtered";
+	  JSON_version = "Collisions26_lowPU_May19";
+	  //JSON_version = "Collisions26_lowPU_Filtered";
 	  //JSON_version = "Collisions26_lowPU";
 	  //JSON_version = "Collisions26_401630_402825";
 	  //JSON_version = "Collisions26_401630_403008";
@@ -2801,8 +2807,8 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 			"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
 			"");
 
-	//jerpathsf = "";
-	jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026D_JRV2M_MC_SF_AK4PFPuppi.txt";
+	jerpathsf = "";
+	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026D_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026C_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV5M_MC_SF_AK4PFPuppi.txt";
@@ -2816,7 +2822,7 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi.txt";
-	jersfvspt = getFJC("", "Prompt26_2026D_JRV2M_MC_SF_AK4PFPuppi", "");
+	//jersfvspt = getFJC("", "Prompt26_2026D_JRV2M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt26_2026C_JRV2M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt26_2026B_JRV2M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV5M_MC_SF_AK4PFPuppi", "");
@@ -2830,10 +2836,10 @@ if (TString(dataset.c_str()).Contains("Winter24MG") || TString(dataset.c_str()).
 	//jersfvspt = getFJC("", "Prompt26_2026B_JRV0M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "Prompt25_2025CDEFG_JRV2M_MC_SF_AK4PFPuppi", "");
 	//jersfvspt = getFJC("", "ReReco24_2024CDEFGHI_nib_JRV9M_MC_SF_AK4PFPuppi", "");
-	//jersfvspt = getFJC("", "", "");
-	jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-	//jerpath = "";
-	useJERSFvsPt = true; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+	jersfvspt = getFJC("", "", "");
+	//jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+	jerpath = "";
+	useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
 
            	
 	   if (reweightPU && !doPU_per_trigger)
@@ -4079,11 +4085,14 @@ if (isMG)
       //LoadJSON("rootfiles/2026/CombinedJSONS_GoldenRuns_401630to402788_DCSRuns_402789to402825.json");
       //LoadJSON("rootfiles/2026/CombinedJSONS_MLEnhancedGoldenRuns_401630to402825_DCSRuns_402826to403008.json");
       //LoadJSON("rootfiles/2026/Cert_Collisions2026_lowPU.json");
-      LoadJSON("rootfiles/2026/Cert_Collisions2026_lowPU_Filtered.json");
+      //LoadJSON("rootfiles/2026/Cert_Collisions2026_lowPU_Filtered.json");
+      //LoadJSON("rootfiles/2026/Cert_Collisions2026_lowPU_May19.json");
+      LoadJSON("rootfiles/2026/Cert_Collisions2026_lowPU_May19_Filtered.json");
     if (TString(dataset.c_str()).Contains("2026D"))
       //LoadJSON("rootfiles/2026/CombinedJSONS_MLEnhancedGolden_401630to403457_DCSRuns_403458to403493.json");
       //LoadJSON("rootfiles/2026/CombinedJSONS_GoldenRuns_401630to403774_DCSRuns_403775to403895.json");
-      LoadJSON("rootfiles/2026/Collisions26_401623_403937_MLEnhancedGolden_Latest.json");
+      //LoadJSON("rootfiles/2026/Collisions26_401623_403937_MLEnhancedGolden_Latest.json");
+      LoadJSON("rootfiles/2026/Cert_Collisions2026_401624_403937_golden.json");
 
   }
   int _nbadevts_json(0);
@@ -8208,7 +8217,7 @@ if (isMG)
 	    if (doGluonJets_SF && isMC && itag >= 0 && iprobe >= 0) {
               double sf_tag = 1.0;
               int flav_tag = abs(Jet_partonFlavour[itag]);
-              if (flav_tag >= 1 && flav_tag <= 5 && h3_quark) {
+              if (flav_tag >= 1 && flav_tag < 4 && h3_quark) {
                   sf_tag = h3_quark->GetBinContent(h3_quark->FindBin(Jet_btagPNetQvG[itag], fabs(Jet_eta[itag]), Jet_pt[itag]));
               } else if (flav_tag == 21 && h3_gluon) {
                   sf_tag = h3_gluon->GetBinContent(h3_gluon->FindBin(Jet_btagPNetQvG[itag], fabs(Jet_eta[itag]), Jet_pt[itag]));
@@ -8217,7 +8226,7 @@ if (isMG)
 
               double sf_probe = 1.0;
               int flav_probe = abs(Jet_partonFlavour[iprobe]);
-              if (flav_probe >= 1 && flav_probe <= 5 && h3_quark) {
+              if (flav_probe >= 1 && flav_probe < 4 && h3_quark) {
                   sf_probe = h3_quark->GetBinContent(h3_quark->FindBin(Jet_btagPNetQvG[iprobe], fabs(Jet_eta[iprobe]), Jet_pt[iprobe]));
               } else if (flav_probe == 21 && h3_gluon) {
                   sf_probe = h3_gluon->GetBinContent(h3_gluon->FindBin(Jet_btagPNetQvG[iprobe], fabs(Jet_eta[iprobe]), Jet_pt[iprobe]));
