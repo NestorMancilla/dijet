@@ -72,6 +72,8 @@ Bugs:
 (To-do: Downdload Summer23 and ReReco samples. Not yet done for ZeroBias at least)
 (To-do: QG SFs and response)
 
+// v171. Adding p2r based on the flavour. Also p2m* extended to include flavour and no abs eta restriction.
+//	 v171_v2 uses PS weights.
 // v170. New JECs V11M 2024, V5M 2025, V2M 2026. Also fix histograms for Incjet.
 //       v170_v2 JERSF 2024.
 //	 v170_v3 JERSF 2025. Only one that finished. It also contains the corrected SF version for Summer24MG.
