@@ -13,11 +13,14 @@
 #include "TH1D.h"
 
 #include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+//#include "../CondFormats/JetMETObjects/interface/FactorizedJetCorrectorWrapper.h"
 #include "../CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "../CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 #include "../CondFormats/JetMETObjects/interface/JetResolutionObject.h"
 #include "../JetMETCorrections/Modules/interface/JetResolution.h"
+
+#include "../CondFormats/JetMETObjects/interface/JetIdHelper.h"
 
 #include <iostream>
 #include <cstdio>
@@ -51,10 +54,10 @@ public :
    double          w_ptprobe;
    double          w_PUReweight;
    double          PU_weight;
+   double	   trpu_JSON;
    map<string, map<int, double>> mlumi;
    map<string, map<int, int> > _prescales;
    map<int, map<int, int> > _json;
-   //map<int, map<int, float> > _lums;
    map<int, float> _lums;
    double _lumsum;
    std::vector<double> _runNumberBin;
@@ -185,7 +188,7 @@ public :
    Float_t         GenJetAK8_phi[9];   //[nGenJetAK8]
    Float_t         GenJetAK8_pt[9];   //[nGenJetAK8]
   //UChar_t         GenJetAK8_nConstituents[9];   //[nGenJetAK8]
-  static const int nGenJetMax = 100; // was 76
+  static const int nGenJetMax = 200; // was 76
    Int_t           nGenJet;
    Float_t         GenJet_eta[nGenJetMax];   //[nGenJet]
    Float_t         GenJet_mass[nGenJetMax];   //[nGenJet]
@@ -260,7 +263,7 @@ public :
   //Float_t         GenJetAK8ForJEC_pt[45];   //[nGenJetAK8ForJEC]
   //UChar_t         GenJetAK8ForJEC_nConstituents[45];   //[nGenJetAK8ForJEC]
 
-   static const int nJetMax = 100;
+   static const int nJetMax = 200;
    Int_t          nJet;
    Float_t         Jet_area[nJetMax];   //[nJet]
    //   Float_t         Jet_btagCSVV2[nJetMax];   //[nJet]
@@ -275,8 +278,12 @@ public :
    //   Float_t         Jet_btagDeepFlavUDS[nJetMax];   //[nJet]
    Float_t         Jet_btagPNetQvG[nJetMax];  //[nJet] Gluon Jets, Nestor. May20, 2024.
    Float_t         Jet_btagUParTAK4QvG[nJetMax]; //[nJet] Winter24MGV14 studies. Nestor Aug8, 2024.
+   Float_t         Jet_btagUParTAK4B[nJetMax]; // [nJet] QvsGluon studies Jan 26, 2026.
+   Float_t         Jet_btagUParTAK4CvL[nJetMax]; // [nJet] QvsGluon studies Jan 26, 2026.
    Float_t         Jet_chEmEF[nJetMax];   //[nJet]
    Float_t         Jet_chHEF[nJetMax];   //[nJet]
+   UChar_t         Jet_chMultiplicity[nJetMax];
+   UChar_t         Jet_neMultiplicity[nJetMax];
    Float_t         Jet_eta[nJetMax];   //[nJet]
    //   Float_t         Jet_hfEmEF[nJetMax];   //[nJet]
    Float_t         Jet_hfHEF[nJetMax];   //[nJet]
@@ -313,7 +320,7 @@ public :
    Int_t           Jet_electronIdx2[nJetMax];   //[nJet]
    Int_t           Jet_hfadjacentEtaStripsSize[nJetMax];   //[nJet]
    Int_t           Jet_hfcentralEtaStripSize[nJetMax];   //[nJet]
-  // Int_t           Jet_jetId[nJetMax];   //[nJet] // NanoV10,11
+   //Int_t           Jet_jetId[nJetMax];   //[nJet] // NanoV10,11
    UChar_t         Jet_jetId[nJetMax];   //[nJet] // NanoV12
    Int_t           Jet_muonIdx1[nJetMax];   //[nJet]
    Int_t           Jet_muonIdx2[nJetMax];   //[nJet]
@@ -1318,9 +1325,13 @@ public :
   //Bool_t          HLT_PFJet15;
   //Bool_t          HLT_PFJet25;
    Bool_t          HLT_PFJet40;
+   Bool_t          HLT_PFJet40_L1Jet24; //LowPU
+   Bool_t          HLT_PFJet40_L1Jet35; //LowPU
    Bool_t          HLT_PFJet60;
    Bool_t          HLT_PFJet80;
+   Bool_t          HLT_PFJet80_L1Jet60; //LowPU
    Bool_t          HLT_PFJet140;
+   Bool_t          HLT_PFJet110;
    Bool_t          HLT_PFJet200;
    Bool_t          HLT_PFJet260;
    Bool_t          HLT_PFJet320;
@@ -1822,6 +1833,10 @@ public :
 
    // Pointers to branches
    map<string, const Bool_t *> mtrg;
+   //map<string, Bool_t> mtrg;
+
+
+
 
    // List of branches
    TBranch        *b_run;   //!
@@ -2022,8 +2037,12 @@ public :
    //   TBranch        *b_Jet_btagDeepFlavUDS;   //!
    TBranch        *b_Jet_btagPNetQvG; //! Gluon Jets, Nestor May20, 2024.
    TBranch        *b_Jet_btagUParTAK4QvG; //! Winter24MGV14 studies. Nestor Aug 8, 2024.
+   TBranch        *b_Jet_btagUParTAK4B; //! QvsGluon studies Jan 26, 2026.
+   TBranch        *b_Jet_btagUParTAK4CvL; //! QvsGluon studies Jan 26, 2026.
    TBranch        *b_Jet_chEmEF;   //!
    TBranch        *b_Jet_chHEF;   //!
+   TBranch        *b_Jet_chMultiplicity; //!
+   TBranch        *b_Jet_neMultiplicity; //!
    TBranch        *b_Jet_eta;   //!
    //   TBranch        *b_Jet_hfEmEF;   //!
    //   TBranch        *b_Jet_hfHEF;   //!
@@ -3038,9 +3057,13 @@ public :
   //TBranch        *b_HLT_PFJet15;   //!
   //TBranch        *b_HLT_PFJet25;   //!
    TBranch        *b_HLT_PFJet40;   //!
+   TBranch        *b_HLT_PFJet40_L1Jet24; //LowPU
+   TBranch        *b_HLT_PFJet40_L1Jet35; //LowPU
    TBranch        *b_HLT_PFJet60;   //!
    TBranch        *b_HLT_PFJet80;   //!
+   TBranch        *b_HLT_PFJet80_L1Jet60; //LowPU
    TBranch        *b_HLT_PFJet140;   //!
+   TBranch        *b_HLT_PFJet110;
    TBranch        *b_HLT_PFJet200;   //!
    TBranch        *b_HLT_PFJet260;   //!
    TBranch        *b_HLT_PFJet320;   //!
@@ -3588,9 +3611,14 @@ DijetHistosFill::DijetHistosFill(TTree *tree, int itype, string datasetname, str
   isRun3 = (TString(datasetname.c_str()).Contains("2022") ||
 	    TString(datasetname.c_str()).Contains("2023") ||
 	    TString(datasetname.c_str()).Contains("2024") ||
+	    TString(datasetname.c_str()).Contains("2025") ||
+	    TString(datasetname.c_str()).Contains("2026") ||
 	    TString(datasetname.c_str()).Contains("Summer22") ||
 	    TString(datasetname.c_str()).Contains("Summer23") ||
-	    TString(datasetname.c_str()).Contains("Winter24"));
+	    TString(datasetname.c_str()).Contains("Summer24") ||
+	    TString(datasetname.c_str()).Contains("Winter24") ||
+	    TString(datasetname.c_str()).Contains("Winter25") ||
+	    TString(datasetname.c_str()).Contains("Winter26"));
   assert(isRun2 || isRun3);
   assert(!(isRun2 && isRun3));
   isZB = (TString(datasetname.c_str()).Contains("_ZB"));
@@ -4323,8 +4351,12 @@ void DijetHistosFill::Init(TTree *tree)
    //   fChain->SetBranchAddress("Jet_btagDeepFlavUDS", Jet_btagDeepFlavUDS, &b_Jet_btagDeepFlavUDS);
    fChain->SetBranchAddress("Jet_btagPNetQvG", Jet_btagPNetQvG, &b_Jet_btagPNetQvG); // Gluon jets, Nestor. May20,2024.
    fChain->SetBranchAddress("Jet_btagUParTAK4QvG", Jet_btagUParTAK4QvG, &b_Jet_btagUParTAK4QvG); // Winter24MGV14 studies, Nestor Aug 8, 2024.
+   fChain->SetBranchAddress("Jet_btagUParTAK4B", Jet_btagUParTAK4B, &b_Jet_btagUParTAK4B); // QvsGluon studies Jan 26, 2026.
+   fChain->SetBranchAddress("Jet_btagUParTAK4CvL", Jet_btagUParTAK4CvL, &b_Jet_btagUParTAK4CvL); // QvsGluon studies Jan 26, 2026.
    fChain->SetBranchAddress("Jet_chEmEF", Jet_chEmEF, &b_Jet_chEmEF);
    fChain->SetBranchAddress("Jet_chHEF", Jet_chHEF, &b_Jet_chHEF);
+   fChain->SetBranchAddress("Jet_chMultiplicity", Jet_chMultiplicity, &b_Jet_chMultiplicity);
+   fChain->SetBranchAddress("Jet_neMultiplicity", Jet_neMultiplicity, &b_Jet_neMultiplicity);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
    //   fChain->SetBranchAddress("Jet_hfEmEF", Jet_hfEmEF, &b_Jet_hfEmEF);
    //   fChain->SetBranchAddress("Jet_hfHEF", Jet_hfHEF, &b_Jet_hfHEF);
@@ -5370,9 +5402,13 @@ void DijetHistosFill::Init(TTree *tree)
      //fChain->SetBranchAddress("HLT_PFJet15", &HLT_PFJet15, &b_HLT_PFJet15);
      //fChain->SetBranchAddress("HLT_PFJet25", &HLT_PFJet25, &b_HLT_PFJet25);
      fChain->SetBranchAddress("HLT_PFJet40", &HLT_PFJet40, &b_HLT_PFJet40);
+     fChain->SetBranchAddress("HLT_PFJet40_L1Jet24", &HLT_PFJet40_L1Jet24, &b_HLT_PFJet40_L1Jet24); //LowPU
+     fChain->SetBranchAddress("HLT_PFJet40_L1Jet35", &HLT_PFJet40_L1Jet35, &b_HLT_PFJet40_L1Jet35); //LowPU
      fChain->SetBranchAddress("HLT_PFJet60", &HLT_PFJet60, &b_HLT_PFJet60);
      fChain->SetBranchAddress("HLT_PFJet80", &HLT_PFJet80, &b_HLT_PFJet80);
+     fChain->SetBranchAddress("HLT_PFJet80_L1Jet60", &HLT_PFJet80_L1Jet60, &b_HLT_PFJet80_L1Jet60); //LowPU
      fChain->SetBranchAddress("HLT_PFJet140", &HLT_PFJet140, &b_HLT_PFJet140);
+     fChain->SetBranchAddress("HLT_PFJet110", &HLT_PFJet110, &b_HLT_PFJet110);
      fChain->SetBranchAddress("HLT_PFJet200", &HLT_PFJet200, &b_HLT_PFJet200);
      fChain->SetBranchAddress("HLT_PFJet260", &HLT_PFJet260, &b_HLT_PFJet260);
      fChain->SetBranchAddress("HLT_PFJet320", &HLT_PFJet320, &b_HLT_PFJet320);
@@ -5740,8 +5776,10 @@ void DijetHistosFill::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_IsoTrackHE", &HLT_IsoTrackHE, &b_HLT_IsoTrackHE);
    fChain->SetBranchAddress("HLT_ZeroBias_FirstCollisionAfterAbortGap", &HLT_ZeroBias_FirstCollisionAfterAbortGap, &b_HLT_ZeroBias_FirstCollisionAfterAbortGap);
    fChain->SetBranchAddress("HLT_ZeroBias_IsolatedBunches", &HLT_ZeroBias_IsolatedBunches, &b_HLT_ZeroBias_IsolatedBunches);
+   */
    fChain->SetBranchAddress("HLT_ZeroBias_FirstCollisionInTrain", &HLT_ZeroBias_FirstCollisionInTrain, &b_HLT_ZeroBias_FirstCollisionInTrain);
    fChain->SetBranchAddress("HLT_ZeroBias_LastCollisionInTrain", &HLT_ZeroBias_LastCollisionInTrain, &b_HLT_ZeroBias_LastCollisionInTrain);
+   /*
    fChain->SetBranchAddress("HLT_ZeroBias_FirstBXAfterTrain", &HLT_ZeroBias_FirstBXAfterTrain, &b_HLT_ZeroBias_FirstBXAfterTrain);
    fChain->SetBranchAddress("HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr", &HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr, &b_HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr);
    fChain->SetBranchAddress("HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET90", &HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET90, &b_HLT_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_MET90);
@@ -5881,8 +5919,57 @@ void DijetHistosFill::Init(TTree *tree)
 
    //map<string, Bool_t *> mtrg;
    //Bool_t HLT_MC(true);
+   /*
+   fChain->SetBranchAddress("HLT_MC", &mtrg["HLT_MC"]);
+   fChain->SetBranchAddress("HLT_ZeroBias", &mtrg["HLT_ZeroBias"]);
+
+   if (!isZB){
+     fChain->SetBranchAddress("HLT_DiPFJetAve40", &mtrg["HLT_DiPFJetAve40"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve60", &mtrg["HLT_DiPFJetAve60"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve80", &mtrg["HLT_DiPFJetAve80"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve140", &mtrg["HLT_DiPFJetAve140"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve200", &mtrg["HLT_DiPFJetAve200"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve260", &mtrg["HLT_DiPFJetAve260"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve320", &mtrg["HLT_DiPFJetAve320"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve400", &mtrg["HLT_DiPFJetAve400"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve500", &mtrg["HLT_DiPFJetAve500"]);
+
+     fChain->SetBranchAddress("HLT_PFJet40", &mtrg["HLT_PFJet40"]);
+     fChain->SetBranchAddress("HLT_PFJet60", &mtrg["HLT_PFJet60"]);
+     fChain->SetBranchAddress("HLT_PFJet80", &mtrg["HLT_PFJet80"]);
+     fChain->SetBranchAddress("HLT_PFJet140", &mtrg["HLT_PFJet140"]);
+     fChain->SetBranchAddress("HLT_PFJet200", &mtrg["HLT_PFJet200"]);
+     fChain->SetBranchAddress("HLT_PFJet260", &mtrg["HLT_PFJet260"]);
+     fChain->SetBranchAddress("HLT_PFJet320", &mtrg["HLT_PFJet320"]);
+     fChain->SetBranchAddress("HLT_PFJet400", &mtrg["HLT_PFJet400"]);
+     fChain->SetBranchAddress("HLT_PFJet450", &mtrg["HLT_PFJet450"]);
+     fChain->SetBranchAddress("HLT_PFJet500", &mtrg["HLT_PFJet500"]);
+     fChain->SetBranchAddress("HLT_PFJet550", &mtrg["HLT_PFJet550"]);
+
+     fChain->SetBranchAddress("HLT_DiPFJetAve60_HFJEC", &mtrg["HLT_DiPFJetAve60_HFJEC"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve80_HFJEC", &mtrg["HLT_DiPFJetAve80_HFJEC"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve100_HFJEC", &mtrg["HLT_DiPFJetAve100_HFJEC"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve160_HFJEC", &mtrg["HLT_DiPFJetAve160_HFJEC"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve220_HFJEC", &mtrg["HLT_DiPFJetAve220_HFJEC"]);
+     fChain->SetBranchAddress("HLT_DiPFJetAve300_HFJEC", &mtrg["HLT_DiPFJetAve300_HFJEC"]);
+
+     fChain->SetBranchAddress("HLT_PFJetFwd40", &mtrg["HLT_PFJetFwd40"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd60", &mtrg["HLT_PFJetFwd60"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd80", &mtrg["HLT_PFJetFwd80"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd140", &mtrg["HLT_PFJetFwd140"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd200", &mtrg["HLT_PFJetFwd200"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd260", &mtrg["HLT_PFJetFwd260"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd320", &mtrg["HLT_PFJetFwd320"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd400", &mtrg["HLT_PFJetFwd400"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd450", &mtrg["HLT_PFJetFwd450"]);
+     fChain->SetBranchAddress("HLT_PFJetFwd500", &mtrg["HLT_PFJetFwd500"]);
+   }
+   */
+   
    mtrg["HLT_MC"] = &HLT_MC;
    mtrg["HLT_ZeroBias"] = &HLT_ZeroBias;
+   mtrg["HLT_ZeroBias_FirstCollisionInTrain"] = &HLT_ZeroBias_FirstCollisionInTrain;
+   mtrg["HLT_ZeroBias_LastCollisionInTrain"] = &HLT_ZeroBias_LastCollisionInTrain;
 
    if (!isZB) {
      mtrg["HLT_DiPFJetAve40"] = &HLT_DiPFJetAve40;
@@ -5896,9 +5983,12 @@ void DijetHistosFill::Init(TTree *tree)
      mtrg["HLT_DiPFJetAve500"] = &HLT_DiPFJetAve500;
      
      mtrg["HLT_PFJet40"] = &HLT_PFJet40;
+     mtrg["HLT_PFJet40_L1Jet24"] = &HLT_PFJet40_L1Jet24; //LowPU
+     mtrg["HLT_PFJet40_L1Jet35"] = &HLT_PFJet40_L1Jet35; //LowPU
      mtrg["HLT_PFJet60"] = &HLT_PFJet60;
      mtrg["HLT_PFJet80"] = &HLT_PFJet80;
-     //mtrg["HLT_PFJet110"] = &HLT_PFJet110;
+     mtrg["HLT_PFJet80_L1Jet60"] = &HLT_PFJet80_L1Jet60; //LowPU
+     mtrg["HLT_PFJet110"] = &HLT_PFJet110;
      mtrg["HLT_PFJet140"] = &HLT_PFJet140;
      mtrg["HLT_PFJet200"] = &HLT_PFJet200;
      mtrg["HLT_PFJet260"] = &HLT_PFJet260;
