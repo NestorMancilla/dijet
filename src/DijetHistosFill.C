@@ -80,12 +80,12 @@ bool doDijet2NM = false; // true;
 bool doJetID = false;    // add JetID class
 bool doLeadingJet = true; // To compare with Athens results
 bool doEtaPhi = true;
-bool doPSVar = false;
+bool doPSVar = true;
 bool doISRdown = false;
 bool doFSRdown = false;
 bool doISRup = false;
 bool doFSRup = false; // same as JMENANO 0p5
-bool doFSRup_JMENANO = false;
+bool doFSRup_JMENANO = true;
 bool doFSRup0p5_JMENANO = false;
 
 bool doQvsG_Eff = true;
