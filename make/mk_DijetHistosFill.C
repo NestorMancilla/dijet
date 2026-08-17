@@ -126,7 +126,15 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer24MG_2025_5", "Summer24MG_2025_6", "Summer24MG_2025_7", "Summer24MG_2025_8",
      "Summer24MG_2025_9", "Summer24MG_2025_10", "Summer24MG_2025_11",
      "Winter26MG_1", "Winter26MG_2", "Winter26MG_3", "Winter26MG_4", "Winter26MG_5", "Winter26MG_6",
-     "Winter26MG_7", "Winter26MG_8", "Winter26MG_9", "Winter26MG_10", "Winter26MG_11"
+     "Winter26MG_7", "Winter26MG_8", "Winter26MG_9", "Winter26MG_10", "Winter26MG_11",
+     "Summer20UL16APVMG_1", "Summer20UL16APVMG_2", "Summer20UL16APVMG_3", "Summer20UL16APVMG_4", "Summer20UL16APVMG_5",
+     "Summer20UL16APVMG_6", "Summer20UL16APVMG_7", "Summer20UL16APVMG_8", "Summer20UL16APVMG_9",
+     "Summer20UL16MG_1", "Summer20UL16MG_2", "Summer20UL16MG_3", "Summer20UL16MG_4", "Summer20UL16MG_5",
+     "Summer20UL16MG_6", "Summer20UL16MG_7", "Summer20UL16MG_8", "Summer20UL16MG_9",
+     "Summer20UL17MG_1", "Summer20UL17MG_2", "Summer20UL17MG_3", "Summer20UL17MG_4", "Summer20UL17MG_5",
+     "Summer20UL17MG_6", "Summer20UL17MG_7", "Summer20UL17MG_8", "Summer20UL17MG_9",
+     "Summer20UL18MG_1", "Summer20UL18MG_2", "Summer20UL18MG_3", "Summer20UL18MG_4", "Summer20UL18MG_5",
+     "Summer20UL18MG_6", "Summer20UL18MG_7", "Summer20UL18MG_8", "Summer20UL18MG_9"
      };
 
   std::unordered_set<std::string> DT_datasets = {"UL2016BCD", 
@@ -212,7 +220,12 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
   "2026D_0", "2026D_1", "2026D_ZB",
   "2026B_JME_0", "2026B_JME_1", "2026B_JME_ZB",
   "2026C_JME_0", "2026C_JME_1", "2026C_JME_2", "2026C_JME_3", "2026C_JME_4", "2026C_JME_5", "2026C_JME_ZB",
-  "2026D_JME_0", "2026D_JME_1", "2026D_JME_ZB"
+  "2026D_JME_0", "2026D_JME_1", "2026D_JME_ZB",
+  "2016B_HIPM", "2016B_HIPM_ZB", "2016C_HIPM", "2016C_HIPM_ZB", "2016D_HIPM", "2016D_HIPM_ZB",
+  "2016E_HIPM", "2016E_HIPM_ZB", "2016F_HIPM", "2016F_HIPM_ZB",
+  "2016F", "2016F_ZB", "2016G", "2016G_ZB", "2016H", "2016H_ZB",
+  "2017B", "2017B_ZB", "2017C", "2017C_ZB", "2017D", "2017D_ZB", "2017E", "2017E_ZB", "2017F", "2017F_ZB",
+  "2018A", "2018A_ZB", "2018B", "2018B_ZB", "2018C", "2018C_ZB", "2018D", "2018D_ZB"
   };
 
   // Check if dataset is supported

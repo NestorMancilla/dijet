@@ -80,12 +80,12 @@ bool doDijet2NM = false; // true;
 bool doJetID = false;    // add JetID class
 bool doLeadingJet = true; // To compare with Athens results
 bool doEtaPhi = true;
-bool doPSVar = true;
+bool doPSVar = false;
 bool doISRdown = false;
 bool doFSRdown = false;
 bool doISRup = false;
 bool doFSRup = false; // same as JMENANO 0p5
-bool doFSRup_JMENANO = true;
+bool doFSRup_JMENANO = false;
 bool doFSRup0p5_JMENANO = false;
 
 bool doQvsG_Eff = true;
@@ -129,8 +129,15 @@ double DELTAR(double phi1, double phi2, double eta1, double eta2)
   return sqrt(pow(DELTAPHI(phi1, phi2), 2) + pow(eta1 - eta2, 2));
 }
 
+//Run2
+constexpr const char lumibyls2016[] = "luminosityscripts/csvfiles/2016/lumi_271036_284044_Golden_HLTPFJet500.csv";
+constexpr const char lumibyls2016_ZB[] = "luminosityscripts/csvfiles/2016/lumi_271036_284044_Golden_HLTZeroBias.csv";
+constexpr const char lumibyls2017[] = "luminosityscripts/csvfiles/2017/lumi_294927_306462_Golden_HLTPFJet500.csv";
+constexpr const char lumibyls2017_ZB[] = "luminosityscripts/csvfiles/2017/lumi_294927_306462_Golden_HLTZeroBias.csv";
+constexpr const char lumibyls2018[] = "luminosityscripts/csvfiles/2018/lumi_314472_325175_Golden_HLTPFJet500.csv";
+constexpr const char lumibyls2018_ZB[] = "luminosityscripts/csvfiles/2018/lumi_314472_325175_Golden_HLTZeroBias.csv";
 
-
+// Run3
 constexpr const char lumibyls2022C[] = "luminosityscripts/csvfiles/lumibyls2022C.csv";
 constexpr const char lumibyls2022D[] = "luminosityscripts/csvfiles/lumibyls2022D.csv";
 constexpr const char lumibyls2022E[] = "luminosityscripts/csvfiles/lumibyls2022E.csv";
@@ -199,7 +206,41 @@ constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_low
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTPFJet500.csv";
 constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTZeroBias.csv";
 
-constexpr std::array<std::pair<const char*, const char*>, 333> lumifiles = {{
+constexpr std::array<std::pair<const char*, const char*>, 367> lumifiles = {{
+    {"2016B_HIPM", lumibyls2016},
+    {"2016B_HIPM_ZB", lumibyls2016_ZB},
+    {"2016C_HIPM", lumibyls2016},
+    {"2016C_HIPM_ZB", lumibyls2016_ZB},
+    {"2016D_HIPM", lumibyls2016},
+    {"2016D_HIPM_ZB", lumibyls2016_ZB},
+    {"2016E_HIPM", lumibyls2016},
+    {"2016E_HIPM_ZB", lumibyls2016_ZB},
+    {"2016F_HIPM", lumibyls2016},
+    {"2016F_HIPM_ZB", lumibyls2016_ZB},
+    {"2016F", lumibyls2016},
+    {"2016F_ZB", lumibyls2016_ZB},
+    {"2016G", lumibyls2016_ZB},
+    {"2016G_ZB", lumibyls2016_ZB},
+    {"2016H", lumibyls2016},
+    {"2016H_ZB", lumibyls2016_ZB},
+    {"2017B", lumibyls2017},
+    {"2017B_ZB", lumibyls2017_ZB},
+    {"2017C", lumibyls2017},
+    {"2017C_ZB", lumibyls2017_ZB},
+    {"2017D", lumibyls2017},
+    {"2017D_ZB", lumibyls2017_ZB},
+    {"2017E", lumibyls2017},
+    {"2017E_ZB", lumibyls2017_ZB},
+    {"2017F", lumibyls2017},
+    {"2017F_ZB", lumibyls2017_ZB},
+    {"2018A", lumibyls2018},
+    {"2018A_ZB", lumibyls2018_ZB},
+    {"2018B", lumibyls2018},
+    {"2018B_ZB", lumibyls2018_ZB},
+    {"2018C", lumibyls2018},
+    {"2018C_ZB", lumibyls2018_ZB},
+    {"2018D", lumibyls2018},
+    {"2018D_ZB", lumibyls2018_ZB}, /////// ----> End of Run2 :D //////
     {"2022C", lumibyls2022C},
     {"2022C_ZB", lumibyls2022C},
     {"2022D", lumibyls2022D},
@@ -1019,9 +1060,10 @@ void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
     std::vector<std::string> vtrg = {
 	"HLT_ZeroBias",
         "HLT_PFJet40", 
-	"HLT_PFJet40_L1Jet24", "HLT_PFJet40_L1Jet35", //LowPU
+	//"HLT_PFJet40_L1Jet24", //LowPU
+	//"HLT_PFJet40_L1Jet35", //LowPU
 	"HLT_PFJet60", "HLT_PFJet80", 
-        "HLT_PFJet80_L1Jet60",	//LowPU
+        //"HLT_PFJet80_L1Jet60",	//LowPU
 	"HLT_PFJet110",
         "HLT_PFJet140", "HLT_PFJet200",
         "HLT_PFJet260", "HLT_PFJet320", "HLT_PFJet400", "HLT_PFJet450", "HLT_PFJet500",
@@ -1130,11 +1172,11 @@ bool DijetHistosFill::LoadLumi()
 	vector<string> vtrg = {
 		"HLT_ZeroBias",
 		"HLT_PFJet40",
-		"HLT_PFJet40_L1Jet24", //LowPU
-		"HLT_PFJet40_L1Jet35", //LowPU
+		//"HLT_PFJet40_L1Jet24", //LowPU
+		//"HLT_PFJet40_L1Jet35", //LowPU
 		"HLT_PFJet60",
 		"HLT_PFJet80",
-		"HLT_PFJet80_L1Jet60", //LowPU
+		//"HLT_PFJet80_L1Jet60", //LowPU
 		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
@@ -1221,15 +1263,28 @@ bool DijetHistosFill::LoadLumi()
 	//string JSON_version = "Collisions2023_366442_370790_Golden";
 	//string JSON_version = "Collisions2022_355100_362760_Golden";
 	//string era_year_path = "luminosityscripts/csvfiles/"
+	
+	if (TString(dataset.c_str()).Contains("2018")){
+          JSON_version = "Collisions18_314472_325175_Golden";
+          data_year = "2018";
+        }
+	if (TString(dataset.c_str()).Contains("2017")){
+          JSON_version = "Collisions18_294927_306462_Golden";
+          data_year = "2017";
+        }
+	if (TString(dataset.c_str()).Contains("2016")){
+          JSON_version = "Collisions16_271036_284044_Golden";
+          data_year = "2016";
+        }
 	// List of filenames
 	vector<string> filenames = {
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_ZeroBias_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet24_"+JSON_version+".csv", //LowPU
-		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet35_"+JSON_version+".csv", //LowPU
+		//"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet24_"+JSON_version+".csv", //LowPU
+		//"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet35_"+JSON_version+".csv", //LowPU
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet60_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_"+JSON_version+".csv",
-		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_L1Jet60_"+JSON_version+".csv", //LowPU
+		//"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_L1Jet60_"+JSON_version+".csv", //LowPU
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet110_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet140_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet200_"+JSON_version+".csv",
@@ -1358,6 +1413,10 @@ bool DijetHistosFill::LoadLumi()
 	//} else if (lumifile_str.Contains("lumibyls2024_378981_386951_Golden")) {
 	//	expectedTag = "#Data tag : online , Norm tag: None";
           //      expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
+	} else if (lumifile_str.Contains("lumi_271036_284044") || lumifile_str.Contains("lumi_294927_306462") || 
+		   lumifile_str.Contains("lumi_314472_325175")) {
+		expectedTag = "#Data tag : 24v2 , Norm tag: None";
+		expectedHeader = "#run:fill,ls,time,hltpath,delivered(/fb),recorded(/fb),avgpu,source";
 	} else if (lumifile_str.Contains("lumibyls2023_366442_370790_Golden")) {
 		expectedTag = "#Data tag : 24v2 , Norm tag: None";
                 expectedHeader = "#run:fill,time,nls,ncms,delivered(/fb),recorded(/fb)";
@@ -1709,8 +1768,9 @@ void DijetHistosFill::Loop()
 	}
 
 	if (isMC)
-		fChain->SetBranchStatus("Generator_binvar", 1); // pThat in Pythia8
-	if (isMC && !(isMG && isRun3))
+		fChain->SetBranchStatus("Generator_binvar", 1); // pThat
+	//if (isMC && !(isMG && isRun3))
+	if (isMC && !isMG)
 		fChain->SetBranchStatus("Pileup_pthatmax", 1);
 
 	if (isMC && (reweightPU || doPU_per_trigger || do_PUProfiles))
@@ -1760,7 +1820,8 @@ void DijetHistosFill::Loop()
 	fChain->SetBranchStatus("event", 1);
 	// fChain->SetBranchStatus("Rho_fixedGridRhoAll",1);
 	if (isRun2)
-		fChain->SetBranchStatus("fixedGridRhoFastjetAll", 1);
+		//fChain->SetBranchStatus("fixedGridRhoFastjetAll", 1);
+		fChain->SetBranchStatus("Rho_fixedGridRhoFastjetAll", 1);
 	        fChain->SetBranchStatus("Rho_fixedGridRhoFastjetCentral", 1);
                 fChain->SetBranchStatus("Rho_fixedGridRhoFastjetCentralChargedPileUp", 1);
 	if (isRun3)
@@ -1778,11 +1839,11 @@ void DijetHistosFill::Loop()
 		//"HLT_ZeroBias_FirstCollisionInTrain",
 		//"HLT_ZeroBias_LastCollisionInTrain",
 		"HLT_PFJet40",
-		"HLT_PFJet40_L1Jet24", //LowPU
-		"HLT_PFJet40_L1Jet35", //LowPU
+		//"HLT_PFJet40_L1Jet24", //LowPU
+		//"HLT_PFJet40_L1Jet35", //LowPU
 		"HLT_PFJet60",
 		"HLT_PFJet80",
-		"HLT_PFJet80_L1Jet60", //LowPU
+		//"HLT_PFJet80_L1Jet60", //LowPU
 		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
@@ -1822,8 +1883,8 @@ void DijetHistosFill::Loop()
 		//vtrg.insert(vtrg.begin(), "HLT_ZeroBias_FirstCollisionInTrain");
 		//vtrg.insert(vtrg.begin(), "HLT_ZeroBias_LastCollisionInTrain");
 
-	if (isRun2 > 2)
-		vtrg.push_back("HLT_PFJet550");
+	//if (isRun2 > 2)
+	//	vtrg.push_back("HLT_PFJet550");
 	//}
 
 	// vtrg.push_back("HLT_PFJetFwd15");
@@ -1968,8 +2029,8 @@ fChain->SetBranchStatus("Jet_neMultiplicity", 1);
 
 
 fChain->SetBranchStatus("Jet_rawFactor", 1);
-if (isRun2)
-	fChain->SetBranchStatus("Jet_area", 1);
+//if (isRun2)
+//	fChain->SetBranchStatus("Jet_area", 1);
 
 	// bool doPFComposition = true;
 if (doPFComposition)
@@ -2065,12 +2126,12 @@ mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
 //https://github.com/miquork/jecsys3/blob/main/minitools/DijetHistosCombine.C#L264-L370
 //mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
 mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
-mt["HLT_PFJet40_L1Jet24"] = range{64, 84, 0, 3.0}; //LowPU
-mt["HLT_PFJet40_L1Jet35"] = range{64, 84, 0, 3.0}; //LowPU
+//mt["HLT_PFJet40_L1Jet24"] = range{64, 84, 0, 3.0}; //LowPU
+//mt["HLT_PFJet40_L1Jet35"] = range{64, 84, 0, 3.0}; //LowPU
 mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
 //mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
 mt["HLT_PFJet80"]  = range{114, 155, 0, 3.0};
-mt["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, 3.0}; //LowPU
+//mt["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, 3.0}; //LowPU
 //mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
 mt["HLT_PFJet110"] = range{155, 196, 0, 3.0};
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
@@ -2101,12 +2162,12 @@ mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
 //mi["HLT_ZeroBias_LastCollisionInTrain"] = range{10,  49,  0, 5.2};
 //mi["HLT_MC"]       = range{15,6500,  0, 5.2};
 mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
-mi["HLT_PFJet40_L1Jet24"]  = range{49,  84,  0, fwdeta0}; //LowPU
-mi["HLT_PFJet40_L1Jet35"]  = range{49,  84,  0, fwdeta0}; //LowPU
+//mi["HLT_PFJet40_L1Jet24"]  = range{49,  84,  0, fwdeta0}; //LowPU
+//mi["HLT_PFJet40_L1Jet35"]  = range{49,  84,  0, fwdeta0}; //LowPU
 mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
 //mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
 mi["HLT_PFJet80"]  = range{114, 155, 0, fwdeta};  // Upper bound hands off to 110
-mi["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, fwdeta}; //LowPU
+//mi["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, fwdeta}; //LowPU
 mi["HLT_PFJet110"] = range{155, 196, 0, fwdeta};  // Bridges the gap between 80 and 140
 mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
 //mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
@@ -2180,15 +2241,15 @@ md2pf["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 //md2pf["HLT_ZeroBias_FirstCollisionInTrain"] = range{15,  59,  0, 5.2};
 //md2pf["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-md2pf["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
-md2pf["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
+//md2pf["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
+//md2pf["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
 md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet110"] = range{140, 236, 0, 5.2};
 md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
-md2pf["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
+//md2pf["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
 md2pf["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
 md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2pf["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
@@ -2214,15 +2275,15 @@ md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 //md2tc["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
 md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-md2tc["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
-md2tc["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
+//md2tc["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
+//md2tc["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
 md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet110"] = range{140, 236, 0, 5.2};
 md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
-md2tc["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
+//md2tc["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
 md2tc["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
 md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2tc["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
@@ -2262,12 +2323,6 @@ if (dataset == "UL2016APVMG")
 {
 	jec = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
 			"Summer19UL16APV_V7_MC_L2Relative_AK4PFchs", "");
-	/*
-        FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
-                        "Summer19UL16APV_V7_MC_L2Relative_AK4PFchs", "");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
-
 
 	jecl1rc = getFJC("Summer19UL16APV_V7_MC_L1RC_AK4PFchs", "", "");
 	jerpath = "JRDatabase/textFiles/Summer20UL16APV_JRV3_MC/Summer20UL16APV_JRV3_MC_PtResolution_AK4PFchs.txt";
@@ -2279,12 +2334,6 @@ if (dataset == "UL2016BCD" || dataset == "UL2016BCD_ZB")
 	jec = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL16APV_RunBCD_V7_DATA_L2Relative_AK4PFchs",
 			"Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL16APV_RunBCD_V7_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 	jecl1rc = getFJC("Summer19UL16APV_RunBCD_V7_DATA_L1RC_AK4PFchs", "", "");
 }
@@ -2293,13 +2342,6 @@ if (dataset == "UL2016EF" || dataset == "UL2016EF_ZB")
 	jec = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL16APV_RunEF_V7_DATA_L2Relative_AK4PFchs",
 			"Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL16APV_RunEF_V7_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
-
 
 	jecl1rc = getFJC("Summer19UL16APV_RunEF_V7_DATA_L1RC_AK4PFchs", "", "");
 }
@@ -2308,11 +2350,6 @@ if (dataset == "UL2016MG" || dataset == "UL2016Flat")
 {
 	jec = getFJC("Summer19UL16_V7_MC_L1FastJet_AK4PFchs",
 			"Summer19UL16_V7_MC_L2Relative_AK4PFchs", "");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16_V7_MC_L1FastJet_AK4PFchs",
-                        "Summer19UL16_V7_MC_L2Relative_AK4PFchs", "");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 	jecl1rc = getFJC("Summer19UL16_V7_MC_L1RC_AK4PFchs", "", "");
 	// jec = getFJC("Summer20UL16_V1_MC_L1FastJet_AK4PFchs",
@@ -2327,13 +2364,6 @@ if (dataset == "UL2016GH" || dataset == "UL2016GH_ZB")
 	jec = getFJC("Summer19UL16_RunFGH_V7_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL16_RunFGH_V7_DATA_L2Relative_AK4PFchs",
 			"Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL16_RunFGH_V7_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL16_RunFGH_V7_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
-
 
 	jecl1rc = getFJC("Summer19UL16_RunFGH_V7_DATA_L1RC_AK4PFchs", "", "");
 	// jec = getFJC("Summer20UL16_RunGH_V1_DATA_L1FastJet_AK4PFchs",
@@ -2347,11 +2377,6 @@ if (dataset == "UL2017MG")
 {
 	jec = getFJC("Summer19UL17_V6_MC_L1FastJet_AK4PFchs",
 			"Summer19UL17_V6_MC_L2Relative_AK4PFchs", "");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_V6_MC_L1FastJet_AK4PFchs",
-                        "Summer19UL17_V6_MC_L2Relative_AK4PFchs", "");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL17_V6_MC_L1RC_AK4PFchs", "", "");
@@ -2364,12 +2389,6 @@ if (dataset == "UL2017B" || dataset == "UL2017B_ZB")
 	jec = getFJC("Summer19UL17_RunB_V6_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL17_RunB_V6_DATA_L2Relative_AK4PFchs",
 			"Summer19UL17_RunB_V6_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunB_V6_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL17_RunB_V6_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL17_RunB_V6_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL17_RunB_V6_DATA_L1RC_AK4PFchs", "", "");
@@ -2379,12 +2398,6 @@ if (dataset == "UL2017C" || dataset == "UL2017C_ZB")
 	jec = getFJC("Summer19UL17_RunC_V6_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL17_RunC_V6_DATA_L2Relative_AK4PFchs",
 			"Summer19UL17_RunC_V6_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunC_V6_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL17_RunC_V6_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL17_RunC_V6_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL17_RunC_V6_DATA_L1RC_AK4PFchs", "", "");
@@ -2394,12 +2407,6 @@ if (dataset == "UL2017D" || dataset == "UL2017D_ZB")
 	jec = getFJC("Summer19UL17_RunD_V6_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL17_RunD_V6_DATA_L2Relative_AK4PFchs",
 			"Summer19UL17_RunD_V6_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunD_V6_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL17_RunD_V6_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL17_RunD_V6_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL17_RunD_V6_DATA_L1RC_AK4PFchs", "", "");
@@ -2409,12 +2416,6 @@ if (dataset == "UL2017E" || dataset == "UL2017E_ZB")
 	jec = getFJC("Summer19UL17_RunE_V6_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL17_RunE_V6_DATA_L2Relative_AK4PFchs",
 			"Summer19UL17_RunE_V6_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunE_V6_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL17_RunE_V6_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL17_RunE_V6_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999); 
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL17_RunE_V6_DATA_L1RC_AK4PFchs", "", "");
@@ -2426,13 +2427,6 @@ if (dataset == "UL2017F" || dataset == "UL2017F_ZB")
 			"Summer19UL17_RunF_V6_DATA_L2Relative_AK4PFchs",
 			"Summer19UL17_RunF_V6_DATA_L2L3Residual_AK4PFchs");
 	
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL17_RunF_V6_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL17_RunF_V6_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL17_RunF_V6_DATA_L2L3Residual_AK4PFchs");
-	jecl1rc = getFJC("Summer19UL17_RunF_V6_DATA_L1RC_AK4PFchs", "", "");
-	*/
-
 
 }
 // 2018
@@ -2440,11 +2434,6 @@ if (dataset == "UL2018MG" || TString(dataset.c_str()).Contains("UL2018MG") || TS
 {
 	jec = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
 			"Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_V5_MC_L1FastJet_AK4PFchs",
-                        "Summer19UL18_V5_MC_L2Relative_AK4PFchs", "");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL18_V5_MC_L1RC_AK4PFchs", "", "");
@@ -2460,12 +2449,6 @@ if (dataset == "UL2018A" || dataset == "UL2018A_ZB")
 	jec = getFJC("Summer19UL18_RunA_V5_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL18_RunA_V5_DATA_L2Relative_AK4PFchs",
 			"Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunA_V5_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL18_RunA_V5_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL18_RunA_V5_DATA_L1RC_AK4PFchs", "", "");
@@ -2475,12 +2458,6 @@ if (dataset == "UL2018B" || dataset == "UL2018B_ZB")
 	jec = getFJC("Summer19UL18_RunB_V5_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL18_RunB_V5_DATA_L2Relative_AK4PFchs",
 			"Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunB_V5_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL18_RunB_V5_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
-        jec->addJEC(tempJEC, 1, 999999); 	
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL18_RunB_V5_DATA_L1RC_AK4PFchs", "", "");
@@ -2490,12 +2467,6 @@ if (dataset == "UL2018C" || dataset == "UL2018C_ZB")
 	jec = getFJC("Summer19UL18_RunC_V5_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL18_RunC_V5_DATA_L2Relative_AK4PFchs",
 			"Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunC_V5_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL18_RunC_V5_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999); 
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL18_RunC_V5_DATA_L1RC_AK4PFchs", "", "");
@@ -2506,17 +2477,209 @@ if (dataset == "UL2018D" || dataset == "UL2018D_ZB" ||
 	jec = getFJC("Summer19UL18_RunD_V5_DATA_L1FastJet_AK4PFchs",
 			"Summer19UL18_RunD_V5_DATA_L2Relative_AK4PFchs",
 			"Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("Summer19UL18_RunD_V5_DATA_L1FastJet_AK4PFchs",
-                        "Summer19UL18_RunD_V5_DATA_L2Relative_AK4PFchs",
-                        "Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 
 	jecl1rc = getFJC("Summer19UL18_RunD_V5_DATA_L1RC_AK4PFchs", "", "");
 }
+// Run2 PUPPI JECs
+//
+// 2016
+if (TString(dataset.c_str()).Contains("2016")) {
 
+	if (TString(dataset.c_str()).Contains("2016B") || TString(dataset.c_str()).Contains("2016C") ||
+	    TString(dataset.c_str()).Contains("2016D")){
+        	jec = getFJC("",
+                	        //"Summer20UL16APV_RunBCD_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL16APVNanoV15_RunBCD_V1_DATA_L2Relative_AK4PFPuppi",
+				"Summer20UL16APVNanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                        	//"Summer20UL16APV_RunBCD_V1_DATA_L2L3Residual_AK4PFPuppi",
+				//"Summer20UL16APVNanoV15_RunBCD_V1_DATA_L2L3Residual_AK4PFPuppi",
+				"Summer19UL16APV_RunBCD_V7_DATA_L2L3Residual_AK4PFchs");
+	}
+	else if (TString(dataset.c_str()).Contains("2016E") || TString(dataset.c_str()).Contains("2016F_HIPM")) {
+		jec = getFJC("",
+                                //"Summer20UL16APV_RunEF_V1_DATA_L2Relative_AK4PFPuppi",
+				"Summer20UL16APVNanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL16APV_RunEF_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL16APV_RunEF_V7_DATA_L2L3Residual_AK4PFchs");
+	}
+	else {
+		jec = getFJC("",
+                                //"Summer20UL16_RunFGH_V1_DATA_L2Relative_AK4PFPuppi",
+				"Summer20UL16NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL16_RunFGH_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL16NanoV15_RunFGH_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL16_RunFGH_V7_DATA_L2L3Residual_AK4PFchs");
+	}
+}
+if (TString(dataset.c_str()).Contains("Summer20UL16APVMG") || TString(dataset.c_str()).Contains("Summer20UL16MG"))
+{
+	if (TString(dataset.c_str()).Contains("Summer20UL16APVMG")){
+        jec = getFJC("",
+                        "Summer20UL16APVNanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                        "");
+	}
+	else {
+	jec = getFJC("",
+                        "Summer20UL16NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                        "");
+	}
+
+        jerpathsf = "";
+        jersfvspt = getFJC("", "", "");
+        jerpath = "";
+        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+
+           if (reweightPU && !doPU_per_trigger)
+           {
+                 TFile f("luminosityscripts/PUWeights2025/75mb/PUWeight2025Cv1/PUWeights_HLT_PFJet500_2025Cv1.root");
+                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2025Cv1");
+                 pileupRatio->SetDirectory(0);
+                 // Print mean, min weight, max weight
+                 cout << "PU weight file: " << f.GetName() << endl;
+                 cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+                 cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+                 cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+           }
+}
+
+// 2017
+if (TString(dataset.c_str()).Contains("2017")) {
+
+        if (TString(dataset.c_str()).Contains("2017B")){
+                jec = getFJC("",
+                                //"Summer20UL17_RunB_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL17NanoV15_RunB_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL17NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+				//"Summer20UL17NanoV15_RunB_V1_DATA_L2L3Residual_AK4PFPuppi",
+                                //"Summer20UL17_RunB_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL17_RunB_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+        else if (TString(dataset.c_str()).Contains("2017C")) {
+                jec = getFJC("",
+                                //"Summer20UL17_RunC_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL17NanoV15_RunC_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL17NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL17_RunC_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL17NanoV15_RunC_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL17_RunC_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+	else if (TString(dataset.c_str()).Contains("2017D")) {
+                jec = getFJC("",
+                                //"Summer20UL17_RunD_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL17NanoV15_RunD_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL17NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL17_RunD_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL17NanoV15_RunD_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL17_RunD_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+	else if (TString(dataset.c_str()).Contains("2017E")) {
+                jec = getFJC("",
+                                //"Summer20UL17_RunE_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL17NanoV15_RunE_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL17NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL17_RunE_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL17NanoV15_RunE_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL17_RunE_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+        else {
+                jec = getFJC("",
+                                //"Summer20UL17_RunF_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL17NanoV15_RunF_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL17NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL17_RunF_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL17NanoV15_RunF_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL17_RunF_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+
+}
+if (TString(dataset.c_str()).Contains("Summer20UL17MG"))
+{
+        jec = getFJC("",
+                        "Summer20UL17NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                        "");
+
+        jerpathsf = "";
+        jersfvspt = getFJC("", "", "");
+        jerpath = "";
+        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+
+           if (reweightPU && !doPU_per_trigger)
+           {     
+                 TFile f("luminosityscripts/PUWeights2025/75mb/PUWeight2025Cv1/PUWeights_HLT_PFJet500_2025Cv1.root");
+                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2025Cv1");
+                 pileupRatio->SetDirectory(0);
+                 // Print mean, min weight, max weight
+                 cout << "PU weight file: " << f.GetName() << endl;
+                 cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+                 cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+                 cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+           }
+}
+// 2018
+if (TString(dataset.c_str()).Contains("2018")) {
+
+        if (TString(dataset.c_str()).Contains("2018A")){
+                jec = getFJC("",
+                                //"Summer20UL18_RunA_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL18NanoV15_RunA_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL18NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL18_RunA_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL18NanoV15_RunA_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL18_RunA_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+        else if (TString(dataset.c_str()).Contains("2018B")) {
+                jec = getFJC("",
+                                //"Summer20UL18_RunB_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL18NanoV15_RunB_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL18NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL18_RunB_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL18NanoV15_RunB_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL18_RunB_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+        else if (TString(dataset.c_str()).Contains("2018C")) {
+                jec = getFJC("",
+                                //"Summer20UL18_RunC_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL18NanoV15_RunC_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL18NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL18_RunC_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL18NanoV15_RunC_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL18_RunC_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+        else {
+                jec = getFJC("",
+                                //"Summer20UL18_RunD_V1_DATA_L2Relative_AK4PFPuppi",
+				//"Summer20UL18NanoV15_RunD_V1_DATA_L2Relative_AK4PFPuppi"
+				"Summer20UL18NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                                //"Summer20UL18_RunD_V1_DATA_L2L3Residual_AK4PFPuppi"
+				//"Summer20UL18NanoV15_RunD_V1_DATA_L2L3Residual_AK4PFPuppi"
+				"Summer19UL18_RunD_V5_DATA_L2L3Residual_AK4PFchs");
+        }
+}
+if (TString(dataset.c_str()).Contains("Summer20UL18MG"))
+{
+        jec = getFJC("",
+                        "Summer20UL18NanoV15_V1_MC_L2Relative_AK4PFPuppi",
+                        "");
+
+        jerpathsf = "";
+        jersfvspt = getFJC("", "", "");
+        jerpath = "";
+        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+
+           if (reweightPU && !doPU_per_trigger)
+           {     
+                 TFile f("luminosityscripts/PUWeights2025/75mb/PUWeight2025Cv1/PUWeights_HLT_PFJet500_2025Cv1.root");
+                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2025Cv1");
+                 pileupRatio->SetDirectory(0);
+                 // Print mean, min weight, max weight
+                 cout << "PU weight file: " << f.GetName() << endl;
+                 cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+                 cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+                 cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+           }
+}
+// Run3 PUPPI JECs
 // 2022
 //  Align JECs with
 //  https://indico.cern.ch/event/1335203/#7-update-on-l2res-for-2022-rer
@@ -2531,12 +2694,6 @@ if (TString(dataset.c_str()).Contains("2022C"))
 			// "Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
 	    "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Winter22Run3_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("", 
-			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI",
-		       	"Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 }
 if (TString(dataset.c_str()).Contains("2022D"))
@@ -2550,12 +2707,6 @@ if (TString(dataset.c_str()).Contains("2022D"))
 			//"Run22CD-22Sep2023_DATA_L2L3Residual_AK4PFPuppi"
 	    "Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Winter22Run3_RunD_V2_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI",
-			"Summer22-22Sep2023_Run2022CD_V3_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 }
 if (TString(dataset.c_str()).Contains("2022E"))
@@ -2570,12 +2721,6 @@ if (TString(dataset.c_str()).Contains("2022E"))
 	    "Summer22EE-22Sep2023_Run2022E_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"Summer22EEPrompt22_RunE_V2_L2Residual_AK4PFPuppi");
 	//"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
-			"Summer22EE-22Sep2023_Run2022E_V3_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 }
 // if (dataset=="2022F" || dataset=="2022F_ZB") {
@@ -2589,12 +2734,6 @@ if (TString(dataset.c_str()).Contains("2022F"))
 			// "Run22F-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer22EEPrompt22_Run2022F_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Summer22EEPrompt22_RunF_V1_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
-			"Summer22EEPrompt22_Run2022F_V3_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-        */
 
 }
 if (TString(dataset.c_str()).Contains("2022G"))
@@ -2608,12 +2747,6 @@ if (TString(dataset.c_str()).Contains("2022G"))
 			// "Run22G-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer22EEPrompt22_Run2022G_V3_DATA_L2L3Residual_AK4PFPuppi");
 	//"");//"Summer22EEPrompt22_RunG_V1_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
-			"Summer22EEPrompt22_Run2022G_V3_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-        */
 
 }
 
@@ -2628,12 +2761,6 @@ if (dataset == "Summer22" ||
 			//"Winter22Run3_V2_MC_L2Relative_AK4PFPuppi",
 			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI", // Mikel
 			"");                                      // Winter22Run3_V2_MC_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer22Run3_V1_MC_L2Relative_AK4PUPPI",
-			"");
-	jec->addJEC(tempJEC, 1, 999999);
-        */
 
 	//jerpath = "CondFormats/JetMETObjects/data/Summer22_V1_NSCP_MC_PtResolution_ak4puppi.txt";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt"; // Same as Summer22EE, is ok
@@ -2660,12 +2787,6 @@ if (dataset == "Summer22EE" ||
 			//"Summer22EEPrompt22_V1_MC_L2Relative_AK4PFPuppi",
 			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI", // Mikel
 			"");                                            // Summer22EEPrompt22_V1_MC_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer22EEVetoRun3_V1_MC_L2Relative_AK4PUPPI",
-			"");
-	jec->addJEC(tempJEC, 1, 999999);
-        */
 
 	jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt";
 	jerpathsf = "CondFormats/JetMETObjects/data/Summer22EERun3_V1_MC_SF_AK4PFPuppi.txt";
@@ -2692,13 +2813,7 @@ if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str
 		jec = getFJC("",
 				"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
 				"");
-		/*
-		FactorizedJetCorrector *tempJEC = getFJC("",
-				"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
-				"");
-		jec->addJEC(tempJEC, 1, 999999);
-                */
-
+	
 		jerpathsf = "";
 		jersfvspt = getFJC("", "", "");
 		//jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt";
@@ -2709,13 +2824,7 @@ if (TString(dataset.c_str()).Contains("Summer23MGBPix") || TString(dataset.c_str
 		jec = getFJC("", 
 				"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
 				"");
-		/*
-		FactorizedJetCorrector *tempJEC = getFJC("",
-				"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
-				"");
-		jec->addJEC(tempJEC, 1, 999999);
-                */
-
+	
 		jerpathsf = "";
 		jersfvspt = getFJC("", "", "");
 		//jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023Cv123_JRV1_MC_SF_AK4PFPuppi";
@@ -2776,12 +2885,6 @@ if (TString(dataset.c_str()).Contains("2023B") || TString(dataset.c_str()).Conta
 			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                         // Mikel
 			// "Run23C123-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
-			"Summer23Prompt23_Run2023Cv123_V2_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-        */
 
 }
 
@@ -2795,12 +2898,6 @@ if (TString(dataset.c_str()).Contains("2023Cv4"))
 			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",                       // Mikel
 			//"Run23C4-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer23Run3_V1_MC_L2Relative_AK4PUPPI",
-			"Summer23Prompt23_Run2023Cv4_V2_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 }
 
@@ -2815,12 +2912,6 @@ if (TString(dataset.c_str()).Contains("2023D"))
 			//"Run23D-Prompt_DATA_L2L3Residual_AK4PFPuppi"
 			//"Summer23Prompt23_Run2023D_V2_DATA_L2L3Residual_AK4PFPuppi"); //"Winter23Prompt23_RunC_V2_DATA_L2L3Residual_AK4PFPuppi");
 	    "Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI",
-			"Summer23BPixPrompt23_RunD_V1_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 }
 
@@ -2832,12 +2923,6 @@ if (TString(dataset.c_str()).Contains("Winter24MCFlat") )
 			//"Summer23BPixRun3_V3_MC_L2Relative_AK4PUPPI", // To compare with Summer23MGBPix
 			//"Summer23Run3_V1_MC_L2Relative_AK4PUPPI", // To compare with Summer23MG
 			"");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Winter24Run3_V1_MC_L2Relative_AK4PUPPI",
-			"");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 	jerpath = "CondFormats/JetMETObjects/data/Summer22EEVetoRun3_V1_NSCP_MC_PtResolution_ak4puppi.txt"; // Same as Summer22EE, until updated
 	//jerpathsf = "CondFormats/JetMETObjects/data/Summer23_2023D_JRV1_MC_SF_AK4PFPuppi.txt"; // To compare with Summer23MGBPix
@@ -3395,12 +3480,6 @@ if (TString(dataset.c_str()).Contains("Winter25MG") || TString(dataset.c_str()).
         jec = getFJC("",
                         "Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
                         "");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Winter25Run3_V1_MC_L2Relative_AK4PUPPI",
-			"");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
         jerpathsf = "";
 	//jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
@@ -3723,7 +3802,8 @@ if (debug)
 
 	// Setup HT bin weighting and monitoring
 	TH1D *hxsec(0), *hnevt(0), *hnwgt(0), *hLHE_HT(0), *hLHE_HTw(0), *hHT(0), *hHT_Now(0), *hHT_MCw(0), *hHT_w(0);
-	double vht2[] = {0, 25, 50, 100, 200, 300, 500, 700, 1000, 1500, 2000, 13800};
+	//double vht2[] = {0, 25, 50, 100, 200, 300, 500, 700, 1000, 1500, 2000, 13800}; //Before NANOAODv15
+	double vht2[] = {0, 50, 100, 200, 300, 500, 700, 1000, 1500, 2000, 13800};
 const int nht2 = sizeof(vht2) / sizeof(vht2[0]) - 1;
 double vht3[] = {0, 40, 70, 100, 200, 400, 600, 800, 1000, 1200, 1500, 2000,
 	13800};
@@ -3747,8 +3827,23 @@ if (isMG)
     // Reference number of events, retrieved manually with
     // TChain c("Events"); c.AddFile("<path to files>/*.root"); c.GetEntries();
     // Also re-calculated this code before event loop when needed
-    int vnevt2[nht2] = {0, 0, 11197186, 23002929, 17512439, 16405924, 14359110,
-                        13473185, 4365993, 2944561, 1836165};
+    //int vnevt2[nht2] = {0, 0, 11197186, 23002929, 17512439, 16405924, 14359110,
+      //                  13473185, 4365993, 2944561, 1836165};
+    //
+    //Run2
+    //python3 src/get_mg_weights.py: updated the Campaing and the number of bins when running the script.
+    int vnevt2_Summer20UL16APVMG[nht2] = {0, 12233035, 12239275, 18273591, 15341307, 15775001, 15808790, 4773503, 3503675, 1629000};
+    double vnwgt2_Summer20UL16APVMG[nht2] = {0.0, 12233035.0, 12239275.0, 18273591.0, 15341307.0, 15775001.0, 15808790.0, 4773503.0, 3503675.0, 1629000.0};
+
+    int vnevt2_Summer20UL16MG[nht2] = {0, 11197186, 23717410, 17569141, 16747056, 15222746, 13905714, 4365993, 3217830, 1847781};
+    double vnwgt2_Summer20UL16MG[nht2] = {0.0, 11197186.0, 23717410.0, 17569141.0, 16747056.0, 15222746.0, 13905714.0, 4365993.0, 3217830.0, 1847781.0};
+
+    int vnevt2_Summer20UL17MG[nht2] = {0, 26243010, 54760426, 42714435, 42560630, 36194860, 34051754, 10256089, 7701876, 4112573};
+    double vnwgt2_Summer20UL17MG[nht2] = {0.0, 26243010.0, 54760426.0, 42714435.0, 42560630.0, 36194860.0, 34051754.0, 10256089.0, 7701876.0, 4112573.0};
+
+    int vnevt2_Summer20UL18MG[nht2] = {0, 38599389, 84461486, 57336623, 61705174, 49184771, 48506751, 14527915, 10871473, 5374711};
+    double vnwgt2_Summer20UL18MG[nht2] = {0.0, 38599389.0, 84461486.0, 57336623.0, 61705174.0, 49184771.0, 48506751.0, 14527915.0, 10871473.0, 5374711.0};
+    //Run3
     // int vnevt3[nht3] = {0, 9929, 26573, 16411, 10495, 8260, 7929, 10082, 14390, 6548, 6250}; // Summer22MG, local files
     //int vnevt3[nht3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Summer22MG, local files
     //int vnwgt3[nht3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Summer22MG, local files
@@ -3767,6 +3862,11 @@ if (isMG)
     double vnwgt3_Winter26MG[nht3] = {0.0, 1.13170570907319e+16, 2572952522725280.0, 1493178473700920.0, 181631535021091.0, 10525172327100.0,
 	                  1707660210118.12, 402189245330.36005, 109592764959.61401, 49997724948.47508, 14896742425.454603, 3349000050.623581};
 
+    //Run2
+    int* vnevt2 = nullptr;
+    double* vnwgt2 = nullptr;
+
+    //Run3
     int* vnevt3 = nullptr;
     double* vnwgt3 = nullptr;
     TString dsName(dataset);
@@ -3783,6 +3883,22 @@ if (isMG)
         vnevt3 = vnevt3_Winter26MG;
         vnwgt3 = vnwgt3_Winter26MG;
     }
+    else if (dsName.Contains("Summer20UL16APVMG")) {
+        vnevt2 = vnevt2_Summer20UL16APVMG;
+        vnwgt2 = vnwgt2_Summer20UL16APVMG;
+    }
+    else if (dsName.Contains("Summer20UL16MG")) {
+	vnevt2 = vnevt2_Summer20UL16MG;
+        vnwgt2 = vnwgt2_Summer20UL16MG;
+    }
+    else if (dsName.Contains("Summer20UL17MG")) {
+	vnevt2 = vnevt2_Summer20UL17MG;
+        vnwgt2 = vnwgt2_Summer20UL17MG;
+    }
+    else if (dsName.Contains("Summer20UL18MG")) {
+	vnevt2 = vnevt2_Summer20UL18MG;
+        vnwgt2 = vnwgt2_Summer20UL18MG;
+    }
     else {
         cout << "\n[ERROR] Unknown MadGraph dataset: " << dataset << endl;
         cout << "Please add its global weights to the arrays in DijetHistosFill.C!" << endl;
@@ -3793,7 +3909,8 @@ if (isMG)
     //const int *vnwgt = (isRun3 ? &vnwgt3[0] : &vnevt2[0]);
     for (int i = 0; i != nht; ++i)
     {
-      double current_vnwgt = (isRun3 ? vnwgt3[i] : (double)vnevt2[i]);
+      //double current_vnwgt = (isRun3 ? vnwgt3[i] : (double)vnevt2[i]);
+      double current_vnwgt = (isRun3 ? vnwgt3[i] : vnwgt2[i]);
       //double current_vnwgt = (isRun3 ? active_vnwgt3[i] : (double)vnevt2[i]);
       hnevt->SetBinContent(i + 1, vnevt[i]);
       hnwgt->SetBinContent(i + 1, current_vnwgt);
@@ -3807,8 +3924,9 @@ if (isMG)
          << flush;
 
     // xsec from jetphys/settings.h_template
-    double vxsec2[nht2] = {0, 0, 246300000. * 23700000. / 28060000., 23700000,
-                           1547000, 322600, 29980, 6334, 1088, 99.11, 20.23};
+    //double vxsec2[nht2] = {0, 0, 246300000. * 23700000. / 28060000., 23700000,
+      //                     1547000, 322600, 29980, 6334, 1088, 99.11, 20.23};
+    double vxsec2[nht2] = {0, 1.862e+08, 2.367e+07, 1.549e+06, 3.244e+05, 32100, 6.432e+03, 1.123e+03, 1.082e+02, 2.210e+01};
     // Run3 xsec from Mikel Mendizabal, MatterMost 16 Oct 2023
     // SUMMER22
     //double vxsec3[nht3] =
@@ -6251,11 +6369,11 @@ if (isMG)
   // JECDatabase/jet_veto_maps/Summer19UL17_V2/hotjets-UL17_v2.root
   // JECDatabase/jet_veto_maps/Summer19UL18_V1/hotjets-UL18.root
   TFile *fjv(0);
-  if (isRun2 == 1 || isRun2 == 2) // TString(ds.c_str()).Contains("2016"))
+  if (TString(dataset.c_str()).Contains("2016") || TString(dataset.c_str()).Contains("Summer20UL16")) // TString(ds.c_str()).Contains("2016"))
     fjv = new TFile("rootfiles/hotjets-UL16.root", "READ");
-  if (isRun2 == 3) // TString(ds.c_str()).Contains("2017"))
+  if (TString(dataset.c_str()).Contains("2017") || TString(dataset.c_str()).Contains("Summer20UL17")) // TString(ds.c_str()).Contains("2017"))
     fjv = new TFile("rootfiles/hotjets-UL17_v2.root", "READ");
-  if (isRun2 == 4 || TString(dataset.c_str()).Contains("2018"))
+  if (TString(dataset.c_str()).Contains("2018") || TString(dataset.c_str()).Contains("Summer20UL18"))
     fjv = new TFile("rootfiles/hotjets-UL18.root", "READ");
   if (TString(dataset.c_str()).Contains("2022C") || TString(dataset.c_str()).Contains("2022D") ||
       dataset == "2022C" || dataset == "2022D" || dataset == "2022C_ZB" ||
@@ -6337,7 +6455,7 @@ if (isMG)
   TH2D *h2jv(0);
   // To add BPix veto for prompt 2024
   TH2D *h2jvBPix(0);
-  if (isRun2 == 1 || isRun2 == 2)
+  if (TString(dataset.c_str()).Contains("2016") || TString(dataset.c_str()).Contains("Summer20UL16"))
   { // TString(ds.c_str()).Contains("2016")) {
     h2jv = (TH2D *)fjv->Get("h2hot_ul16_plus_hbm2_hbp12_qie11");
     assert(h2jv);
@@ -6345,9 +6463,9 @@ if (isMG)
     assert(h2mc);
     h2jv->Add(h2mc);
   }
-  if (isRun2 == 3) // TString(ds.c_str()).Contains("2017"))
+  if (TString(dataset.c_str()).Contains("2017") || TString(dataset.c_str()).Contains("Summer20UL17"))
     h2jv = (TH2D *)fjv->Get("h2hot_ul17_plus_hep17_plus_hbpw89");
-  if (isRun2 == 4 || TString(dataset.c_str()).Contains("2018"))
+  if (TString(dataset.c_str()).Contains("2018") || TString(dataset.c_str()).Contains("Summer20UL18"))
     h2jv = (TH2D *)fjv->Get("h2hot_ul18_plus_hem1516_and_hbp2m1");
   if (TString(dataset.c_str()).Contains("2022C") || TString(dataset.c_str()).Contains("2022D") ||
       dataset == "2022C" || dataset == "2022D" || dataset == "2022C_ZB" ||
@@ -6689,7 +6807,8 @@ if (isMG)
       }
 
       double xsec = hxsec->GetBinContent(iht);
-      double nevt = (isRun3 ? hnwgt->GetBinContent(iht) : hnevt->GetBinContent(iht));
+      //double nevt = (isRun3 ? hnwgt->GetBinContent(iht) : hnevt->GetBinContent(iht));
+      double nevt = hnwgt->GetBinContent(iht);
       double wht = (nevt ? xsec / nevt : 1);
       w *= wht;
       w_ptlead *= wht;
@@ -6720,9 +6839,13 @@ if (isMG)
     bool doPtHatFilter = true; // Set to false for MC Nano V09, isMG works fine 
     if (doPtHatFilter && isMC )
     {
+      /* //Before NANOAODv15
       if (isMG && !isRun3 && 2. * Pileup_pthatmax > LHE_HT)
         continue;
       if (isMG && isRun3 && 2. * Jet_pt[0] / LHE_HT > 2.5 / pow(LHE_HT / 40., 2) + 1.5)
+        continue; // Run3 MG patch for missing Pileup_pthatmax
+      */
+      if (isMG && 2. * Jet_pt[0] / LHE_HT > 2.5 / pow(LHE_HT / 40., 2) + 1.5)
         continue; // Run3 MG patch for missing Pileup_pthatmax
       if (!isMG && Pileup_pthatmax > Generator_binvar &&
 	  !(TString(dataset.c_str()).Contains("Summer22MC_hadCalibOff")) && 
@@ -6824,6 +6947,7 @@ if (isMG)
         jec->setJetPt(rawJetPt);
         jec->setJetEta(Jet_eta[i]);
         jec->setJetPhi(Jet_phi[i]);
+	/*
         if (isRun2)
         {
           jec->setJetA(Jet_area[i]);
@@ -6833,6 +6957,8 @@ if (isMG)
           jecl1rc->setJetA(Jet_area[i]);
           jecl1rc->setRho(Rho_fixedGridRhoFastjetAll);
         }
+	*/
+
         // double corr = jec->getCorrection();
         vector<float> v = jec->getSubCorrections();
         double corr = v.back();
@@ -6843,7 +6969,8 @@ if (isMG)
         Jet_mass[i] = corr * rawJetMass;
         Jet_rawFactor[i] = (1.0 - 1.0 / corr);
         // pt*(1-l1rcFactor)=ptl1rc => l1rcFactor = 1 - ptl1rc/pt
-        Jet_l1rcFactor[i] = (isRun2 ? (1.0 - jecl1rc->getCorrection() / corr) : Jet_rawFactor[i]);
+        //Jet_l1rcFactor[i] = (isRun2 ? (1.0 - jecl1rc->getCorrection() / corr) : Jet_rawFactor[i]); // No L1 for Run2 NanoAODv15.
+	Jet_l1rcFactor[i] = Jet_rawFactor[i];
       }
       else
       {
@@ -7380,6 +7507,7 @@ if (isMG)
     // int njetn = 0;
 
     // Reset MET vectors
+    /*
     if (isRun2)
     {
       p4rawmet.SetPtEtaPhiM(ChsMET_pt, 0, ChsMET_phi, 0);
@@ -7395,6 +7523,12 @@ if (isMG)
       // p4t1met.SetPtEtaPhiM(PuppiMET_pt,0,PuppiMET_phi,0);
       // p4m0.SetPtEtaPhiM(PuppiMET_pt,0,PuppiMET_phi,0);
     }
+    */
+
+    p4rawmet.SetPtEtaPhiM(RawPuppiMET_pt, 0, RawPuppiMET_phi, 0);
+    p4t1met.SetPtEtaPhiM(RawPuppiMET_pt, 0, RawPuppiMET_phi, 0);
+    p4m0.SetPtEtaPhiM(RawPuppiMET_pt, 0, RawPuppiMET_phi, 0);
+
     p4mht.SetPtEtaPhiM(0, 0, 0, 0);
 
     // Reset dijet vectors

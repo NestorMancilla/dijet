@@ -106,6 +106,14 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     'Summer24MG_2026_9', 'Summer24MG_2026_10', 'Summer24MG_2026_11',
     'Winter26MG_1', 'Winter26MG_2', 'Winter26MG_3', 'Winter26MG_4', 'Winter26MG_5', 'Winter26MG_6',
     'Winter26MG_7', 'Winter26MG_8', 'Winter26MG_9', 'Winter26MG_10', 'Winter26MG_11',
+    'Summer20UL16APVMG_1', 'Summer20UL16APVMG_2', 'Summer20UL16APVMG_3', 'Summer20UL16APVMG_4', 'Summer20UL16APVMG_5',
+    'Summer20UL16APVMG_6', 'Summer20UL16APVMG_7', 'Summer20UL16APVMG_8', 'Summer20UL16APVMG_9',
+    'Summer20UL16MG_1', 'Summer20UL16MG_2', 'Summer20UL16MG_3', 'Summer20UL16MG_4', 'Summer20UL16MG_5',
+    'Summer20UL16MG_6', 'Summer20UL16MG_7', 'Summer20UL16MG_8', 'Summer20UL16MG_9',
+    'Summer20UL17MG_1', 'Summer20UL17MG_2', 'Summer20UL17MG_3', 'Summer20UL17MG_4', 'Summer20UL17MG_5',
+    'Summer20UL17MG_6', 'Summer20UL17MG_7', 'Summer20UL17MG_8', 'Summer20UL17MG_9',
+    'Summer20UL18MG_1', 'Summer20UL18MG_2', 'Summer20UL18MG_3', 'Summer20UL18MG_4', 'Summer20UL18MG_5',
+    'Summer20UL18MG_6', 'Summer20UL18MG_7', 'Summer20UL18MG_8', 'Summer20UL18MG_9',
     '2025Fv1_Skim_11', '2025Fv1_Skim_12', '2025Fv1_Skim_13', '2025Fv1_Skim_21', '2025Fv1_Skim_22', '2025Fv1_Skim_23',
     '2025Fv2_Skim_1', '2025Fv2_Skim_2',
     '2025Fv1', '2025Fv1_ZB', '2025Fv2', '2025Fv2_ZB'
@@ -134,7 +142,12 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     '2026D_0', '2026D_1', '2026D_ZB',
     '2026B_JME_0', '2026B_JME_1', '2026B_JME_ZB', 
     '2026C_JME_0', '2026C_JME_1', '2026C_JME_2', '2026C_JME_3', '2026C_JME_4', '2026C_JME_5', '2026C_JME_ZB',
-    '2026D_JME_0', '2026D_JME_1', '2026D_JME_ZB'
+    '2026D_JME_0', '2026D_JME_1', '2026D_JME_ZB',
+    '2016B_HIPM', '2016B_HIPM_ZB', '2016C_HIPM', '2016C_HIPM_ZB', '2016D_HIPM', '2016D_HIPM_ZB',
+    '2016E_HIPM', '2016E_HIPM_ZB', '2016F_HIPM', '2016F_HIPM_ZB',
+    '2016F', '2016F_ZB', '2016G', '2016G_ZB', '2016H', '2016H_ZB',
+    '2017B', '2017B_ZB', '2017C', '2017C_ZB', '2017D', '2017D_ZB', '2017E', '2017E_ZB', '2017F', '2017F_ZB',
+    '2018A', '2018A_ZB', '2018B', '2018B_ZB', '2018C', '2018C_ZB', '2018D', '2018D_ZB'
 ]
 
 # Run 3 is all samples with year 2023 and 2022 from the full IOV_list
@@ -143,7 +156,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v171_v2'
+version = 'v172'
 #version = 'v120'
 
 IOV_input = []

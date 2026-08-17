@@ -3601,13 +3601,22 @@ DijetHistosFill::DijetHistosFill(TTree *tree, int itype, string datasetname, str
   // Use data set to decide on active branches
   //string& ds = datasetname;
   //isrun3 = (ds=="RunCearly");
-  isRun2 = (TString(datasetname.c_str()).Contains("UL2018") ? 4 :
+  isRun2 = (TString(datasetname.c_str()).Contains("2016") ||
+	    TString(datasetname.c_str()).Contains("2017") ||
+	    TString(datasetname.c_str()).Contains("2018") ||
+	    TString(datasetname.c_str()).Contains("Summer20UL16") ||
+	    TString(datasetname.c_str()).Contains("Summer20UL17") ||
+	    TString(datasetname.c_str()).Contains("Summer20UL18"));
+
+	  /*
+	  (TString(datasetname.c_str()).Contains("UL2018") ? 4 :
 	    (TString(datasetname.c_str()).Contains("UL2017") ? 3 :
 	     (TString(datasetname.c_str()).Contains("UL2016APV") ? 1 :
 	      (TString(datasetname.c_str()).Contains("UL2016BCD") ? 1 :
 	       (TString(datasetname.c_str()).Contains("UL2016EF") ? 1 :
 		(TString(datasetname.c_str()).Contains("UL2016") ? 2 :
 		 0))))));
+	  */
   isRun3 = (TString(datasetname.c_str()).Contains("2022") ||
 	    TString(datasetname.c_str()).Contains("2023") ||
 	    TString(datasetname.c_str()).Contains("2024") ||
@@ -4133,6 +4142,7 @@ void DijetHistosFill::Init(TTree *tree)
    // (once per file to be processed).
      // Find the HT from file name
 
+   if (isRun3) {
    HT_bins["40to70"] = std::make_pair(2, std::make_pair(40, 70));
    HT_bins["70to100"] = std::make_pair(3, std::make_pair(70, 100)); 
    HT_bins["100to200"] = std::make_pair(4, std::make_pair(100, 200));
@@ -4144,6 +4154,19 @@ void DijetHistosFill::Init(TTree *tree)
    HT_bins["1200to1500"] = std::make_pair(10, std::make_pair(1200, 1500));
    HT_bins["1500to2000"] = std::make_pair(11, std::make_pair(1500, 2000));
    HT_bins["HT-2000"] = std::make_pair(12, std::make_pair(2000, 9999));
+   }
+   else {
+       // RUN 2 BIN MAPPING
+       HT_bins["50to100"]    = std::make_pair(2, std::make_pair(50, 100));
+       HT_bins["100to200"]   = std::make_pair(3, std::make_pair(100, 200));
+       HT_bins["200to300"]   = std::make_pair(4, std::make_pair(200, 300));
+       HT_bins["300to500"]   = std::make_pair(5, std::make_pair(300, 500));
+       HT_bins["500to700"]   = std::make_pair(6, std::make_pair(500, 700));
+       HT_bins["700to1000"]  = std::make_pair(7, std::make_pair(700, 1000));
+       HT_bins["1000to1500"] = std::make_pair(8, std::make_pair(1000, 1500));
+       HT_bins["1500to2000"] = std::make_pair(9, std::make_pair(1500, 2000));
+       HT_bins["2000toInf"]= std::make_pair(10, std::make_pair(2000, 9999));
+   }
 
    // Set branch addresses and branch pointers
    if (!tree) return;
@@ -4634,7 +4657,8 @@ void DijetHistosFill::Init(TTree *tree)
    if (isMC) fChain->SetBranchAddress("Pileup_nTrueInt", &Pileup_nTrueInt, &b_Pileup_nTrueInt);
    if (isMC) fChain->SetBranchAddress("Pileup_pudensity", &Pileup_pudensity, &b_Pileup_pudensity);
    if (isMC) fChain->SetBranchAddress("Pileup_gpudensity", &Pileup_gpudensity, &b_Pileup_gpudensity);
-   if (isMC && !(isMG && isRun3)) fChain->SetBranchAddress("Pileup_pthatmax", &Pileup_pthatmax, &b_Pileup_pthatmax);
+   //if (isMC && !(isMG && isRun3)) fChain->SetBranchAddress("Pileup_pthatmax", &Pileup_pthatmax, &b_Pileup_pthatmax);
+   if (isMC && !isMG) fChain->SetBranchAddress("Pileup_pthatmax", &Pileup_pthatmax, &b_Pileup_pthatmax);
    if (isMC) fChain->SetBranchAddress("Pileup_nPU", &Pileup_nPU, &b_Pileup_nPU);
    if (isMC) fChain->SetBranchAddress("Pileup_sumEOOT", &Pileup_sumEOOT, &b_Pileup_sumEOOT);
    if (isMC) fChain->SetBranchAddress("Pileup_sumLOOT", &Pileup_sumLOOT, &b_Pileup_sumLOOT);
@@ -4659,6 +4683,7 @@ void DijetHistosFill::Init(TTree *tree)
    fChain->SetBranchAddress("RawPuppiMET_phi", &RawPuppiMET_phi, &b_RawPuppiMET_phi);
    fChain->SetBranchAddress("RawPuppiMET_pt", &RawPuppiMET_pt, &b_RawPuppiMET_pt);
    fChain->SetBranchAddress("RawPuppiMET_sumEt", &RawPuppiMET_sumEt, &b_RawPuppiMET_sumEt);
+   /*
    if (isRun2) {
      fChain->SetBranchAddress("fixedGridRhoFastjetAll", &Rho_fixedGridRhoFastjetAll, &b_Rho_fixedGridRhoFastjetAll);
    }
@@ -4670,6 +4695,14 @@ void DijetHistosFill::Init(TTree *tree)
      fChain->SetBranchAddress("Rho_fixedGridRhoFastjetCentralChargedPileUp", &Rho_fixedGridRhoFastjetCentralChargedPileUp, &b_Rho_fixedGridRhoFastjetCentralChargedPileUp);
      fChain->SetBranchAddress("Rho_fixedGridRhoFastjetCentralNeutral", &Rho_fixedGridRhoFastjetCentralNeutral, &b_Rho_fixedGridRhoFastjetCentralNeutral);
    }
+   */
+   fChain->SetBranchAddress("Rho_fixedGridRhoAll", &Rho_fixedGridRhoAll, &b_Rho_fixedGridRhoAll);
+   fChain->SetBranchAddress("Rho_fixedGridRhoFastjetAll", &Rho_fixedGridRhoFastjetAll, &b_Rho_fixedGridRhoFastjetAll);
+   fChain->SetBranchAddress("Rho_fixedGridRhoFastjetCentral", &Rho_fixedGridRhoFastjetCentral, &b_Rho_fixedGridRhoFastjetCentral);
+   fChain->SetBranchAddress("Rho_fixedGridRhoFastjetCentralCalo", &Rho_fixedGridRhoFastjetCentralCalo, &b_Rho_fixedGridRhoFastjetCentralCalo);
+   fChain->SetBranchAddress("Rho_fixedGridRhoFastjetCentralChargedPileUp", &Rho_fixedGridRhoFastjetCentralChargedPileUp, &b_Rho_fixedGridRhoFastjetCentralChargedPileUp);
+   fChain->SetBranchAddress("Rho_fixedGridRhoFastjetCentralNeutral", &Rho_fixedGridRhoFastjetCentralNeutral, &b_Rho_fixedGridRhoFastjetCentralNeutral);
+
    if (isMC) fChain->SetBranchAddress("nGenDressedLepton", &nGenDressedLepton, &b_nGenDressedLepton);
    if (isMC) fChain->SetBranchAddress("GenDressedLepton_eta", GenDressedLepton_eta, &b_GenDressedLepton_eta);
    if (isMC) fChain->SetBranchAddress("GenDressedLepton_mass", GenDressedLepton_mass, &b_GenDressedLepton_mass);
@@ -5415,6 +5448,8 @@ void DijetHistosFill::Init(TTree *tree)
      fChain->SetBranchAddress("HLT_PFJet400", &HLT_PFJet400, &b_HLT_PFJet400);
      fChain->SetBranchAddress("HLT_PFJet450", &HLT_PFJet450, &b_HLT_PFJet450);
      fChain->SetBranchAddress("HLT_PFJet500", &HLT_PFJet500, &b_HLT_PFJet500);
+
+     /*
      if (isRun2>2) {// && dataset!="UL2017B") {
        fChain->SetBranchAddress("HLT_PFJet550", &HLT_PFJet550, &b_HLT_PFJet550);
        //fChain->SetBranchAddress("HLT_PFJetFwd15", &HLT_PFJetFwd15, &b_HLT_PFJetFwd15);
@@ -5442,6 +5477,7 @@ void DijetHistosFill::Init(TTree *tree)
        //fChain->SetBranchAddress("HLT_AK8PFJetFwd450", &HLT_AK8PFJetFwd450, &b_HLT_AK8PFJetFwd450);
        //fChain->SetBranchAddress("HLT_AK8PFJetFwd500", &HLT_AK8PFJetFwd500, &b_HLT_AK8PFJetFwd500);
      }
+     */
    } // !isZB
    /*
    fChain->SetBranchAddress("HLT_PFHT180", &HLT_PFHT180, &b_HLT_PFHT180);

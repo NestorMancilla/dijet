@@ -73,7 +73,23 @@ Bugs:
 (To-do: QG SFs and response)
 
 
-// v172. Process Run2 datasets.
+// v172. Process Run2 datasets. Needs to update branches, xsec, and not sure what else :D.
+//	 From the .h file:
+//	   isRun3, the condition was removed for Pileup_pthatmax so also isRun2 contained.
+//	   isRun2, the condition for fixedGridRho removed, now it uses Run3 names.
+//		   also it was removed for isRun2>2 to include Fwd triggers, those are already included for Run3.
+//	 From src/DijetHistosFill.C:
+//	   Same, Rho was added for Run2.
+//	   The trigger HLT_PFJet550 was removed only for Run2 > 2.
+//	   The area for Run2 was also removed. It is not in Run3, so no reason to keep it for both.
+//	   We are using PUPPI jets for Run2 Nanov15, so we dont need L1 JECs, for this reason we keep only the
+//	   method for Run3 JECs and remove the old one for Run2 (redoJEC).
+//	   RawMET from RawPuppiMET and not ChsMET, the one for Run2.
+//	   pTHatmax for both Run3 and now Run2.
+//	 From the JetIdHelper.cc, now isNanoAODv15 is always true.	  
+//
+//	Missing:
+//		Golden JSON files (and their PU). 
 // v171. Adding p2r based on the flavour. Also p2m* extended to include flavour and no abs eta restriction.
 //	 v171_v2 uses PS weights.
 // v170. New JECs V11M 2024, V5M 2025, V2M 2026. Also fix histograms for Incjet.
