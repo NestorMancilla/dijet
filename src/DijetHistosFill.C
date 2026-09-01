@@ -89,6 +89,7 @@ bool doFSRup_JMENANO = false;
 bool doFSRup0p5_JMENANO = false;
 
 bool doQvsG_Eff = true;
+bool doQvsG_tagger = true;
 bool doGluonJets_SF = true;
 bool doJetId_variables = true; // To compare Jet_jetId branch 
 bool debug = false;      // general debug
@@ -128,6 +129,36 @@ double DELTAR(double phi1, double phi2, double eta1, double eta2)
 {
   return sqrt(pow(DELTAPHI(phi1, phi2), 2) + pow(eta1 - eta2, 2));
 }
+
+//To get matrix flavour.
+int getFlavorID(float b_score, float cvl_score, float qvg_score) {
+    // 1. Check B-Jet -> returns 5
+    if (b_score > 0.4648) return 5; 
+
+    // 2. Check C-Jet (Fails B, PASSES CvL) -> returns 4
+    if (b_score <= 0.4648 && cvl_score > 0.650) return 4; 
+
+    // 3. Check Light Quark (Fails B and C, QvG is HIGH >= 0.45) -> returns 1
+    if (b_score <= 0.4648 && cvl_score <= 0.650 && qvg_score >= 0.45 && qvg_score <= 1.0) return 1; 
+
+    // 4. Check Gluon (Fails B and C, QvG is LOW < 0.45) -> returns 6
+    if (b_score <= 0.4648 && cvl_score <= 0.650 && qvg_score >= 0.0 && qvg_score < 0.45) return 6; 
+
+    // 5. Untagged / Invalid -> returns 0
+    return 0; 
+}
+
+int getTrueFlavorID(int pdgId) {
+    int flav = abs(pdgId);
+    if (flav == 1) return 1;              // u
+    if (flav == 2) return 2;              // d
+    if (flav == 3) return 3;              // s
+    if (flav == 4) return 4;              // c
+    if (flav == 5) return 5;              // b
+    if (flav == 21) return 6;             // g
+    return 0;                             // unmatched/other
+}
+
 
 //Run2
 constexpr const char lumibyls2016[] = "luminosityscripts/csvfiles/2016/lumi_271036_284044_Golden_HLTPFJet500.csv";
@@ -185,8 +216,8 @@ constexpr const char lumibyls2025BCD[] = "luminosityscripts/csvfiles/2025/lumi_3
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402244_DCS_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_402655_DCS_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401623_402655_DCS_HLTZeroBias.csv";
-//constexpr const char lumibyls2026B[] = "luminosityscripts/csvfiles/2026/lumi_401624_402537_golden_HLTPFJet500.csv";
-constexpr const char lumibyls2026B[] = "luminosityscripts/csvfiles/2026/lumi_401624_402537_golden_HLTZeroBias.csv";
+constexpr const char lumibyls2026B[] = "luminosityscripts/csvfiles/2026/lumi_401624_402537_golden_HLTPFJet500.csv";
+constexpr const char lumibyls2026B_ZB[] = "luminosityscripts/csvfiles/2026/lumi_401624_402537_golden_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402825_MLM_HLTPFJet500.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_402825_MLM_HLTZeroBias.csv";
 //constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_401630_403008_hybrid_HLTPFJet500.csv";
@@ -203,8 +234,8 @@ constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_low
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTPFJet500.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401623_403937_MLEnhancedGolden_HLTZeroBias.csv";
-//constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTPFJet500.csv";
-constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTZeroBias.csv";
+constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTPFJet500.csv";
+constexpr const char lumibyls2026D_ZB[] = "luminosityscripts/csvfiles/2026/lumi_401624_403937_golden_HLTZeroBias.csv";
 
 constexpr std::array<std::pair<const char*, const char*>, 367> lumifiles = {{
     {"2016B_HIPM", lumibyls2016},
@@ -504,7 +535,7 @@ constexpr std::array<std::pair<const char*, const char*>, 367> lumifiles = {{
     {"2026A_ZB", lumibyls2026BCD},
     {"2026B_0", lumibyls2026B},
     {"2026B_1", lumibyls2026B},
-    {"2026B_ZB", lumibyls2026B},
+    {"2026B_ZB", lumibyls2026B_ZB},
     {"2026Bnib1_0", lumibyls2026BCD},
     {"2026Bnib1_1", lumibyls2026BCD},
     {"2026Bnib2_0", lumibyls2026BCD},
@@ -560,7 +591,7 @@ constexpr std::array<std::pair<const char*, const char*>, 367> lumifiles = {{
     {"2026C_ZB1", lumibyls2026BCD},
     {"2026D_0", lumibyls2026D},
     {"2026D_1", lumibyls2026D},
-    {"2026D_ZB", lumibyls2026D},
+    {"2026D_ZB", lumibyls2026D_ZB},
     {"2026B_JME_0", lumibyls2026B},
     {"2026B_JME_1", lumibyls2026B},
     {"2026B_JME_ZB", lumibyls2026B},
@@ -573,7 +604,7 @@ constexpr std::array<std::pair<const char*, const char*>, 367> lumifiles = {{
     {"2026C_JME_ZB", lumibyls2026C},
     {"2026D_JME_0", lumibyls2026D},
     {"2026D_JME_1", lumibyls2026D},
-    {"2026D_JME_ZB", lumibyls2026D},
+    {"2026D_JME_ZB", lumibyls2026D_ZB},
 }}; // NOT CORRECT FOR 2023BCv123!!!! TEMP. FIX WHILE LUMI IS STILL NOT IN USE
 
 constexpr const char *getLumifile(const char* dataset, std::size_t index = 0)
@@ -880,6 +911,34 @@ public:
 
   // ptprobe eff
   TH2D *h2_QvGProbeEff_Denom_Quark, *h2_QvGProbeEff_Denom_Gluon, *h2_QvGProbeEff_Num_Quark, *h2_QvGProbeEff_Num_Gluon;
+
+  //To check how the response changes depending on the tagger fraction
+  /*
+  TProfile2D *p2m0ab_tagger_qg, *p2m2ab_tagger_qg; //pt, avp
+  TProfile2D *p2m0ab_tagger_gq, *p2m2ab_tagger_gq; //pt, avp
+  TProfile2D *p2m0ad_tagger_qg, *p2m2ad_tagger_qg; //pt, ave
+  TProfile2D *p2m0ad_tagger_gq, *p2m2ad_tagger_gq; //pt, ave
+  */
+
+  // Flavor Matrix Profiles (Y-axis = Combined Tag/Probe ID)
+  TProfile2D *p2m0ab_flavormatrix, *p2m2ab_flavormatrix, *p2mnab_flavormatrix, *p2muab_flavormatrix; // Bisector axis
+  TProfile2D *p2m0ad_flavormatrix, *p2m2ad_flavormatrix, *p2mnad_flavormatrix, *p2muad_flavormatrix; // Average axis
+  TProfile2D *p2m0tc_flavormatrix, *p2m2tc_flavormatrix, *p2mntc_flavormatrix, *p2mutc_flavormatrix; // Tag axis
+  TProfile2D *p2m0pf_flavormatrix, *p2m2pf_flavormatrix, *p2mnpf_flavormatrix, *p2mupf_flavormatrix; // Probe axis
+
+  // 3D True Flavor Matrices (X = pT, Y = Reco ID, Z = True ID)
+  TProfile3D *p3m0ab_true, *p3m2ab_true, *p3mnab_true, *p3muab_true;
+  TProfile3D *p3m0ad_true, *p3m2ad_true, *p3mnad_true, *p3muad_true;
+  TProfile3D *p3m0tc_true, *p3m2tc_true, *p3mntc_true, *p3mutc_true;
+  TProfile3D *p3m0pf_true, *p3m2pf_true, *p3mnpf_true, *p3mupf_true;
+
+  // 2D Tagger Space Contours (X = CvL, Y = B_score)
+  TH2D *h2_TaggerSpace_u;
+  TH2D *h2_TaggerSpace_d;
+  TH2D *h2_TaggerSpace_s;
+  TH2D *h2_TaggerSpace_g;
+  TH2D *h2_TaggerSpace_c;
+  TH2D *h2_TaggerSpace_b;
 
 };
 
@@ -4025,6 +4084,10 @@ if (isMG)
   const double vetadU[] = {0., 0.5, 1.0, 1.5, 2.0, 2.5}; // removing 3.0 due to low pt issues
   const int netadU = sizeof(vetadU) / sizeof(vetadU[0]) - 1;
 
+  // Tagger Score
+  const double vscore[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+  const int nscore = 10;
+
   // p_reco/p_gen binning
   int reco_nedges = 101;
   double minValue = 0.0;
@@ -5753,6 +5816,77 @@ if (isMG)
                                                    "N_{events}",
                                   nx, vx, npt, vpt);
       }
+      if (doQvsG_tagger){
+	dout->mkdir("GluonJets/FlavorMatrix");
+        dout->cd("GluonJets/FlavorMatrix");
+        
+	// Bisector (ab)
+        h->p2m0ab_flavormatrix = new TProfile2D("p2m0ab_flavormatrix", ";p_{T,avp} (GeV);Tag/Probe Combined ID;MPF0", npt, vpt, 67, 0.0, 67);
+        h->p2m2ab_flavormatrix = new TProfile2D("p2m2ab_flavormatrix", ";p_{T,avp} (GeV);Tag/Probe Combined ID;MPF2", npt, vpt, 67, 0.0, 67);
+        h->p2mnab_flavormatrix = new TProfile2D("p2mnab_flavormatrix", ";p_{T,avp} (GeV);Tag/Probe Combined ID;MPFn", npt, vpt, 67, 0.0, 67);
+        h->p2muab_flavormatrix = new TProfile2D("p2muab_flavormatrix", ";p_{T,avp} (GeV);Tag/Probe Combined ID;MPFu", npt, vpt, 67, 0.0, 67);
+
+        // Dijet average (ad)
+        h->p2m0ad_flavormatrix = new TProfile2D("p2m0ad_flavormatrix", ";p_{T,ave} (GeV);Tag/Probe Combined ID;MPF0", npt, vpt, 67, 0.0, 67);
+        h->p2m2ad_flavormatrix = new TProfile2D("p2m2ad_flavormatrix", ";p_{T,ave} (GeV);Tag/Probe Combined ID;MPF2", npt, vpt, 67, 0.0, 67);
+        h->p2mnad_flavormatrix = new TProfile2D("p2mnad_flavormatrix", ";p_{T,ave} (GeV);Tag/Probe Combined ID;MPFn", npt, vpt, 67, 0.0, 67);
+        h->p2muad_flavormatrix = new TProfile2D("p2muad_flavormatrix", ";p_{T,ave} (GeV);Tag/Probe Combined ID;MPFu", npt, vpt, 67, 0.0, 67);
+
+        // Tag jet (tc)
+        h->p2m0tc_flavormatrix = new TProfile2D("p2m0tc_flavormatrix", ";p_{T,tag} (GeV);Tag/Probe Combined ID;MPF0", npt, vpt, 67, 0.0, 67);
+        h->p2m2tc_flavormatrix = new TProfile2D("p2m2tc_flavormatrix", ";p_{T,tag} (GeV);Tag/Probe Combined ID;MPF2", npt, vpt, 67, 0.0, 67);
+        h->p2mntc_flavormatrix = new TProfile2D("p2mntc_flavormatrix", ";p_{T,tag} (GeV);Tag/Probe Combined ID;MPFn", npt, vpt, 67, 0.0, 67);
+        h->p2mutc_flavormatrix = new TProfile2D("p2mutc_flavormatrix", ";p_{T,tag} (GeV);Tag/Probe Combined ID;MPFu", npt, vpt, 67, 0.0, 67);
+
+        // Probe jet (pf)
+        h->p2m0pf_flavormatrix = new TProfile2D("p2m0pf_flavormatrix", ";p_{T,probe} (GeV);Tag/Probe Combined ID;MPF0", npt, vpt, 67, 0.0, 67);
+        h->p2m2pf_flavormatrix = new TProfile2D("p2m2pf_flavormatrix", ";p_{T,probe} (GeV);Tag/Probe Combined ID;MPF2", npt, vpt, 67, 0.0, 67);
+        h->p2mnpf_flavormatrix = new TProfile2D("p2mnpf_flavormatrix", ";p_{T,probe} (GeV);Tag/Probe Combined ID;MPFn", npt, vpt, 67, 0.0, 67);
+        h->p2mupf_flavormatrix = new TProfile2D("p2mupf_flavormatrix", ";p_{T,probe} (GeV);Tag/Probe Combined ID;MPFu", npt, vpt, 67, 0.0, 67);
+
+
+	if (isMC){
+	  //True flavour
+          // Bisector (ab)
+	  double vID[68];
+            for (int i = 0; i <= 67; ++i) {
+                vID[i] = 0.0 + i;
+            }
+
+            // 3D True Matrices
+            // Bisector (ab)
+            h->p3m0ab_true = new TProfile3D("p3m0ab_true", ";p_{T,avp};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3m2ab_true = new TProfile3D("p3m2ab_true", ";p_{T,avp};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3mnab_true = new TProfile3D("p3mnab_true", ";p_{T,avp};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3muab_true = new TProfile3D("p3muab_true", ";p_{T,avp};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+
+            // Dijet average (ad)
+            h->p3m0ad_true = new TProfile3D("p3m0ad_true", ";p_{T,ave};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3m2ad_true = new TProfile3D("p3m2ad_true", ";p_{T,ave};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3mnad_true = new TProfile3D("p3mnad_true", ";p_{T,ave};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3muad_true = new TProfile3D("p3muad_true", ";p_{T,ave};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+
+            // Tag jet (tc)
+            h->p3m0tc_true = new TProfile3D("p3m0tc_true", ";p_{T,tag};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3m2tc_true = new TProfile3D("p3m2tc_true", ";p_{T,tag};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3mntc_true = new TProfile3D("p3mntc_true", ";p_{T,tag};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3mutc_true = new TProfile3D("p3mutc_true", ";p_{T,tag};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+
+            // Probe jet (pf)
+            h->p3m0pf_true = new TProfile3D("p3m0pf_true", ";p_{T,probe};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3m2pf_true = new TProfile3D("p3m2pf_true", ";p_{T,probe};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3mnpf_true = new TProfile3D("p3mnpf_true", ";p_{T,probe};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+            h->p3mupf_true = new TProfile3D("p3mupf_true", ";p_{T,probe};Reco ID;True ID", npt, vpt, 67, vID, 67, vID);
+
+          // 2D Tagger Phase Space
+          h->h2_TaggerSpace_u = new TH2D("h2_TaggerSpace_u", "True Up;CvL Score;B Score", 100, 0.0, 1.0, 100, 0.0, 1.0);
+          h->h2_TaggerSpace_d = new TH2D("h2_TaggerSpace_d", "True Down;CvL Score;B Score", 100, 0.0, 1.0, 100, 0.0, 1.0);
+          h->h2_TaggerSpace_s = new TH2D("h2_TaggerSpace_s", "True Strange;CvL Score;B Score", 100, 0.0, 1.0, 100, 0.0, 1.0);
+          h->h2_TaggerSpace_g = new TH2D("h2_TaggerSpace_g", "True Gluon;CvL Score;B Score", 100, 0.0, 1.0, 100, 0.0, 1.0);
+          h->h2_TaggerSpace_c = new TH2D("h2_TaggerSpace_c", "True Charm;CvL Score;B Score", 100, 0.0, 1.0, 100, 0.0, 1.0);
+          h->h2_TaggerSpace_b = new TH2D("h2_TaggerSpace_b", "True Bottom;CvL Score;B Score", 100, 0.0, 1.0, 100, 0.0, 1.0);
+        }
+      }
       if (isMC && doGluonJets_SF){
         dout->mkdir("GluonJets/tight/SF");
         dout->cd("GluonJets/tight/SF");
@@ -6558,8 +6692,11 @@ if (isMG)
           else if (doFSRdown) PSvariation = PSWeight[1];
           else if (doISRup) PSvariation = PSWeight[2];
           else if (doFSRup) PSvariation = PSWeight[3]; // Same variation as JMENANO
-          else if (doFSRup_JMENANO) PSvariation = PSWeight[4];
-	  else if (doFSRup0p5_JMENANO) PSvariation = PSWeight[2];
+          else if (doFSRup_JMENANO && nPSWeight > 4) PSvariation = PSWeight[4];
+	  else if (doFSRup0p5_JMENANO && nPSWeight > 2) PSvariation = PSWeight[2];
+	  else {
+		  cout << "No valid variation" << endl;
+	       }
       }
 
       //double w = genWeight;
@@ -7209,104 +7346,104 @@ if (isMG)
         bool hasMatchJet_dR4 = (dR < 0.4 && p4g.Pt() > 0 && p4.Pt() > 0);
 
 	//UParTAK4QvG studies, also PNet for comparison
-	if (doQvsG){
+	if (doQvsG && i>=0 ){
 	  if ( 0 < abs(GenJet_partonFlavour[j]) && abs(GenJet_partonFlavour[j]) < 4 ) { // u = 1, d = 2, s = 3, unidentified = 0
 	    if (abs(p4g.Eta()) < 1.3) {
-	      h->h2UParTQvG_Q13->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-	      h->h2PNetQvG_Q13->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+	      h->h2UParTQvG_Q13->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+	      h->h2PNetQvG_Q13->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 
 	      if (Pileup_nTrue < 20) {
-	        h->h2UParTQvG_Q13_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q13_20->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w); 
+	        h->h2UParTQvG_Q13_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q13_20->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w); 
 	      } else if (20 < Pileup_nTrue && Pileup_nTrue < 30) {
-	        h->h2UParTQvG_Q13_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q13_30->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+	        h->h2UParTQvG_Q13_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q13_30->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 	      } else if (30 < Pileup_nTrue && Pileup_nTrue < 40) {
-                h->h2UParTQvG_Q13_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q13_40->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q13_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q13_40->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 	      } else if (40 < Pileup_nTrue && Pileup_nTrue < 50) {
-                h->h2UParTQvG_Q13_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q13_50->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q13_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q13_50->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 	      } else if (50 < Pileup_nTrue && Pileup_nTrue < 60) {
-                h->h2UParTQvG_Q13_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q13_60->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q13_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q13_60->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 	      } else if (60 < Pileup_nTrue && Pileup_nTrue < 80) {
-                h->h2UParTQvG_Q13_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q13_80->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q13_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q13_80->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 	      } 
 	    }
 	    if (1.3 < abs(p4g.Eta()) && abs(p4g.Eta()) < 2.5) {
-	      h->h2UParTQvG_Q25->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-	      h->h2PNetQvG_Q25->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+	      h->h2UParTQvG_Q25->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+	      h->h2PNetQvG_Q25->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 
 	      if (Pileup_nTrue < 20) {
-                h->h2UParTQvG_Q25_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q25_20->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q25_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q25_20->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (20 < Pileup_nTrue && Pileup_nTrue < 30) {
-                h->h2UParTQvG_Q25_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q25_30->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q25_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q25_30->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (30 < Pileup_nTrue && Pileup_nTrue < 40) {
-                h->h2UParTQvG_Q25_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q25_40->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q25_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q25_40->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (40 < Pileup_nTrue && Pileup_nTrue < 50) {
-                h->h2UParTQvG_Q25_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q25_50->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q25_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q25_50->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (50 < Pileup_nTrue && Pileup_nTrue < 60) {
-                h->h2UParTQvG_Q25_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q25_60->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q25_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q25_60->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (60 < Pileup_nTrue && Pileup_nTrue < 80) {
-                h->h2UParTQvG_Q25_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_Q25_80->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_Q25_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_Q25_80->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               }
 	    }
 	  }
 	  if (GenJet_partonFlavour[j] == 21) { // gluons = 21
             if (abs(p4g.Eta()) < 1.3) {
-	      h->h2UParTQvG_G13->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-	      h->h2PNetQvG_G13->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+	      h->h2UParTQvG_G13->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+	      h->h2PNetQvG_G13->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 
 	      if (Pileup_nTrue < 20) {
-                h->h2UParTQvG_G13_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G13_20->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G13_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G13_20->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (20 < Pileup_nTrue && Pileup_nTrue < 30) {
-                h->h2UParTQvG_G13_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G13_30->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G13_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G13_30->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (30 < Pileup_nTrue && Pileup_nTrue < 40) {
-                h->h2UParTQvG_G13_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G13_40->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G13_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G13_40->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (40 < Pileup_nTrue && Pileup_nTrue < 50) {
-                h->h2UParTQvG_G13_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G13_50->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G13_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G13_50->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (50 < Pileup_nTrue && Pileup_nTrue < 60) {
-                h->h2UParTQvG_G13_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G13_60->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G13_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G13_60->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (60 < Pileup_nTrue && Pileup_nTrue < 80) {
-                h->h2UParTQvG_G13_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G13_80->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G13_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G13_80->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               }
 	    }
             if (1.3 < abs(p4g.Eta()) && abs(p4g.Eta()) < 2.5) {
-	      h->h2UParTQvG_G25->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-	      h->h2PNetQvG_G25->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+	      h->h2UParTQvG_G25->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+	      h->h2PNetQvG_G25->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
 
 	      if (Pileup_nTrue < 20) {
-                h->h2UParTQvG_G25_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G25_20->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G25_20->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G25_20->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (20 < Pileup_nTrue && Pileup_nTrue < 30) {
-                h->h2UParTQvG_G25_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G25_30->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G25_30->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G25_30->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (30 < Pileup_nTrue && Pileup_nTrue < 40) {
-                h->h2UParTQvG_G25_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G25_40->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G25_40->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G25_40->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (40 < Pileup_nTrue && Pileup_nTrue < 50) {
-                h->h2UParTQvG_G25_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G25_50->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G25_50->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G25_50->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (50 < Pileup_nTrue && Pileup_nTrue < 60) {
-                h->h2UParTQvG_G25_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G25_60->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G25_60->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G25_60->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               } else if (60 < Pileup_nTrue && Pileup_nTrue < 80) {
-                h->h2UParTQvG_G25_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[j], w);
-                h->h2PNetQvG_G25_80->Fill(p4g.Pt(), Jet_btagPNetQvG[j], w);
+                h->h2UParTQvG_G25_80->Fill(p4g.Pt(), Jet_btagUParTAK4QvG[i], w);
+                h->h2PNetQvG_G25_80->Fill(p4g.Pt(), Jet_btagPNetQvG[i], w);
               }
 	    }
 	  }
@@ -7851,12 +7988,12 @@ if (isMG)
               double eta = p4.Eta();
               double pt = p4.Pt();
               h->p2pt->Fill(eta, pt, Jet_pt[i], w);
-	      //
+	      /*
 	      if (doPU_per_trigger){
 	         get_weight(pt, eta, "doInc");
                  h->p2rho_PURW->Fill(eta, pt, rho, w * PU_weight);
 	      }
-	      //
+	      */
 	      h->p2rho->Fill(eta, pt, rho, w);
               h->p2chf->Fill(eta, pt, Jet_chHEF[i], w);
               h->p2nhf->Fill(eta, pt, Jet_neHEF[i], w);
@@ -8586,7 +8723,7 @@ if (isMG)
     	      bool isTrueLightQuark = (truthFlav >= 1 && truthFlav < 4);
     	      bool isTrueGluon      = (truthFlav == 21);
 
-    	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 && fabs(eta) < 1.3) {
+    	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.650 && fabs(eta) < 1.3) {
 
         	if (isTrueLightQuark){
 		  h->h2_QvGProbeEff_Denom_Quark->Fill(eta, ptprobe, w);
@@ -8607,6 +8744,84 @@ if (isMG)
 	      } // tagger conditions
 	    } // doQvsG_Eff
 
+	    if(doQvsG_tagger && fabs(eta) < 1.3) {
+	    
+	      //The function is defined almost at the beggining of the code.
+              int id_tag = getFlavorID(Jet_btagUParTAK4B[itag], Jet_btagUParTAK4CvL[itag], Jet_btagPNetQvG[itag]);
+              int id_probe = getFlavorID(Jet_btagUParTAK4B[iprobe], Jet_btagUParTAK4CvL[iprobe], Jet_btagPNetQvG[iprobe]);
+
+              // Encode to a single Y-axis bin, se later we can extract the tag or probe score from the taggers.
+              int combined_score = (id_tag * 10) + id_probe;
+
+	      // Bisector (ab)
+              h->p2m0ab_flavormatrix->Fill(ptavp2, combined_score, m0b, w);
+              h->p2m2ab_flavormatrix->Fill(ptavp2, combined_score, m2b, w);
+              h->p2mnab_flavormatrix->Fill(ptavp2, combined_score, mnb, w);
+              h->p2muab_flavormatrix->Fill(ptavp2, combined_score, mub, w);
+
+              // Dijet average (ad)
+              h->p2m0ad_flavormatrix->Fill(ptave, combined_score, m0d, w);
+              h->p2m2ad_flavormatrix->Fill(ptave, combined_score, m2d, w);
+              h->p2mnad_flavormatrix->Fill(ptave, combined_score, mnd, w);
+              h->p2muad_flavormatrix->Fill(ptave, combined_score, mud, w);
+
+              // Tag jet (tc)
+              h->p2m0tc_flavormatrix->Fill(pttag, combined_score, m0c, w);
+              h->p2m2tc_flavormatrix->Fill(pttag, combined_score, m2c, w);
+              h->p2mntc_flavormatrix->Fill(pttag, combined_score, mnc, w);
+              h->p2mutc_flavormatrix->Fill(pttag, combined_score, muc, w);
+
+              // Probe jet (pf)
+              h->p2m0pf_flavormatrix->Fill(ptprobe, combined_score, m0f, w);
+              h->p2m2pf_flavormatrix->Fill(ptprobe, combined_score, m2f, w);
+              h->p2mnpf_flavormatrix->Fill(ptprobe, combined_score, mnf, w);
+              h->p2mupf_flavormatrix->Fill(ptprobe, combined_score, muf, w);
+
+	      if (isMC) {
+                  int true_tag = (Jet_genJetIdx[itag] >= 0) ? getTrueFlavorID(Jet_partonFlavour[itag]) : 0;
+                  int true_probe = (Jet_genJetIdx[iprobe] >= 0) ? getTrueFlavorID(Jet_partonFlavour[iprobe]) : 0;
+                  int true_combined = (true_tag * 10) + true_probe;
+
+                  h->p3m0ab_true->Fill(ptavp2, combined_score, true_combined, m0b, w);
+                  h->p3m2ab_true->Fill(ptavp2, combined_score, true_combined, m2b, w);
+                  h->p3mnab_true->Fill(ptavp2, combined_score, true_combined, mnb, w);
+                  h->p3muab_true->Fill(ptavp2, combined_score, true_combined, mub, w);
+
+                  h->p3m0ad_true->Fill(ptave, combined_score, true_combined, m0d, w);
+                  h->p3m2ad_true->Fill(ptave, combined_score, true_combined, m2d, w);
+                  h->p3mnad_true->Fill(ptave, combined_score, true_combined, mnd, w);
+                  h->p3muad_true->Fill(ptave, combined_score, true_combined, mud, w);
+
+                  h->p3m0tc_true->Fill(pttag, combined_score, true_combined, m0c, w);
+                  h->p3m2tc_true->Fill(pttag, combined_score, true_combined, m2c, w);
+                  h->p3mntc_true->Fill(pttag, combined_score, true_combined, mnc, w);
+                  h->p3mutc_true->Fill(pttag, combined_score, true_combined, muc, w);
+
+                  h->p3m0pf_true->Fill(ptprobe, combined_score, true_combined, m0f, w);
+                  h->p3m2pf_true->Fill(ptprobe, combined_score, true_combined, m2f, w);
+                  h->p3mnpf_true->Fill(ptprobe, combined_score, true_combined, mnf, w);
+                  h->p3mupf_true->Fill(ptprobe, combined_score, true_combined, muf, w);
+
+                  auto fillTaggerSpace = [&](int jetIdx) {
+                      if (Jet_genJetIdx[jetIdx] < 0) return; // Skip pileup fakes
+                      
+                      int trueFlav = abs(Jet_partonFlavour[jetIdx]);
+                      double cvl = Jet_btagUParTAK4CvL[jetIdx];
+                      double bscore = Jet_btagUParTAK4B[jetIdx];
+
+		      if (trueFlav == 1)      h->h2_TaggerSpace_u->Fill(cvl, bscore, w);
+                      else if (trueFlav == 2) h->h2_TaggerSpace_d->Fill(cvl, bscore, w);
+                      else if (trueFlav == 3) h->h2_TaggerSpace_s->Fill(cvl, bscore, w);
+                      else if (trueFlav == 4) h->h2_TaggerSpace_c->Fill(cvl, bscore, w);
+                      else if (trueFlav == 5) h->h2_TaggerSpace_b->Fill(cvl, bscore, w);
+                      else if (trueFlav == 21) h->h2_TaggerSpace_g->Fill(cvl, bscore, w);
+                      
+                  };
+
+                  fillTaggerSpace(itag);
+                  fillTaggerSpace(iprobe);
+	      }
+	    }
 
 	    
 	    // To take SF for tag and probe jets
@@ -8891,14 +9106,14 @@ if (isMG)
               } // QvsG SF
 
              } // g -> gg
-           } // Tag gluon, probe quark or gluo 
+           } // Tag gluon, probe quark or gluon 
 
 
-	    if (Jet_btagUParTAK4B[itag] <= 0.4648 && Jet_btagUParTAK4CvL[itag] <= 0.421 &&
+	    if (Jet_btagUParTAK4B[itag] <= 0.4648 && Jet_btagUParTAK4CvL[itag] <= 0.650 &&
 	        0. <= Jet_btagPNetQvG[itag] && 0.45 <= Jet_btagPNetQvG[itag]) 
 	    {
-	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
-                  0. <= Jet_btagPNetQvG[iprobe] && 0.45 <= Jet_btagPNetQvG[iprobe]) // && fabs(eta)<1.3)
+	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.650 &&
+                  0. <= Jet_btagPNetQvG[iprobe] && 0.45 <= Jet_btagPNetQvG[iprobe])
 	      {
                 h->h_tagprobeab_qq->Fill(ptavp2, w);
                 h->h_tagprobead_qq->Fill(ptave, w);
@@ -8977,7 +9192,7 @@ if (isMG)
                 }
 	      } // tag quark and probe quark
 
-	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
+	      if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.650 &&
                   0. <= Jet_btagPNetQvG[iprobe] && Jet_btagPNetQvG[iprobe] < 0.45) // && fabs(eta)<1.3)
               {
 	        h->h_tagprobeab_qg->Fill(ptavp2, w);
@@ -9058,10 +9273,10 @@ if (isMG)
 	      } //tag quark and probe gluon
 	    } // WP tight tag quark
 
-            if (Jet_btagUParTAK4B[itag] <= 0.4648 && Jet_btagUParTAK4CvL[itag] <= 0.421 &&
+            if (Jet_btagUParTAK4B[itag] <= 0.4648 && Jet_btagUParTAK4CvL[itag] <= 0.650 &&
                 0. <= Jet_btagPNetQvG[itag] && Jet_btagPNetQvG[itag] < 0.45 )
             {
-              if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
+              if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.650 &&
                   0. <= Jet_btagPNetQvG[iprobe] && 0.45 <= Jet_btagPNetQvG[iprobe]) // && fabs(eta)<1.3)
               {
 	       
@@ -9144,7 +9359,7 @@ if (isMG)
                 }
               } // tag gluon and probe quark
 
-              if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.421 &&
+              if (Jet_btagUParTAK4B[iprobe] <= 0.4648 && Jet_btagUParTAK4CvL[iprobe] <= 0.650 &&
                   0. <= Jet_btagPNetQvG[iprobe] && Jet_btagPNetQvG[iprobe] < 0.45) // && fabs(eta)<1.3)
               {
 	        h->h_tagprobeab_gg->Fill(ptavp2, w);
