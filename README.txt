@@ -73,6 +73,11 @@ Bugs:
 (To-do: QG SFs and response)
 
 
+// v174. Redefine the unfolding RM and the cov matrix in the incjet directory outside the njet loop for dijet-incjet.
+//       Also add Winter26 LowPU MC. Lumi map roduced by yhe python3 generate_lumi_map.py located in the lowPU_May folder.
+// v173. Add Flavour for u,d,s (and negative) to calculate responses. Updated WP for CvL 0.650. The previous one was for CvB
+//	 We dont need the CvB tagger for the QvsG studies, we already excluded B and C with B and CvL taggers.
+//       The tagger fractions and the responses based on the tagger selections are fine, the question still the SF application.
 // v172. Process Run2 datasets. Needs to update branches, xsec, and not sure what else :D.
 //	 From the .h file:
 //	   isRun3, the condition was removed for Pileup_pthatmax so also isRun2 contained.

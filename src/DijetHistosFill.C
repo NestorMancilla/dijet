@@ -226,8 +226,8 @@ constexpr const char lumibyls2026BCD[] = "luminosityscripts/csvfiles/2026/lumi_4
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_HLTZeroBias.csv";
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTPFJet500.csv";
 //constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_LowPU_Filtered_HLTZeroBias.csv";
-//constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_May19_HLTPFJet500.csv";
-constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_May19_HLTZeroBias.csv";
+constexpr const char lumibyls2026C[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_May19_HLTPFJet500.csv";
+constexpr const char lumibyls2026C_ZB[] = "luminosityscripts/csvfiles/2026/lumi_lowPU_May19_HLTZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTPFJet500.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403493_Hybrid_HLTZeroBias.csv";
 //constexpr const char lumibyls2026D[] = "luminosityscripts/csvfiles/2026/lumi_401630_403895_Hybrid_HLTPFJet500.csv";
@@ -581,7 +581,7 @@ constexpr std::array<std::pair<const char*, const char*>, 367> lumifiles = {{
     {"2026C_3", lumibyls2026C},
     {"2026C_4", lumibyls2026C},
     {"2026C_5", lumibyls2026C},
-    {"2026C_ZB", lumibyls2026C},
+    {"2026C_ZB", lumibyls2026C_ZB},
     {"2026C_01", lumibyls2026BCD},
     {"2026C_11", lumibyls2026BCD},
     {"2026C_21", lumibyls2026BCD},
@@ -601,7 +601,7 @@ constexpr std::array<std::pair<const char*, const char*>, 367> lumifiles = {{
     {"2026C_JME_3", lumibyls2026C},
     {"2026C_JME_4", lumibyls2026C},
     {"2026C_JME_5", lumibyls2026C},
-    {"2026C_JME_ZB", lumibyls2026C},
+    {"2026C_JME_ZB", lumibyls2026C_ZB},
     {"2026D_JME_0", lumibyls2026D},
     {"2026D_JME_1", lumibyls2026D},
     {"2026D_JME_ZB", lumibyls2026D_ZB},
@@ -736,11 +736,19 @@ public:
   TUnfoldBinning *TUrec;
   TH2 *h2Cov;
   TH1 *hRec, *htmp;
+
+  TH1D *hRec_v2_[ny], *htmp_v2_[ny];
+  TH1D *hUnf_gen_[ny], *hUnf_missOut_[ny], *hUnf_missNoMatch_[ny];
+  TH1D *hUnf_fakeOut_[ny], *hUnf_fakeNoMatch_[ny];
+  TH2D *h2Unf_RM_glob; //*h2Unf_RM_[ny], 
+  TH2D *h2cov_v2_[ny], *h2yMig;
+  /*
   TH1D *hRec_v2, *htmp_v2;
   TH2D *h2cov_v2;
   //
-  //TH1D *hUnf_gen, *hUnf_missNoMatch, *hUnf_missOut, *hUnf_fakeNoMatch, *hUnf_fakeOut; // For MCUnfold
-  //TH2D *h2Unf_RM; // For MCUnfold
+  TH1D *hUnf_gen, *hUnf_missNoMatch, *hUnf_missOut, *hUnf_fakeNoMatch, *hUnf_fakeOut; // For MCUnfold
+  TH2D *h2Unf_RM;
+  */
 };
 
 class dijetHistos
@@ -1119,10 +1127,10 @@ void DijetHistosFill::get_PU_hist(const std::string& PUdataset) {
     std::vector<std::string> vtrg = {
 	"HLT_ZeroBias",
         "HLT_PFJet40", 
-	//"HLT_PFJet40_L1Jet24", //LowPU
-	//"HLT_PFJet40_L1Jet35", //LowPU
+	"HLT_PFJet40_L1Jet24", //LowPU
+	"HLT_PFJet40_L1Jet35", //LowPU
 	"HLT_PFJet60", "HLT_PFJet80", 
-        //"HLT_PFJet80_L1Jet60",	//LowPU
+        "HLT_PFJet80_L1Jet60",	//LowPU
 	"HLT_PFJet110",
         "HLT_PFJet140", "HLT_PFJet200",
         "HLT_PFJet260", "HLT_PFJet320", "HLT_PFJet400", "HLT_PFJet450", "HLT_PFJet500",
@@ -1231,11 +1239,11 @@ bool DijetHistosFill::LoadLumi()
 	vector<string> vtrg = {
 		"HLT_ZeroBias",
 		"HLT_PFJet40",
-		//"HLT_PFJet40_L1Jet24", //LowPU
-		//"HLT_PFJet40_L1Jet35", //LowPU
+		"HLT_PFJet40_L1Jet24", //LowPU
+		"HLT_PFJet40_L1Jet35", //LowPU
 		"HLT_PFJet60",
 		"HLT_PFJet80",
-		//"HLT_PFJet80_L1Jet60", //LowPU
+		"HLT_PFJet80_L1Jet60", //LowPU
 		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
@@ -1339,11 +1347,11 @@ bool DijetHistosFill::LoadLumi()
 	vector<string> filenames = {
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_ZeroBias_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_"+JSON_version+".csv",
-		//"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet24_"+JSON_version+".csv", //LowPU
-		//"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet35_"+JSON_version+".csv", //LowPU
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet24_"+JSON_version+".csv", //LowPU
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet40_L1Jet35_"+JSON_version+".csv", //LowPU
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet60_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_"+JSON_version+".csv",
-		//"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_L1Jet60_"+JSON_version+".csv", //LowPU
+		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet80_L1Jet60_"+JSON_version+".csv", //LowPU
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet110_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet140_"+JSON_version+".csv",
 		"luminosityscripts/csvfiles/"+data_year+"/lumi_HLT_PFJet200_"+JSON_version+".csv",
@@ -1806,7 +1814,8 @@ void DijetHistosFill::Loop()
 		fChain->SetBranchStatus("nPSWeight", 1);
 	}
 
-        Float_t PSvariation;
+        //Float_t PSvariation;
+	Float_t PSvariation = 1.0;
         if (doPSVar && doISRdown) {
 	  cout << "PS variation True! The variation is doISRdown" << endl;
 	}
@@ -1845,7 +1854,7 @@ void DijetHistosFill::Loop()
                 fChain->SetBranchStatus("PV_npvsGood", 1);	
 	}
 
-	if (isMC && (smearJets || doMCtruth))
+	if (isMC && (smearJets || doMCtruth || doIncjet))
 	{
 		cout << "Adding branches for GenJets ("
 			<< (smearJets ? " smearJets" : "")
@@ -1858,7 +1867,7 @@ void DijetHistosFill::Loop()
 		fChain->SetBranchStatus("GenJet_mass", 1);
 
 		fChain->SetBranchStatus("Jet_partonFlavour", 1);
-		if (doMCtruth)
+		if (doMCtruth || doIncjet)
 		{
 			fChain->SetBranchStatus("GenVtx_z", 1);
 			fChain->SetBranchStatus("PV_z", 1);
@@ -1898,11 +1907,11 @@ void DijetHistosFill::Loop()
 		//"HLT_ZeroBias_FirstCollisionInTrain",
 		//"HLT_ZeroBias_LastCollisionInTrain",
 		"HLT_PFJet40",
-		//"HLT_PFJet40_L1Jet24", //LowPU
-		//"HLT_PFJet40_L1Jet35", //LowPU
+		"HLT_PFJet40_L1Jet24", //LowPU
+		"HLT_PFJet40_L1Jet35", //LowPU
 		"HLT_PFJet60",
 		"HLT_PFJet80",
-		//"HLT_PFJet80_L1Jet60", //LowPU
+		"HLT_PFJet80_L1Jet60", //LowPU
 		"HLT_PFJet110",
 		"HLT_PFJet140",
 		"HLT_PFJet200",
@@ -2185,12 +2194,12 @@ mt["HLT_DiPFJetAve300_HFJEC"] = range{350, 6500, fwdeta0, 5.2};
 //https://github.com/miquork/jecsys3/blob/main/minitools/DijetHistosCombine.C#L264-L370
 //mt["HLT_ZeroBias"] = range{0, 64, 0, 3.0};
 mt["HLT_PFJet40"] = range{64, 84, 0, 3.0};
-//mt["HLT_PFJet40_L1Jet24"] = range{64, 84, 0, 3.0}; //LowPU
-//mt["HLT_PFJet40_L1Jet35"] = range{64, 84, 0, 3.0}; //LowPU
+mt["HLT_PFJet40_L1Jet24"] = range{64, 84, 0, 3.0}; //LowPU
+mt["HLT_PFJet40_L1Jet35"] = range{64, 84, 0, 3.0}; //LowPU
 mt["HLT_PFJet60"] = range{84, 114, 0, 3.0};
 //mt["HLT_PFJet80"]  = range{114, 196, 0, 3.0};
 mt["HLT_PFJet80"]  = range{114, 155, 0, 3.0};
-//mt["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, 3.0}; //LowPU
+mt["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, 3.0}; //LowPU
 //mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
 mt["HLT_PFJet110"] = range{155, 196, 0, 3.0};
 mt["HLT_PFJet140"] = range{196, 272, 0, 3.0};
@@ -2221,12 +2230,12 @@ mi["HLT_ZeroBias"] = range{10,  49,  0, 5.2};
 //mi["HLT_ZeroBias_LastCollisionInTrain"] = range{10,  49,  0, 5.2};
 //mi["HLT_MC"]       = range{15,6500,  0, 5.2};
 mi["HLT_PFJet40"]  = range{49,  84,  0, fwdeta0}; //Ref number from vtrg: 0
-//mi["HLT_PFJet40_L1Jet24"]  = range{49,  84,  0, fwdeta0}; //LowPU
-//mi["HLT_PFJet40_L1Jet35"]  = range{49,  84,  0, fwdeta0}; //LowPU
+mi["HLT_PFJet40_L1Jet24"]  = range{49,  84,  0, fwdeta0}; //LowPU
+mi["HLT_PFJet40_L1Jet35"]  = range{49,  84,  0, fwdeta0}; //LowPU
 mi["HLT_PFJet60"]  = range{84,  114, 0, fwdeta};  // 1
 //mi["HLT_PFJet80"]  = range{114, 196, 0, fwdeta}; // 2
 mi["HLT_PFJet80"]  = range{114, 155, 0, fwdeta};  // Upper bound hands off to 110
-//mi["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, fwdeta}; //LowPU
+mi["HLT_PFJet80_L1Jet60"]  = range{114, 155, 0, fwdeta}; //LowPU
 mi["HLT_PFJet110"] = range{155, 196, 0, fwdeta};  // Bridges the gap between 80 and 140
 mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta};
 //mi["HLT_PFJet140"] = range{196, 272, 0, fwdeta}; // 3
@@ -2300,15 +2309,15 @@ md2pf["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 //md2pf["HLT_ZeroBias_FirstCollisionInTrain"] = range{15,  59,  0, 5.2};
 //md2pf["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2pf["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-//md2pf["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
-//md2pf["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
+md2pf["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
+md2pf["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
 md2pf["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
 //md2pf["HLT_PFJet110"] = range{140, 236, 0, 5.2};
 md2pf["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
-//md2pf["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
+md2pf["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
 md2pf["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
 md2pf["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2pf["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
@@ -2334,15 +2343,15 @@ md2tc["HLT_ZeroBias"] = range{15,  59,  0, 5.2};
 //md2tc["HLT_ZeroBias_LastCollisionInTrain"] = range{15,  59,  0, 5.2};
 md2tc["HLT_MC"]       = range{15,6500,  0, 5.2};
 md2tc["HLT_PFJet40"]  = range{59,  86,  0, 5.2};
-//md2tc["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
-//md2tc["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
+md2tc["HLT_PFJet40_L1Jet24"]  = range{59,  86,  0, 5.2}; //LowPU
+md2tc["HLT_PFJet40_L1Jet35"]  = range{59,  86,  0, 5.2}; //LowPU
 md2tc["HLT_PFJet60"]  = range{86,  110, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet80"]  = range{110, 170, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};//fwdetad};
 //md2tc["HLT_PFJet110"] = range{140, 236, 0, 5.2};
 md2tc["HLT_PFJet80"]  = range{110, 140, 0, 5.2}; // Upper bound hands off to 110
-//md2tc["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
+md2tc["HLT_PFJet80_L1Jet60"]  = range{110, 140, 0, 5.2}; //LowPU
 md2tc["HLT_PFJet110"] = range{140, 170, 0, 5.2}; // Bridges the gap between 80 and 140
 md2tc["HLT_PFJet140"] = range{170, 236, 0, 5.2};
 md2tc["HLT_PFJet200"] = range{236, 302, 0, 5.2};//fwdetad};
@@ -3719,12 +3728,35 @@ if (TString(dataset.c_str()).Contains("Winter26MG") || TString(dataset.c_str()).
         jec = getFJC("",
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         "");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
-			"");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
+
+        jerpathsf = "";
+        //jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
+        //jersfvspt = getFJC("", "Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi", "");
+        jersfvspt = getFJC("", "", "");
+        //jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+        jerpath = "";
+        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+
+           if (reweightPU && !doPU_per_trigger)
+           {
+                 TFile f("luminosityscripts/PUWeights2025/75mb/PUWeight2025Cv1/PUWeights_HLT_PFJet500_2025Cv1.root");
+                 pileupRatio = (TH1D *)f.Get("pileup_weights_HLT_PFJet500_2025Cv1");
+                 pileupRatio->SetDirectory(0);
+                 // Print mean, min weight, max weight
+                 cout << "PU weight file: " << f.GetName() << endl;
+                 cout << "Pileup ratio mean = " << pileupRatio->GetMean() << endl;
+                 cout << "Pileup ratio min = " << pileupRatio->GetMinimum() << endl;
+                 cout << "Pileup ratio max = " << pileupRatio->GetMaximum() << endl;
+
+           }
+}
+
+if (TString(dataset.c_str()).Contains("Summer26MG"))
+{
+
+        jec = getFJC("",
+                        "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+                        "");
 
         jerpathsf = "";
         //jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
@@ -3920,6 +3952,9 @@ if (isMG)
     int vnevt3_Winter26MG[nht3] = {0, 10119228, 8431555, 9112658, 10554984, 10065559, 10597239, 10588607, 9572261, 9889987, 8867056, 9579495};
     double vnwgt3_Winter26MG[nht3] = {0.0, 1.13170570907319e+16, 2572952522725280.0, 1493178473700920.0, 181631535021091.0, 10525172327100.0,
 	                  1707660210118.12, 402189245330.36005, 109592764959.61401, 49997724948.47508, 14896742425.454603, 3349000050.623581};
+    //Summer26MG
+    int vnevt3_Summer26MG[nht3] = {38294220, 36672555, 41604656, 40409448, 37103032, 34757114, 42310935, 35174844, 46469716, 41678018, 39307776, 38869431};
+   double vnwgt3_Summer26MG[nht3] = {1.827732256956556e+17, 4.100816885969112e+16, 1.269882315207144e+16, 6622928043824720.0, 638366979480411.0, 36340749754548.42, 6818431834910.109, 1336230520226.0413, 531925683721.82996, 210686847257.25494, 66023424431.62005, 13585552058.050997};
 
     //Run2
     int* vnevt2 = nullptr;
@@ -3941,6 +3976,10 @@ if (isMG)
     else if (dsName.Contains("Winter26MG")) {
         vnevt3 = vnevt3_Winter26MG;
         vnwgt3 = vnwgt3_Winter26MG;
+    }
+    else if (dsName.Contains("Summer26MG")) {
+        vnevt3 = vnevt3_Summer26MG;
+        vnwgt3 = vnwgt3_Summer26MG;
     }
     else if (dsName.Contains("Summer20UL16APVMG")) {
         vnevt2 = vnevt2_Summer20UL16APVMG;
@@ -3997,7 +4036,9 @@ if (isMG)
 
     // SUMMER23, Fikri MatterMost 22.2.2024
     double vxsec3[nht3] =
-        {0, 3.131e+08,
+        //{0,
+	{6.072e+08, //Summer26	
+	 3.131e+08,
          5.892e+07,
          2.532e+07, 1.964e+06, 9.690e+04,
          1.360e+04,
@@ -4991,6 +5032,7 @@ if (isMG)
 	
         dout->mkdir("Incjet/Unfolding");
         dout->cd("Incjet/Unfolding");
+	/*
 	if (doUnfolding && !isMC)
         {
 	  h->TUrec = new TUnfoldBinning("recIncl_1");
@@ -5000,7 +5042,8 @@ if (isMG)
           h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
           h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
         }
-	if (doUnfolding && isMC) {
+	*/
+	if (doUnfolding) {
 	  h->TUrec = new TUnfoldBinning("recIncl_1");
           h->TUrec->AddAxis("p_{T}",nptdU,vptdU, false, false); //To increase the dimension
           //h->TUrec->AddAxis("|#eta|",netadU,vetadU, false, false); //To increase the dimension
@@ -5008,6 +5051,40 @@ if (isMG)
           h->htmp = h->TUrec->CreateHistogram("tmp", false, 0, "detector level"); // tmp histogram
           h->h2Cov = h->TUrec->CreateErrorMatrixHistogram("cov", false, 0, "covariance");
 	}
+	
+	if (doUnfolding && isMC) {
+	    for (int iy = 0; iy != h->ny; ++iy) {
+	      h->hUnf_gen_[iy] = new TH1D(Form("hUnf_gen_%02d", 5 * (iy + 1)), ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+              h->hUnf_missNoMatch_[iy] = new TH1D(Form("hUnf_missNoMatch_%02d", 5 * (iy + 1)), ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+              h->hUnf_missOut_[iy] = new TH1D(Form("hUnf_missOut_%02d", 5 * (iy + 1)), ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+              h->hUnf_fakeNoMatch_[iy] = new TH1D(Form("hUnf_fakeNoMatch_%02d", 5 * (iy + 1)), ";p_{T,jet} (GeV)", nptdU, vptdU);
+              h->hUnf_fakeOut_[iy] = new TH1D(Form("hUnf_fakeOut_%02d", 5 * (iy + 1)), ";p_{T,jet} (GeV)", nptdU, vptdU);
+              //h->h2Unf_RM_[iy] = new TH2D(Form("h2Unf_RM_%02d", 5 * (iy + 1)), ";p_{T,gen};p_{T,jet} (GeV);N_{events}", nptgendU, vptgendU, nptdU, vptdU);
+
+            }
+
+	    const int nGglob = h->ny * nptgendU;      // 250
+            const int nRglob = h->ny * nptdU;         // 500
+            h->h2Unf_RM_glob = new TH2D("h2Unf_RM_glob",
+                                        ";global gen bin  (p_{T} within |y| slice);"
+                                        "global reco bin  (p_{T} within |y| slice)",
+                                        nGglob, 0, nGglob, nRglob, 0, nRglob);
+
+            h->h2yMig = new TH2D("h2yMig", ";|y| slice gen;|y| slice reco",
+                                  h->ny, 0, h->ny, h->ny, 0, h->ny);
+
+	    /*
+	    h->h2yMig = new TH2D("h2yMig", ";|y| slice gen;|y| slice reco",
+                     h->ny, 0, h->ny, h->ny, 0, h->ny);
+	    
+            h->hUnf_gen = new TH1D("hUnf_gen", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+            h->hUnf_missNoMatch = new TH1D("hUnf_missNoMatch", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+            h->hUnf_missOut = new TH1D("hUnf_missOut", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
+            h->hUnf_fakeNoMatch = new TH1D("hUnf_fakeNoMatch", ";p_{T,jet} (GeV)", nptdU, vptdU);
+            h->hUnf_fakeOut = new TH1D("hUnf_fakeOut", ";p_{T,jet} (GeV)", nptdU, vptdU);
+            h->h2Unf_RM = new TH2D("h2Unf_RM", ";p_{T,gen};p_{T,jet} (GeV);N_{events}", nptgendU, vptgendU, nptdU, vptdU);
+	    */
+        }
 	
         for (int iy = 0; iy != h->ny; ++iy)
         {
@@ -5026,20 +5103,16 @@ if (isMG)
         dout->cd("Incjet/Unfolding_v2");
 
 	// rec, tmp and cov for data
-	h->hRec_v2 = new TH1D("hRec_v2", "p_{T,jet} (GeV)", nptdU, vptdU);
-	h->htmp_v2 = new TH1D("htmp_v2", "p_{T,jet} (GeV)", nptdU, vptdU);
-	h->h2cov_v2 = new TH2D("h2cov_v2", "p_{T,jet} (GeV)", nptdU, vptdU, nptdU, vptdU);
+	//h->hRec_v2 = new TH1D("hRec_v2", "p_{T,jet} (GeV)", nptdU, vptdU);
+	//h->htmp_v2 = new TH1D("htmp_v2", "p_{T,jet} (GeV)", nptdU, vptdU);
+	//h->h2cov_v2 = new TH2D("h2cov_v2", "p_{T,jet} (GeV)", nptdU, vptdU, nptdU, vptdU);
 
-	/*
-	if (isMC) {
-        h->hUnf_gen = new TH1D("hUnf_gen", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
-        h->hUnf_missNoMatch = new TH1D("hUnf_missNoMatch", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
-        h->hUnf_missOut = new TH1D("hUnf_missOut", ";p_{T,jet} (GeV)", nptgendU, vptgendU);
-        h->hUnf_fakeNoMatch = new TH1D("hUnf_fakeNoMatch", ";p_{T,jet} (GeV)", nptdU, vptdU);
-        h->hUnf_fakeOut = new TH1D("hUnf_fakeOut", ";p_{T,jet} (GeV)", nptdU, vptdU);
-        h->h2Unf_RM = new TH2D("h2Unf_RM", ";p_{T,gen};p_{T,jet} (GeV);" "N_{events}", nptgendU, vptgendU, nptdU, vptdU);
-	}
-	*/
+	for (int iy = 0; iy != h->ny; ++iy)
+        {
+	  h->hRec_v2_[iy] = new TH1D(Form("hRec_v2_%02d", 5 * (iy + 1)), "p_{T,jet} (GeV)", nptdU, vptdU);
+          h->htmp_v2_[iy] = new TH1D(Form("htmp_v2_%02d", 5 * (iy + 1)), "p_{T,jet} (GeV)", nptdU, vptdU);
+          h->h2cov_v2_[iy] = new TH2D(Form("h2cov_v2_%02d", 5 * (iy + 1)), "p_{T,jet} (GeV)", nptdU, vptdU, nptdU, vptdU);
+        } // for iy
       }
       
       if (doJetId_variables)
@@ -6578,7 +6651,8 @@ if (isMG)
       TString(dataset.c_str()).Contains("Winter25"))
     //fjv = new TFile("rootfiles/jetveto2025CDE_V2M.root");
     fjv = new TFile("rootfiles/jetveto2025CDEFG_V3M.root");
-  if (TString(dataset.c_str()).Contains("2026") || TString(dataset.c_str()).Contains("Winter26"))                   
+  if (TString(dataset.c_str()).Contains("2026") || TString(dataset.c_str()).Contains("Winter26") ||
+      TString(dataset.c_str()).Contains("Summer26MG")) 
     fjv = new TFile("rootfiles/jetveto2026B_V0M.root");
   assert(fjv);
 
@@ -6651,7 +6725,8 @@ if (isMG)
   if (TString(dataset.c_str()).Contains("2025") ||
       TString(dataset.c_str()).Contains("Winter25"))
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
-  if (TString(dataset.c_str()).Contains("2026") || TString(dataset.c_str()).Contains("Winter26")) 
+  if (TString(dataset.c_str()).Contains("2026") || TString(dataset.c_str()).Contains("Winter26") ||
+      TString(dataset.c_str()).Contains("Summer26MG")) 
     h2jv = (TH2D *)fjv->Get("jetvetomap_all");
   assert(h2jv);
 
@@ -7503,7 +7578,7 @@ if (isMG)
 	  // For Unfolding
 	  bool LowGenPt  = p4g.Pt() < 74.0,
                HighGenPt = p4g.Pt() >= 3832.0,
-               HighGenY  = p4g.Eta() >= 2.0;
+               HighGenY  = fabs(p4g.Rapidity()) >= 2.5;
           bool goodGen = (!LowGenPt) && (!HighGenPt) && (!HighGenY);
 
 	  if (goodGen) 
@@ -7511,7 +7586,7 @@ if (isMG)
 
 	  bool LowRecPt  = p4.Pt() < 74.0,
                HighRecPt = p4.Pt() >= 3832.0,
-               HighRecY  =  p4.Eta() >= 2.0;
+               HighRecY  = fabs(p4g.Rapidity()) >= 2.5;
           bool goodRec = (!LowRecPt) && (!HighRecPt) && (!HighRecY);
 
           if ( goodRec &&  goodGen) {    
@@ -7619,6 +7694,8 @@ if (isMG)
       // Finally check fake rates
       for (int i = 0; i != njet; ++i)
       {
+	p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
+
         bool hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
         bool hasMatchJet = (Jet_genDR[i] < 0.2);
 	h->p2pur_noVtx->Fill(fabs(Jet_eta[i]), Jet_pt[i], hasMatchJet ? 1 : 0); //new
@@ -7694,6 +7771,20 @@ if (isMG)
     
     if (doIncjet)
     {
+      bool hasMatchVtx = false;
+      map<int, int> genToReco;
+    
+      if (isMC) {
+        hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
+       
+        // Map reco->gen so can quickly invert gen->reco
+        for (int i = 0; i != njet; ++i) {
+          if (Jet_genJetIdx[i] >= 0 && Jet_genJetIdx[i] < nGenJet) {
+            genToReco[Jet_genJetIdx[i]] = i;
+          }
+        }
+      }
+
       if (isMC)
       {
 	incjetHistos *h = mhij["HLT_MC"];
@@ -7709,6 +7800,8 @@ if (isMG)
 	  int iy = int(fabs(p4g.Rapidity()) / 0.5);
           //if (iy < h->ny)
           //h->vpt_GenU[iy]->Fill(p4g.Pt(), w);
+	  if (pass_METfilter <= 0) continue;
+
           if (dohpt05)
           {
 	    if (iy < h->ny)
@@ -7721,6 +7814,98 @@ if (isMG)
 	    //} // MET filter
 	} // ngen
       } //isMC
+      for (int itrg = 0; itrg != ntrg; ++itrg) {
+	string &trg = vtrg[itrg];
+        if (!(*mtrg[trg]))
+          continue;
+	incjetHistos *h = mhij[trg];
+
+	if (isMC) { 
+          for (int i = 0; i < njet; ++i) {
+            
+            if (Jet_jetId[i] < 4) continue;
+            if (Jet_jetveto[i]) continue;
+            if (pass_METfilter <= 0) continue;
+            
+            p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
+            double rec_pt = p4.Pt();
+            double rec_eta = fabs(p4.Rapidity());
+	    int iyr = int(rec_eta / 0.5);
+
+	    if (iyr < h->ny && rec_pt >= 74.0 && rec_pt < 3832.0) {
+
+              bool hasMatchJet = false;
+              int j = Jet_genJetIdx[i];
+              if (j >= 0 && j < nGenJet) {
+                p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j], GenJet_mass[j]);
+                double dR = p4g.DeltaR(p4);
+                hasMatchJet = (dR < 0.2 && p4g.Pt() > 0 && rec_pt > 0);
+              }
+                    
+              // If no match, OR fails vertex match -> Pure Fake
+              if (!hasMatchJet || !hasMatchVtx) {
+                h->hUnf_fakeNoMatch_[iyr]->Fill(rec_pt, w);
+              }
+            }
+          } // End Reco Loop
+	}
+
+        if (isMC && pass_METfilter > 0) {
+            for (int j = 0; j != nGenJet; ++j) {
+                p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j], GenJet_mass[j]);
+                double gen_pt = p4g.Pt();
+                double gen_eta = fabs(p4g.Rapidity());
+
+		int iyg = int(gen_eta / 0.5);
+
+		bool goodGen = (gen_pt >= 74.0 && gen_pt < 3832.0 && iyg < h->ny);
+
+                double dR = 999.;
+                int i = -1;
+                if (genToReco.find(j) != genToReco.end()) {
+                    i = genToReco[j];
+                    p4.SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
+                    dR = p4g.DeltaR(p4);
+                } else {
+                    p4.SetPtEtaPhiM(0, 0, 0, 0);
+                }
+
+                bool hasMatchJet = (dR < 0.2 && p4g.Pt() > 0 && p4.Pt() > 0);
+                
+                // Reco must pass Incjet JetID for the Response Matrix
+                bool passRecoID = (i >= 0 && Jet_jetId[i] >= 4 && !Jet_jetveto[i]);
+                
+                double rec_pt = p4.Pt();
+                double rec_eta = fabs(p4.Rapidity());
+              
+	        int    iyr     = (rec_pt > 0 ? int(rec_eta / 0.5) : -1);	
+	        bool goodRec = (rec_pt >= 74.0 && rec_pt < 3832.0 && iyr >= 0 && iyr < h->ny && passRecoID);	
+
+                if (hasMatchVtx && hasMatchJet) {
+                  if (goodGen) h->hUnf_gen_[iyg]->Fill(gen_pt, w);
+
+		  if (goodGen && goodRec) {
+	            h->h2yMig->Fill(iyg, iyr, w);
+		    int ig = h->hUnf_gen_[iyg]->FindBin(gen_pt);
+                    int ir = h->hRec_v2_[iyr]->FindBin(rec_pt);
+                    int Ig = iyg * h->hUnf_gen_[iyg]->GetNbinsX() + ig;
+                    int Ir = iyr * h->hRec_v2_[iyr]->GetNbinsX()  + ir;
+                    h->h2Unf_RM_glob->Fill(Ig - 0.5, Ir - 0.5, w);
+		  }
+		  else {
+                      if (goodGen) h->hUnf_missOut_[iyg]->Fill(gen_pt, w);
+                      if (goodRec) h->hUnf_fakeOut_[iyr]->Fill(rec_pt, w);
+                  }
+                }
+                else {
+                  if (goodGen) {
+                    h->hUnf_gen_[iyg]->Fill(gen_pt, w);
+                    h->hUnf_missNoMatch_[iyg]->Fill(gen_pt, w);
+                  }        
+                } // End Gen Loop
+            } // end gen loop
+	} //end met filter
+      } // End Trigger Loop
     } // doIncjet
     
 
@@ -7875,7 +8060,8 @@ if (isMG)
 
       // Inclusive jets
       if (doIncjet)
-      {
+      { 
+	
         for (int itrg = 0; itrg != ntrg; ++itrg)
         {
 
@@ -7930,11 +8116,6 @@ if (isMG)
               h->hpteta50->Fill(p4.Eta(), w);
             }
 
-	    /*
-	    if (!isMC && mlumi[trg][run] > 0){
-	      h->h2pteta_lumi->Fill(p4.Eta(), p4.Pt(), 1./mlumi[trg][run]);
-            }
-	    */
 	    if (!isMC && totalLumi > 0)
 	    {
 	      h->h2pteta_lumi->Fill(p4.Eta(), p4.Pt(), 1./totalLumi);
@@ -7963,37 +8144,12 @@ if (isMG)
 	      if (!isMC && totalLumi > 0 )
 	        h->vpt_lumi[iy]->Fill(p4.Pt(), 1./totalLumi);
 	    }
-	    // gen and reco match histograms
-	    /*
-            if (isMC)
-            {
-              incjetHistos *h = mhij["HLT_MC"];
-              for (Int_t j = 0; j != nGenJet; ++j)
-              {
-
-                p4g.SetPtEtaPhiM(GenJet_pt[j], GenJet_eta[j], GenJet_phi[j],
-                                 GenJet_mass[j]);
-                int iy = int(fabs(p4g.Rapidity()) / 0.5);
-                if (dohpt05)
-                {
-                  if (iy < h->ny)
-                    h->vpt_GenU[iy]->Fill(p4g.Pt(), w);
-                }
-              } // ngen
-            } //isMC
-            */
 
             if (doPFComposition)
             {
               double eta = p4.Eta();
               double pt = p4.Pt();
               h->p2pt->Fill(eta, pt, Jet_pt[i], w);
-	      /*
-	      if (doPU_per_trigger){
-	         get_weight(pt, eta, "doInc");
-                 h->p2rho_PURW->Fill(eta, pt, rho, w * PU_weight);
-	      }
-	      */
 	      h->p2rho->Fill(eta, pt, rho, w);
               h->p2chf->Fill(eta, pt, Jet_chHEF[i], w);
               h->p2nhf->Fill(eta, pt, Jet_neHEF[i], w);
@@ -8021,6 +8177,7 @@ if (isMG)
 
             } // dohtp05
 
+	    /*
 	    // Unfolding
 	    if (doUnfolding && !isMC) // cov matrix for DATA (2D, pT and eta)
             {
@@ -8041,12 +8198,14 @@ if (isMG)
                 h->htmp->Fill(iRec, w);
               } // Event selection
             } // doUnfolding DATA
+	    */
 
-	    if (doUnfolding && isMC) // cov matrix for MC (1D, pT)
+	    if (doUnfolding) // cov matrix for MC (1D, pT)
             {
-              if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
-                  fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax && p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.5)// 1D matrix ->fabs(p4.Eta()) < 2.0)
-              {
+              //if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax &&
+              //    fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax && p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.5)// 1D matrix ->fabs(p4.Eta()) < 2.0)
+              //{
+	      if (p4.Pt() >= 74.0 && p4.Pt() < 3832.0 && fabs(p4.Rapidity()) <= 2.5) {
                 auto iRec = h->TUrec->GetGlobalBinNumber(p4.Pt());
 
                 // Access binIDs for this trigger
@@ -8060,48 +8219,27 @@ if (isMG)
                 h->hRec->Fill(iRec, w);
                 h->htmp->Fill(iRec, w);
               } // Event selection
-            } // doUnfolding MC
+            } // doUnfolding 1D
 
 	    if (doUnfolding) {
 	      
-	      if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax && fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax &&
-	          p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.0) {
-	        // Fill the data/MC histograms: rec histos
-		auto irecbin = h->hRec_v2->FindBin(p4.Pt());
-		auto &binIDs_v2 = binIDsMap_v2[itrg];
+	      //if (p4.Pt() >= h->ptmin && p4.Pt() < h->ptmax && fabs(p4.Eta()) >= h->absetamin && fabs(p4.Eta()) < h->absetamax &&
+	        //  p4.Pt() >= 74.0 && fabs(p4.Eta()) <= 2.5) {
+              if (p4.Pt() >= 74.0 && p4.Pt() < 3832.0 && iy < h->ny) {
+		auto irecbin = h->hRec_v2_[iy]->FindBin(p4.Pt());
+		//auto &binIDs_v2 = binIDsMap_v2[itrg];
+		auto &binIDs_v2 = binIDsMap_v2[itrg * h->ny + iy];
 		if (find(binIDs_v2.begin(), binIDs_v2.end(), irecbin) == binIDs_v2.end()) 
 		  binIDs_v2.push_back(irecbin);
-                h->hRec_v2->Fill(p4.Pt(), w);
-	        h->htmp_v2->Fill(p4.Pt(), w);
+                h->hRec_v2_[iy]->Fill(p4.Pt(), w);
+	        h->htmp_v2_[iy]->Fill(p4.Pt(), w);
               }
-	        /*	
-		if (isMC)
-		{
-		  for ()
-		  {
-		    
-		  } // loop over gen jets?
-
-		  // Finally check fake rates
-                  for (int i = 0; i != njet; ++i)
-                  {
-                    bool hasMatchVtx = (fabs(PV_z - GenVtx_z) < 0.2);
-                    bool hasMatchJet = (Jet_genDR[i] < 0.2);
-                    //Unfolding
-                    if (p4.Eta() >= 2.0)
-                      continue;
-                    if (p4.Pt() < 74.0 || p4.Pt() > 3832.0)
-                      continue;
-                    if (!hasMatchJet)
-                      h->hUnf_fakeNoMatch->Fill(p4.Pt(), 1);
-                  } // for i
-	        }
-		*/
+	      
 	    } // do unfolding v2 that matches data and MC selection
 
           }   // JetID+METfilter
         }     // for itrg
-      }       // doIncJet
+      }       // doIncjet
 
 
       // Calculate type-I MET (L1L2L3-RC) and MHT
@@ -8190,20 +8328,34 @@ if (isMG)
           }
         }
 	// for the v2
+	for (int iy = 0; iy != h->ny; ++iy) {
+          auto &binIDs_v2 = binIDsMap_v2[itrg * h->ny + iy];
+          for (auto x : binIDs_v2) {
+            for (auto y : binIDs_v2) {
+              double c = h->h2cov_v2_[iy]->GetBinContent(x, y);
+              double t = h->htmp_v2_[iy]->GetBinContent(x) * h->htmp_v2_[iy]->GetBinContent(y);
+              h->h2cov_v2_[iy]->SetBinContent(x, y, c + t);
+            }
+          }
+          h->htmp_v2_[iy]->Reset();
+          binIDs_v2.clear();
+        }
+	/*
 	auto &binIDs_v2 = binIDsMap_v2[itrg];
         for (auto x : binIDs_v2) {
           for (auto y : binIDs_v2) {
-            double cCov_v2 = h->h2cov_v2->GetBinContent(x, y);
-            double cTmp_v2 = h->htmp_v2->GetBinContent(x) * h->htmp_v2->GetBinContent(y);
-            h->h2cov_v2->SetBinContent(x, y, cCov_v2 + cTmp_v2);
+            double cCov_v2 = h->h2cov_v2[iy]->GetBinContent(x, y);
+            double cTmp_v2 = h->htmp_v2[iy]->GetBinContent(x) * h->htmp_v2[iy]->GetBinContent(y);
+            h->h2cov_v2[iy]->SetBinContent(x, y, cCov_v2 + cTmp_v2);
           }
         }
+	*/
 
         // Only reset after all binIDs have been processed
         h->htmp->Reset();
-	h->htmp_v2->Reset();
+	//h->htmp_v2->Reset();
         binIDs.clear();
-        binIDs_v2.clear();	
+        //binIDs_v2.clear();	
       
       } // End Unfolding Cov matrix
     }

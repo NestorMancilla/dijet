@@ -127,6 +127,8 @@ void mk_DijetHistosFill(string dataset = "X", string version = "vX", int nFilesM
      "Summer24MG_2025_9", "Summer24MG_2025_10", "Summer24MG_2025_11",
      "Winter26MG_1", "Winter26MG_2", "Winter26MG_3", "Winter26MG_4", "Winter26MG_5", "Winter26MG_6",
      "Winter26MG_7", "Winter26MG_8", "Winter26MG_9", "Winter26MG_10", "Winter26MG_11",
+     "Summer26MG_0", "Summer26MG_1", "Summer26MG_2", "Summer26MG_3", "Summer26MG_4", "Summer26MG_5",
+     "Summer26MG_6", "Summer26MG_7", "Summer26MG_8", "Summer26MG_9", "Summer26MG_10", "Summer26MG_11",
      "Summer20UL16APVMG_1", "Summer20UL16APVMG_2", "Summer20UL16APVMG_3", "Summer20UL16APVMG_4", "Summer20UL16APVMG_5",
      "Summer20UL16APVMG_6", "Summer20UL16APVMG_7", "Summer20UL16APVMG_8", "Summer20UL16APVMG_9",
      "Summer20UL16MG_1", "Summer20UL16MG_2", "Summer20UL16MG_3", "Summer20UL16MG_4", "Summer20UL16MG_5",
