@@ -2113,6 +2113,7 @@ if (doPFComposition)
 }
 
 double Jet_l1rcFactor[nJetMax]; // For L1L2L3-RC type-I MET
+/*
 if (isRun2)
 {
 	// raw chs PF MET
@@ -2129,6 +2130,10 @@ else
 	//fChain->SetBranchStatus("MET_pt", 1);
 	//fChain->SetBranchStatus("MET_sumEt", 1);
 }
+*/
+fChain->SetBranchStatus("RawPuppiMET_pt", 1);
+fChain->SetBranchStatus("RawPuppiMET_sumEt", 1);
+fChain->SetBranchStatus("RawPuppiMET_phi", 1);
 
 if (TString(dataset.c_str()).Contains("2022") || TString(dataset.c_str()).Contains("2023") ||
     TString(dataset.c_str()).Contains("2024")){
@@ -2387,6 +2392,7 @@ if (debug)
 
 	TH1D *pileupRatio = new TH1D("puRatio", "PURatio;;Ratio", 99, 0, 100);
 
+/*
 if (dataset == "UL2016APVMG")
 {
 	jec = getFJC("Summer19UL16APV_V7_MC_L1FastJet_AK4PFchs",
@@ -2549,6 +2555,8 @@ if (dataset == "UL2018D" || dataset == "UL2018D_ZB" ||
 
 	jecl1rc = getFJC("Summer19UL18_RunD_V5_DATA_L1RC_AK4PFchs", "", "");
 }
+*/
+
 // Run2 PUPPI JECs
 //
 // 2016
@@ -3680,12 +3688,6 @@ if (TString(dataset.c_str()).Contains("2026A") || TString(dataset.c_str()).Conta
 			//"Prompt26_Run2026B_V0M_DATA_L2L3Residual_AK4PFPuppi");
 	                //"Prompt26_Run2026B_V1M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt26_Run2026B_V2M_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
-			"Prompt26_Run2026B_V1M_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
 
 }
 
@@ -3693,15 +3695,11 @@ if (TString(dataset.c_str()).Contains("2026C")) {
 
 	
         jec = getFJC("",
-                        "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+                        //"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+			"RunIII2026LowPUSummer26_PhiDependent_L2Relative_AK4PUPPI",
                         //"Prompt26_Run2026C_V1M_DATA_L2L3Residual_AK4PFPuppi");
-			"Prompt26_Run2026C_V2M_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("",
-			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
-			"Prompt26_Run2026C_V1M_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
+			//"Prompt26_Run2026C_V2M_DATA_L2L3Residual_AK4PFPuppi");
+			"Prompt26_Run2026B_V2M_DATA_L2L3Residual_AK4PFPuppi");
 
 }
 
@@ -3712,13 +3710,7 @@ if (TString(dataset.c_str()).Contains("2026D")) {
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         //"Prompt26_Run2026D_V1M_DATA_L2L3Residual_AK4PFPuppi");
 			"Prompt26_Run2026D_V2M_DATA_L2L3Residual_AK4PFPuppi");
-	/*
-	FactorizedJetCorrector *tempJEC = getFJC("", 
-			"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
-			"Prompt26_Run2026D_V1M_DATA_L2L3Residual_AK4PFPuppi");
-	jec->addJEC(tempJEC, 1, 999999);
-	*/
-
+	
 }
 
 
@@ -3755,7 +3747,8 @@ if (TString(dataset.c_str()).Contains("Summer26MG"))
 {
 
         jec = getFJC("",
-                        "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+                        //"Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
+			"RunIII2026LowPUSummer26_PhiDependent_L2Relative_AK4PUPPI",
                         "");
 
         jerpathsf = "";
@@ -3956,6 +3949,10 @@ if (isMG)
     int vnevt3_Summer26MG[nht3] = {38294220, 36672555, 41604656, 40409448, 37103032, 34757114, 42310935, 35174844, 46469716, 41678018, 39307776, 38869431};
    double vnwgt3_Summer26MG[nht3] = {1.827732256956556e+17, 4.100816885969112e+16, 1.269882315207144e+16, 6622928043824720.0, 638366979480411.0, 36340749754548.42, 6818431834910.109, 1336230520226.0413, 531925683721.82996, 210686847257.25494, 66023424431.62005, 13585552058.050997};
 
+    //Summer26MG_JME
+    int vnevt3_Summer26MG_JME[nht3] = {0, 36672555, 41547006, 40410406, 37110336, 34757114, 42310935, 35174844, 46469716, 41678018, 39307776, 38581836};
+    double vnwgt3_Summer26MG_JME[nht3] = {0.0, 4.100816885969109e+16, 1.268124022592671e+16, 6623085156667760.0, 638492754740191.0, 36340749754548.41, 6818431834910.109, 1336230520226.0408, 531925683721.83, 210686847257.2548, 66023424431.62001, 13485001415.007998};
+
     //Run2
     int* vnevt2 = nullptr;
     double* vnwgt2 = nullptr;
@@ -3978,8 +3975,13 @@ if (isMG)
         vnwgt3 = vnwgt3_Winter26MG;
     }
     else if (dsName.Contains("Summer26MG")) {
-        vnevt3 = vnevt3_Summer26MG;
-        vnwgt3 = vnwgt3_Summer26MG;
+        if (dsName.Contains("JME")){
+	  vnevt3 = vnevt3_Summer26MG_JME;
+          vnwgt3 = vnwgt3_Summer26MG_JME;
+	} else {
+	  vnevt3 = vnevt3_Summer26MG;
+          vnwgt3 = vnwgt3_Summer26MG;
+	}
     }
     else if (dsName.Contains("Summer20UL16APVMG")) {
         vnevt2 = vnevt2_Summer20UL16APVMG;

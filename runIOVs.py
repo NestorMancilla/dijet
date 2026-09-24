@@ -108,6 +108,8 @@ IOV_list= ['UL2016BCD','UL2016EF','UL2016GH',
     'Winter26MG_7', 'Winter26MG_8', 'Winter26MG_9', 'Winter26MG_10', 'Winter26MG_11',
     'Summer26MG_0', 'Summer26MG_1', 'Summer26MG_2', 'Summer26MG_3', 'Summer26MG_4', 'Summer26MG_5',
     'Summer26MG_6', 'Summer26MG_7', 'Summer26MG_8', 'Summer26MG_9', 'Summer26MG_10', 'Summer26MG_11',
+    'Summer26MG_JME_0', 'Summer26MG_JME_1', 'Summer26MG_JME_2', 'Summer26MG_JME_3', 'Summer26MG_JME_4', 'Summer26MG_JME_5',
+    'Summer26MG_JME_6', 'Summer26MG_JME_7', 'Summer26MG_JME_8', 'Summer26MG_JME_9', 'Summer26MG_JME_10', 'Summer26MG_JME_11',
     'Summer20UL16APVMG_1', 'Summer20UL16APVMG_2', 'Summer20UL16APVMG_3', 'Summer20UL16APVMG_4', 'Summer20UL16APVMG_5',
     'Summer20UL16APVMG_6', 'Summer20UL16APVMG_7', 'Summer20UL16APVMG_8', 'Summer20UL16APVMG_9',
     'Summer20UL16MG_1', 'Summer20UL16MG_2', 'Summer20UL16MG_3', 'Summer20UL16MG_4', 'Summer20UL16MG_5',
@@ -158,7 +160,7 @@ run3_DT = [x for x in IOV_list if '2023' in x or '2022' in x]
 run3_MC = [x for x in IOV_list if 'Summer22' in x]
 summer23_MC = [x for x in IOV_list if 'Summer23' in x]
 
-version = 'v174'
+version = 'v175'
 
 IOV_input = []
 
