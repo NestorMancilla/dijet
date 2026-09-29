@@ -42,8 +42,8 @@ bool redoJEC = true;
 bool doMCtrigOnly = true;
 
 // JER smearing (JER SF)
-bool smearJets = false;
-bool useJERSFvsPt = false; // new file format
+bool smearJets = true;
+bool useJERSFvsPt = true; // new file format
 int smearNMax = 3;
 std::uint32_t _seed;
 std::mt19937 _mersennetwister;
@@ -3527,12 +3527,6 @@ if (TString(dataset.c_str()).Contains("2024I"))
 				//"ReReco24_Run2024I_nib1_V9M_DATA_L2L3Residual_AK4PFPuppi");
 				//"Prompt24_Run2024I_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
 				"Prompt24_Run2024I_nib1_V11M_DATA_L2L3Residual_AK4PFPuppi");
-		/*
-		FactorizedJetCorrector *tempJEC = getFJC("",
-				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
-				"Prompt24_Run2024I_nib1_V10M_DATA_L2L3Residual_AK4PFPuppi");
-		jec->addJEC(tempJEC, 1, 999999);
-		*/
 
         } else
         {
@@ -3540,13 +3534,6 @@ if (TString(dataset.c_str()).Contains("2024I"))
                 jec = getFJC("",
                                 "RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
                                 "Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
-		/*
-		FactorizedJetCorrector *tempJEC = getFJC("",
-				"RunIII2024Summer24_V2_MC_L2Relative_AK4PUPPI",
-				"Prompt24_Run2024I_V7M_DATA_L2L3Residual_AK4PFPuppi");
-		jec->addJEC(tempJEC, 1, 999999); 
-		*/
-
         }
 }
 
@@ -3721,13 +3708,13 @@ if (TString(dataset.c_str()).Contains("Winter26MG") || TString(dataset.c_str()).
                         "Run3Winter26_PhiDependent_L2Relative_AK4PUPPI",
                         "");
 
-        jerpathsf = "";
-        //jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
-        //jersfvspt = getFJC("", "Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi", "");
-        jersfvspt = getFJC("", "", "");
-        //jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-        jerpath = "";
-        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+        //jerpathsf = "";
+        jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024_nib_JRV11M_MC_SF_AK4PFPuppi.txt";
+        jersfvspt = getFJC("", "Prompt24_2024_nib_JRV11M_MC_SF_AK4PFPuppi", "");
+        //jersfvspt = getFJC("", "", "");
+        jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+        //jerpath = "";
+        useJERSFvsPt = true; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
 
            if (reweightPU && !doPU_per_trigger)
            {
@@ -3751,13 +3738,13 @@ if (TString(dataset.c_str()).Contains("Summer26MG"))
 			"RunIII2026LowPUSummer26_PhiDependent_L2Relative_AK4PUPPI",
                         "");
 
-        jerpathsf = "";
-        //jerpathsf = "CondFormats/JetMETObjects/data/Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi.txt";
-        //jersfvspt = getFJC("", "Prompt25_2025C_JRV2M_MC_SF_AK4PFPuppi", "");
-        jersfvspt = getFJC("", "", "");
-        //jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
-        jerpath = "";
-        useJERSFvsPt = false; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
+        //jerpathsf = "";
+        jerpathsf = "CondFormats/JetMETObjects/data/Prompt24_2024_nib_JRV11M_MC_SF_AK4PFPuppi.txt";
+        jersfvspt = getFJC("", "Prompt24_2024_nib_JRV11M_MC_SF_AK4PFPuppi", "");
+        //jersfvspt = getFJC("", "", "");
+        jerpath = "CondFormats/JetMETObjects/data/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt";
+        //jerpath = "";
+        useJERSFvsPt = true; //Nestor, Sep20, 2024. True for smear and jersfvspt and jerpath not empty
 
            if (reweightPU && !doPU_per_trigger)
            {
@@ -3945,6 +3932,10 @@ if (isMG)
     int vnevt3_Winter26MG[nht3] = {0, 10119228, 8431555, 9112658, 10554984, 10065559, 10597239, 10588607, 9572261, 9889987, 8867056, 9579495};
     double vnwgt3_Winter26MG[nht3] = {0.0, 1.13170570907319e+16, 2572952522725280.0, 1493178473700920.0, 181631535021091.0, 10525172327100.0,
 	                  1707660210118.12, 402189245330.36005, 109592764959.61401, 49997724948.47508, 14896742425.454603, 3349000050.623581};
+    //Winter26MG_JME
+    int vnevt3_Winter26MG_JME[nht3] = {0, 10119228, 8431555, 9112658, 10554984, 10065559, 10597239, 10588607, 9572261, 9889987, 8867056, 9579495};
+    double vnwgt3_Winter26MG_JME[nht3] = {0.0, 1.13170570907319e+16, 2572952522725280.0, 1493178473700920.0, 181631535021091.0, 10525172327100.0, 1707660210118.12, 402189245330.36005, 109592764959.61401, 49997724948.4751, 14896742425.454603, 3349000050.6235805};
+
     //Summer26MG
     int vnevt3_Summer26MG[nht3] = {38294220, 36672555, 41604656, 40409448, 37103032, 34757114, 42310935, 35174844, 46469716, 41678018, 39307776, 38869431};
    double vnwgt3_Summer26MG[nht3] = {1.827732256956556e+17, 4.100816885969112e+16, 1.269882315207144e+16, 6622928043824720.0, 638366979480411.0, 36340749754548.42, 6818431834910.109, 1336230520226.0413, 531925683721.82996, 210686847257.25494, 66023424431.62005, 13585552058.050997};
@@ -3962,17 +3953,25 @@ if (isMG)
     double* vnwgt3 = nullptr;
     TString dsName(dataset);
 
-    if (dsName.Contains("Summer24MG_JME")) {
+    if (dsName.Contains("Summer24MG")) {
+      if(dsName.Contains("JME")) {
         vnevt3 = vnevt3_Summer24MG_JME;
         vnwgt3 = vnwgt3_Summer24MG_JME;
-    }
-    else if (dsName.Contains("Summer24MG")) {
+      }
+      else {
         vnevt3 = vnevt3_Summer24MG;
         vnwgt3 = vnwgt3_Summer24MG;
+      }
     }
     else if (dsName.Contains("Winter26MG")) {
+      if(dsName.Contains("JME")){
+        vnevt3 = vnevt3_Winter26MG_JME;
+        vnwgt3 = vnwgt3_Winter26MG_JME;
+      }
+      else {
         vnevt3 = vnevt3_Winter26MG;
         vnwgt3 = vnwgt3_Winter26MG;
+      }
     }
     else if (dsName.Contains("Summer26MG")) {
         if (dsName.Contains("JME")){
